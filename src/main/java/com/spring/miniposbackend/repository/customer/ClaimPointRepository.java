@@ -1,4 +1,4 @@
-package com.spring.miniposbackend.repository;
+package com.spring.miniposbackend.repository.customer;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

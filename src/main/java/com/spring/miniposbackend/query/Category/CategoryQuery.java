@@ -2,7 +2,7 @@ package com.spring.miniposbackend.query.Category;
 
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import com.spring.miniposbackend.model.admin.Category;
-import com.spring.miniposbackend.service.CategoryService;
+import com.spring.miniposbackend.service.admin.CategoryService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

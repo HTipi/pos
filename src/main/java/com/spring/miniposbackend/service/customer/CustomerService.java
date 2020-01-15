@@ -1,4 +1,4 @@
-package com.spring.miniposbackend.service;
+package com.spring.miniposbackend.service.customer;
 //package com.spring.miniposbackend.services;
 //
 //import org.mindrot.jbcrypt.BCrypt;

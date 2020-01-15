@@ -1,4 +1,4 @@
-package com.spring.miniposbackend.service;
+package com.spring.miniposbackend.service.admin;
 //package com.spring.miniposbackend.services;
 //
 //import com.coxautodev.graphql.tools.ResolverError;

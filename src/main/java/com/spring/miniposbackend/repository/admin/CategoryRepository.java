@@ -1,4 +1,4 @@
-package com.spring.miniposbackend.repository;
+package com.spring.miniposbackend.repository.admin;
 
 import java.util.List;
 

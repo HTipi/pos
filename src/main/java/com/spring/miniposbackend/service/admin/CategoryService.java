@@ -1,4 +1,4 @@
-package com.spring.miniposbackend.service;
+package com.spring.miniposbackend.service.admin;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.spring.miniposbackend.exception.NotFoundException;
 import com.spring.miniposbackend.model.admin.Category;
-import com.spring.miniposbackend.repository.CategoryRepository;
+import com.spring.miniposbackend.repository.admin.CategoryRepository;
 
 import java.util.List;
 

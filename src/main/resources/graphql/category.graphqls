@@ -10,7 +10,7 @@ type Mutation {
  input CategoryInput{
     name: String!,
     nameKh: String!
-    enable: Boolean
+    enable: Boolean!
 }
 
 type Category {

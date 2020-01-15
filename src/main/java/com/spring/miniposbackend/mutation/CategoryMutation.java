@@ -1,8 +1,8 @@
 package com.spring.miniposbackend.mutation;
 
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
-import com.spring.miniposbackend.models.Category;
-import com.spring.miniposbackend.services.CategoryService;
+import com.spring.miniposbackend.model.Category;
+import com.spring.miniposbackend.service.CategoryService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

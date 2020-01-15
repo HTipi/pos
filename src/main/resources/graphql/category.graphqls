@@ -1,0 +1,10 @@
+type Query {
+	categories	
+}
+
+type Category {
+    id: ID!
+    name: String!
+    name_kh: String!
+    enable: Boolean!
+}

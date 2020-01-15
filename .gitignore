@@ -1,6 +1,7 @@
-**/target/
 **/.idea
-**/.mvn
 **/.settings
 **/target
-
+.classpath
+.project
+postgres.iml
+mini-pos-backend.iml

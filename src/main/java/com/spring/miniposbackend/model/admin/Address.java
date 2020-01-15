@@ -1,4 +1,4 @@
-package com.spring.miniposbackend.model;
+package com.spring.miniposbackend.model.admin;
 
 import java.io.Serializable;
 import java.util.ArrayList;

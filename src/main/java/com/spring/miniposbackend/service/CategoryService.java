@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.spring.miniposbackend.exception.NotFoundException;
-import com.spring.miniposbackend.model.Category;
+import com.spring.miniposbackend.model.admin.Category;
 import com.spring.miniposbackend.repository.CategoryRepository;
 
 import java.util.List;

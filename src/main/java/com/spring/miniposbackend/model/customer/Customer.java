@@ -1,9 +1,11 @@
-package com.spring.miniposbackend.model;
+package com.spring.miniposbackend.model.customer;
 
 import lombok.Getter;
 import lombok.Setter;
 
 import org.hibernate.annotations.ColumnDefault;
+
+import com.spring.miniposbackend.model.AuditModel;
 
 import javax.persistence.*;
 import java.util.Date;

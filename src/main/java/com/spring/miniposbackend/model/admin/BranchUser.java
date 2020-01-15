@@ -1,4 +1,4 @@
-package com.spring.miniposbackend.model;
+package com.spring.miniposbackend.model.admin;
 
 
 import lombok.Getter;
@@ -8,6 +8,7 @@ import javax.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.spring.miniposbackend.model.AuditModel;
 
 @Entity
 @Table(name = "branchs_users")

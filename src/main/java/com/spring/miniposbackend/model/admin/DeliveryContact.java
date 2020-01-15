@@ -1,4 +1,4 @@
-package com.spring.miniposbackend.model;
+package com.spring.miniposbackend.model.admin;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -14,6 +14,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.ColumnDefault;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.spring.miniposbackend.model.AuditModel;
 
 import lombok.Getter;
 import lombok.Setter;

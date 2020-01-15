@@ -1,4 +1,4 @@
-package com.spring.miniposbackend.model;
+package com.spring.miniposbackend.model.admin;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -9,6 +9,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicUpdate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.spring.miniposbackend.model.AuditModel;
 
 import java.util.ArrayList;
 import java.util.List;

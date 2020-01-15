@@ -1,4 +1,4 @@
-package com.spring.miniposbackend.model;
+package com.spring.miniposbackend.model.admin;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.spring.miniposbackend.model.AuditModel;
 
 import javax.persistence.*;
 import java.util.ArrayList;

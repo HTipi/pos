@@ -1,13 +1,17 @@
+scalar Date
 type Query {
     categories: [Category]
     category(id: ID!): Category
+    user(id: ID!): User
+    users: [User]
 }
 
 type Mutation {
-    createCategory(input: CategoryInput): Category
+    createCategory(input: CategoryInput): Category!
+    createUser(input: UserInput): User!
 }
 
- input CategoryInput{
+input CategoryInput{
     name: String!,
     nameKh: String!
     enable: Boolean!
@@ -17,5 +21,29 @@ type Category {
     id: ID!
     name: String!
     nameKh: String!
-    enable: Boolean 
+    createdAt: Date!,
+    updatedAt: Date!,
+    enable: Boolean
+
+}
+type User {
+    id: ID!,
+    firstName: String!,
+    lastName: String!,
+    username: String!,
+    nameKh: String!,
+    telephone: String!,
+    dateOfBirth: Date!,
+    createdAt: Date,
+    updatedAt: Date!
+}
+input UserInput{
+    firstName: String!,
+    lastName: String!,
+    username: String!,
+    nameKh: String!,
+    password: String!,
+    confirmPassword: String!,
+    telephone: String!,
+    dateOfBirth: Date!,
 }

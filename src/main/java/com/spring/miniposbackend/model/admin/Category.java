@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.AuditModel;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -19,13 +20,13 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 @Data
 @DynamicUpdate
-public class Category extends AuditModel{
+public class Category extends AuditModel {
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Integer id;
@@ -35,12 +36,19 @@ public class Category extends AuditModel{
 
     @Column(name = "name_kh", nullable = false)
     private String nameKh;
-    
+
     @Column(name = "enable", nullable = false)
     @ColumnDefault("true")
     private boolean enable;
-    
+
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     @JsonIgnore
     List<Corporate> corporates = new ArrayList<Corporate>();
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+    public Date getCreatedAt() {
+        return createdAt;
+    }
 }

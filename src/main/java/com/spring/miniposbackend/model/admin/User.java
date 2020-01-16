@@ -43,7 +43,7 @@ public class User extends AuditModel{
     @Transient
     private String confirmPassword;
 
-    
+
     @Column(name = "telephone", nullable = false)
     private String telephone;
 

@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.spring.miniposbackend.model.admin.Logo;
 
 @Repository
-public interface BranchLogoRepository extends JpaRepository<Logo,Integer>{
+public interface LogoRepository extends JpaRepository<Logo,Integer>{
 
 }

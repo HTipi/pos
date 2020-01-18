@@ -22,6 +22,11 @@ public class CustomerService {
     }
 
     @Transactional(readOnly = true)
+    public List<Customer> showAll() {
+        return this.customerRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
     public Customer show(Long customerId) {
         return customerRepository.findById(customerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with id " + customerId));

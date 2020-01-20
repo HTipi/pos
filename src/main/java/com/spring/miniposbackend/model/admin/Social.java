@@ -10,7 +10,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "social")
+@Table(name = "socials")
 @EqualsAndHashCode(callSuper = false)
 @Data
 @DynamicUpdate

@@ -5,7 +5,7 @@ type Query {
     user(id: ID!): User
     users: [User]
     userRole(userRoleId: ID!): UserRole
-
+    branchUser(branchUserId: ID!): BranchUser
 }
 
 type Mutation {
@@ -15,6 +15,9 @@ type Mutation {
 
     createUserRole(userId: Int, roleId: Int, userRoleRequest: UserRoleInput): UserRole!
     updateUserRole(userId: Int, roleId: Int, userRoleRequest: UserRoleInput): UserRole!
+
+    createBranchUser(branchId: Int, userId: Int, branchUserRequest: BranchUserInput): BranchUser!
+    updateBranchUser(branchId: Int, userId: Int, branchUserRequest: BranchUserInput): BranchUser!
 
 }
 
@@ -66,6 +69,7 @@ type Branch{
     address: Address,
     corporate: Corporate,
     deliveryContacts: [DeliveryContact],
+    branchUsers: [BranchUser]
     enable: Boolean
 }
 
@@ -78,6 +82,7 @@ input UserInput{
     confirmPassword: String!,
     telephone: String!,
     dateOfBirth: Date!,
+    branchUsers: [BranchUser],
     enable: Boolean
 }
 
@@ -91,10 +96,15 @@ type User{
     confirmPassword: String!,
     telephone: String!,
     dateOfBirth: Date!,
-
+    branchUsers: [BranchUser],
     enable: Boolean
 }
 
+input BranchUserInput{
+    branchId: Int!,
+    userId: Int!,
+    enable: Boolean
+}
 
 input RoleInput{
     name: String!,

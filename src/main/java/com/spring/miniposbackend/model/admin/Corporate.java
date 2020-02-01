@@ -29,9 +29,7 @@ import lombok.Setter;
 @Getter @Setter
 public class Corporate extends AuditModel {
 
-    /**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 1L;
 
 	@Id

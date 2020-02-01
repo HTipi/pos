@@ -44,7 +44,7 @@ public class Branch extends AuditModel{
     
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "coporation_id",nullable = false)
+    @JoinColumn(name = "corporation_id",nullable = false)
     @JsonIgnore
     private Corporate corporate;
 

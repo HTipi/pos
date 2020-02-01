@@ -41,5 +41,5 @@ public class DeliveryContact extends AuditModel{
 	
 	@Column(name = "enable", nullable = false)
 	@ColumnDefault("true")
-	private boolean enabe;
+	private boolean enable;
 }

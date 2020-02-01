@@ -18,7 +18,7 @@ public class Logo {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "coporate_id")
+    @JoinColumn(name = "corporate_id")
     private Corporate corporate;
     
     @ManyToOne(fetch = FetchType.LAZY, cascade =CascadeType.ALL)

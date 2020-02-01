@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.AuditModel;
 
 @Entity
-@Table(name = "branchs_users")
+@Table(name = "branches_users")
 @Getter @Setter
 public class BranchUser extends AuditModel{
 	

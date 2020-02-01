@@ -16,12 +16,12 @@ public class BranchMutation implements GraphQLMutationResolver {
         this.branchService = branchService;
     }
 
-    public Branch createBranch(Branch data, int cop_id) {
-        return this.branchService.create(data, cop_id);
+    public Branch createBranch(int corporateId, int addressId, Branch data) {
+        return this.branchService.create(corporateId, addressId, data);
     }
 
-    public Branch updateBranch(Branch data, int cop_id) {
-        return this.branchService.update(data, cop_id);
+    public Branch updateBranch(int corporateId, int addressId, Branch data) {
+        return this.branchService.update(corporateId, addressId, data);
     }
 
     public Branch showBranch(int id) {

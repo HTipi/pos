@@ -5,6 +5,7 @@ import com.spring.miniposbackend.exception.MessageNotFound;
 import com.spring.miniposbackend.exception.NotFoundException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.model.admin.Branch;
+import com.spring.miniposbackend.repository.admin.AddressRepository;
 import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.admin.CorporateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,36 +19,59 @@ public class BranchService {
     private BranchRepository branchRepository;
     @Autowired
     private CorporateRepository corporateRepository;
+    @Autowired
+    private AddressRepository addressRepository;
 
 
-    public Branch create(Branch data, int cop_id) {
+    public Branch create(Integer corporateId, Integer addressId, Branch branchRequest) {
 
-        boolean corporate = this.corporateRepository.existsById(cop_id);
+        boolean corporate = this.corporateRepository.existsById(corporateId);
 
         if (!corporate)
-            throw new MessageNotFound("The Corporate is not found!", cop_id, "cop_id");
+            throw new MessageNotFound("The Corporate is not found!", corporateId, "corporateId");
 
-        return this.corporateRepository.findById(cop_id).map(post -> {
+        boolean address = this.addressRepository.existsById(addressId);
 
-            data.setCorporate(post);
+        if (!address)
+            throw new MessageNotFound("The Address is not found!", addressId, "addressId");
 
-            return this.branchRepository.save(data);
+        return this.corporateRepository.findById(corporateId).map(corporateData -> {
+
+            return this.addressRepository.findById(addressId).map(addressData -> {
+
+                branchRequest.setCorporate(corporateData);
+                branchRequest.setAddress(addressData);
+                return this.branchRepository.save(branchRequest);
+
+            }).orElseThrow(() -> new ResolverError("Not Found", new Throwable()));
+
         }).orElseThrow(() -> new ResolverError("Not Found", new Throwable()));
 
     }
 
-    public Branch update(Branch data, int cop_id) {
+    public Branch update(Integer corporateId, Integer addressId, Branch branchRequest) {
 
-        boolean corporate = this.corporateRepository.existsById(cop_id);
+        boolean corporate = this.corporateRepository.existsById(corporateId);
 
         if (!corporate)
-            throw new MessageNotFound("The Corporate is not found!", cop_id, "cop_id");
+            throw new MessageNotFound("The Corporate is not found!", corporateId, "corporateId");
 
-        return this.corporateRepository.findById(cop_id).map(post -> {
+        boolean address = this.addressRepository.existsById(addressId);
 
-            data.setCorporate(post);
+        if (!address)
+            throw new MessageNotFound("The Address is not found!", addressId, "addressId");
 
-            return this.branchRepository.save(data);
+
+        return this.corporateRepository.findById(corporateId).map(corporateData -> {
+
+            return this.addressRepository.findById(addressId).map(addressData -> {
+
+                branchRequest.setCorporate(corporateData);
+                branchRequest.setAddress(addressData);
+                return this.branchRepository.save(branchRequest);
+
+            }).orElseThrow(() -> new ResolverError("Not Found", new Throwable()));
+
         }).orElseThrow(() -> new ResolverError("Not Found", new Throwable()));
 
     }

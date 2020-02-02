@@ -54,7 +54,7 @@ public class SocialService {
                 .map(social -> {
                     social.setName(socialRequest.getName());
                     social.setImage(socialRequest.getImage());
-                    social.setOrder(socialRequest.getOrder());
+                    social.setSequence(socialRequest.getSequence());
                     social.setEnable(socialRequest.getEnable());
                     return socialRepository.save(social);
                 }).orElseThrow(() -> new ResourceNotFoundException("Social not found with id " + socialId));

@@ -1,7 +1,7 @@
 package com.spring.miniposbackend.service.admin;
 
-import com.coxautodev.graphql.tools.ResolverError;
-import com.spring.miniposbackend.exception.NotFoundException;
+import com.spring.miniposbackend.exception.BadRequestException;
+import com.spring.miniposbackend.exception.InternalErrorException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.model.admin.User;
 import com.spring.miniposbackend.repository.admin.UserRepository;
@@ -41,7 +41,7 @@ public class UserService {
         String pwd_confirm = user.getConfirmPassword();
 
         if (!pwd.equals(pwd_confirm))
-            throw new NotFoundException("Password not match", 0);
+            throw new BadRequestException("Password not match");
 
 //        boolean role = this.corporateRoleRepository.existsById(role_id);
 //        if (!role)
@@ -60,7 +60,7 @@ public class UserService {
         try {
             return this.userRepository.save(user);
         } catch (Exception e) {
-            throw new NotFoundException(e.getMessage(), 0);
+            throw new InternalErrorException(e.getMessage());
         }
 
 
@@ -72,7 +72,7 @@ public class UserService {
 
     public User getUser(int id) {
 
-        return this.userRepository.findById(id).orElseThrow(() -> new NotFoundException("Not Found", id));
+        return this.userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Not Found"+id));
     }
 
 

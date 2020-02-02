@@ -1,7 +1,6 @@
 package com.spring.miniposbackend.service.customer;
 
-import com.coxautodev.graphql.tools.ResolverError;
-import com.spring.miniposbackend.exception.MessageNotFound;
+import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.model.customer.ClaimPoint;
 import com.spring.miniposbackend.repository.customer.ClaimPointRepository;
 import com.spring.miniposbackend.repository.customer.CustomerPointRepository;
@@ -9,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,7 +25,7 @@ public class ClaimPointService {
         boolean point = this.claimPointRepository.existsById(id);
 
         if (!point)
-            throw new MessageNotFound("This Customer Point is not found !", id, "point_id");
+            throw new ResourceNotFoundException("This Customer Point is not found !"+ id);
 
 
         return this.claimPointRepository.findById(id);
@@ -42,12 +40,12 @@ public class ClaimPointService {
         boolean customerPoint = this.customerPointRepository.existsById(point_id);
 
         if (!customerPoint)
-            throw new MessageNotFound("This Customer Point is not found !", point_id, "point_id");
+            throw new ResourceNotFoundException("This Customer Point is not found !"+ point_id);
 
         return this.customerPointRepository.findById(point_id).map(post -> {
             data.setCustomerPoint(post);
             return this.claimPointRepository.save(data);
-        }).orElseThrow(() -> new ResolverError("Not Found", new Throwable()));
+        }).orElseThrow(() -> new ResourceNotFoundException("Not Found" + new Throwable()));
 
     }
 
@@ -56,12 +54,12 @@ public class ClaimPointService {
         boolean customerPoint = this.customerPointRepository.existsById(point_id);
 
         if (!customerPoint)
-            throw new MessageNotFound("This Customer Point is not found !", point_id, "point_id");
+            throw new ResourceNotFoundException("This Customer Point is not found !"+ point_id);
 
         return this.customerPointRepository.findById(point_id).map(post -> {
             data.setCustomerPoint(post);
             return this.claimPointRepository.save(data);
-        }).orElseThrow(() -> new ResolverError("Not Found", new Throwable()));
+        }).orElseThrow(() -> new ResourceNotFoundException("Not Found"));
 
     }
 
@@ -70,7 +68,7 @@ public class ClaimPointService {
         boolean claimPoint = this.claimPointRepository.existsById(id);
 
         if (!claimPoint)
-            throw new MessageNotFound("This Claim Point is not found !", id, "id");
+            throw new ResourceNotFoundException("This Claim Point is not found !"+ id);
 
         return this.claimPointRepository.findById(id)
                 .map(claim -> {
@@ -78,7 +76,7 @@ public class ClaimPointService {
                     claim.setEnable(true);
                     return this.claimPointRepository.save(claim);
 
-                }).orElseThrow(() -> new ResolverError("Not Found", new Throwable()));
+                }).orElseThrow(() -> new ResourceNotFoundException("Not Found"));
     }
 
     public ClaimPoint disable(int id) {
@@ -86,7 +84,7 @@ public class ClaimPointService {
         boolean claimPoint = this.claimPointRepository.existsById(id);
 
         if (!claimPoint)
-            throw new MessageNotFound("This Claim Point is not found !", id, "id");
+            throw new ResourceNotFoundException("This Claim Point is not found !" + id);
 
         return this.claimPointRepository.findById(id)
                 .map(claim -> {
@@ -94,7 +92,7 @@ public class ClaimPointService {
                     claim.setEnable(false);
                     return this.claimPointRepository.save(claim);
 
-                }).orElseThrow(() -> new ResolverError("Not Found", new Throwable()));
+                }).orElseThrow(() -> new ResourceNotFoundException("Not Found"));
     }
 
 }

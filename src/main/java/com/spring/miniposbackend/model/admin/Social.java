@@ -29,8 +29,8 @@ public class Social extends AuditModel {
     @Column(name = "image", nullable = true)
     private String image;
 
-    @Column(name = "order", nullable = false)
-    private Integer order;
+    @Column(name = "sequence", nullable = false)
+    private Integer sequence;
 
     @Column(name = "enable", nullable = false)
     @ColumnDefault("true")

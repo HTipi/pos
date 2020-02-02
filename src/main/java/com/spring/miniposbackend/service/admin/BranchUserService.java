@@ -1,8 +1,5 @@
 package com.spring.miniposbackend.service.admin;
 
-import com.coxautodev.graphql.tools.ResolverError;
-import com.spring.miniposbackend.exception.MessageNotFound;
-import com.spring.miniposbackend.exception.NotFoundException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.model.admin.BranchUser;
 import com.spring.miniposbackend.repository.admin.BranchRepository;
@@ -25,7 +22,7 @@ public class BranchUserService {
 
     public BranchUser show(Long branchUserId) {
         return this.branchUserRepository.findById(branchUserId)
-                .orElseThrow(() -> new NotFoundException("Not Found", Integer.valueOf(branchUserId.toString())));
+                .orElseThrow(() -> new ResourceNotFoundException("Not Found"));
     }
 
     public List<BranchUser> shows() {
@@ -37,12 +34,12 @@ public class BranchUserService {
         Boolean branch = this.branchRepository.existsById(branchId);
 
         if (!branch)
-            throw new MessageNotFound("The Branch is not found!", branchId, "branchId");
+            throw new ResourceNotFoundException("The Branch is not found!"+ branchId);
 
         Boolean user = this.userRepository.existsById(userId);
 
         if (!user)
-            throw new MessageNotFound("The User is not found!", userId, "userId");
+            throw new ResourceNotFoundException("The User is not found!"+userId);
 
         return this.branchRepository.findById(branchId)
                 .map(branchData -> {
@@ -54,9 +51,9 @@ public class BranchUserService {
                                 branchUserRequest.setBranch(branchData);
                                 return this.branchUserRepository.save(branchUserRequest);
 
-                            }).orElseThrow(() -> new ResolverError("Not Found", new Throwable()));
+                            }).orElseThrow(() -> new ResourceNotFoundException("Not Found"));
 
-                }).orElseThrow(() -> new ResolverError("Not Found", new Throwable()));
+                }).orElseThrow(() -> new ResourceNotFoundException("Not Found"));
 
     }
 

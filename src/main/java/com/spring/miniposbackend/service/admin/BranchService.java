@@ -1,8 +1,6 @@
 package com.spring.miniposbackend.service.admin;
 
-import com.coxautodev.graphql.tools.ResolverError;
-import com.spring.miniposbackend.exception.MessageNotFound;
-import com.spring.miniposbackend.exception.NotFoundException;
+
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.model.admin.Branch;
 import com.spring.miniposbackend.repository.admin.AddressRepository;
@@ -25,28 +23,21 @@ public class BranchService {
 
     public Branch create(Integer corporateId, Integer addressId, Branch branchRequest) {
 
-        boolean corporate = this.corporateRepository.existsById(corporateId);
+        if (!this.corporateRepository.existsById(corporateId))
+            throw new ResourceNotFoundException("The Corporate is not found!"+ corporateId);
 
-        if (!corporate)
-            throw new MessageNotFound("The Corporate is not found!", corporateId, "corporateId");
+        if (!this.addressRepository.existsById(addressId))
+            throw new ResourceNotFoundException("The Address is not found!"+addressId);
 
-        boolean address = this.addressRepository.existsById(addressId);
-
-        if (!address)
-            throw new MessageNotFound("The Address is not found!", addressId, "addressId");
-
-        return this.corporateRepository.findById(corporateId).map(corporateData -> {
-
-            return this.addressRepository.findById(addressId).map(addressData -> {
-
-                branchRequest.setCorporate(corporateData);
-                branchRequest.setAddress(addressData);
-                return this.branchRepository.save(branchRequest);
-
-            }).orElseThrow(() -> new ResolverError("Not Found", new Throwable()));
-
-        }).orElseThrow(() -> new ResolverError("Not Found", new Throwable()));
-
+        return this.corporateRepository.findById(corporateId)
+        		.map(corporate -> {
+        				return this.addressRepository.findById(addressId)
+        						.map(address -> {
+        							branchRequest.setCorporate(corporate);
+        							branchRequest.setAddress(address);
+        							return this.branchRepository.save(branchRequest);
+        						}).orElseThrow(() -> new ResourceNotFoundException("Address not foud"+addressId));
+        }).orElseThrow(() -> new ResourceNotFoundException("Not Found"));
     }
 
     public Branch update(Integer corporateId, Integer addressId, Branch branchRequest) {
@@ -54,12 +45,12 @@ public class BranchService {
         boolean corporate = this.corporateRepository.existsById(corporateId);
 
         if (!corporate)
-            throw new MessageNotFound("The Corporate is not found!", corporateId, "corporateId");
+            throw new ResourceNotFoundException("The Corporate is not found!"+ corporateId);
 
         boolean address = this.addressRepository.existsById(addressId);
 
         if (!address)
-            throw new MessageNotFound("The Address is not found!", addressId, "addressId");
+            throw new ResourceNotFoundException("The Address is not found!"+ addressId);
 
 
         return this.corporateRepository.findById(corporateId).map(corporateData -> {
@@ -70,15 +61,15 @@ public class BranchService {
                 branchRequest.setAddress(addressData);
                 return this.branchRepository.save(branchRequest);
 
-            }).orElseThrow(() -> new ResolverError("Not Found", new Throwable()));
+            }).orElseThrow(() -> new ResourceNotFoundException("Not Found"));
 
-        }).orElseThrow(() -> new ResolverError("Not Found", new Throwable()));
+        }).orElseThrow(() -> new ResourceNotFoundException("Not Found"));
 
     }
 
     public Branch show(int id) {
         return this.branchRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Not Found", id));
+                .orElseThrow(() -> new ResourceNotFoundException("Branch not found"+ id));
     }
 
     public List<Branch> show() {

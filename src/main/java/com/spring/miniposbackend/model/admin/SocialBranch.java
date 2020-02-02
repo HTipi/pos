@@ -32,13 +32,13 @@ public class SocialBranch extends AuditModel {
     @JsonIgnore
     private Social social;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
-    @JoinColumn(name = "corporate_id")
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "corporate_id", nullable = true)
     @JsonIgnore
     private Corporate corporate;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
-    @JoinColumn(name = "branch_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "branch_id", nullable = false)
     @JsonIgnore
     private Branch branch;
 

@@ -1,8 +1,5 @@
 package com.spring.miniposbackend.service.admin;
 
-import com.coxautodev.graphql.tools.ResolverError;
-import com.spring.miniposbackend.exception.CorporateNotFound;
-import com.spring.miniposbackend.exception.MessageNotFound;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.model.admin.Corporate;
 import com.spring.miniposbackend.repository.admin.CategoryRepository;
@@ -35,12 +32,12 @@ public class CorporateService {
         boolean category = this.categoryRepository.existsById(categoryId);
 
         if (!category)
-            throw new MessageNotFound("The Category Id is not found!", categoryId, "categoryId");
+            throw new ResourceNotFoundException("The Category Id is not found!"+ categoryId);
 
         return this.categoryRepository.findById(categoryId).map(post -> {
             corporate.setCategory(post);
             return this.corporateRepository.save(corporate);
-        }).orElseThrow(() -> new ResolverError("Not Found", new Throwable()));
+        }).orElseThrow(() -> new ResourceNotFoundException("Not Found"));
     }
 
     public Corporate enable(Integer coporateId) {

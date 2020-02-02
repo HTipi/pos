@@ -1,6 +1,6 @@
 package com.spring.miniposbackend.service.admin;
 
-import com.spring.miniposbackend.exception.NotFoundException;
+import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.model.admin.Address;
 import com.spring.miniposbackend.repository.admin.AddressRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ public class AddressService {
     @Transactional(readOnly = true)
     public Address show(Integer addressId) {
         return this.addressRepository.findById(addressId)
-                .orElseThrow(() -> new NotFoundException("Not Found", addressId));
+                .orElseThrow(() -> new ResourceNotFoundException("Not Found"+addressId));
     }
 
     public Address create(Address address) {
@@ -35,7 +35,7 @@ public class AddressService {
                 .map(address -> {
                     addressRequest.setId(addressId);
                     return this.addressRepository.save(addressRequest);
-                }).orElseThrow(() -> new NotFoundException("Address is not exist", addressId));
+                }).orElseThrow(() -> new ResourceNotFoundException("Address is not exist"+ addressId));
     }
 
     public Address delete(Integer addressId) {
@@ -43,7 +43,7 @@ public class AddressService {
                 .map(address -> {
                     this.addressRepository.deleteById(addressId);
                     return address;
-                }).orElseThrow(() -> new NotFoundException("Address is not exist", addressId));
+                }).orElseThrow(() -> new ResourceNotFoundException("Address is not exist"+ addressId));
     }
 
 }

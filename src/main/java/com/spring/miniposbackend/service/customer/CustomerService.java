@@ -2,7 +2,6 @@ package com.spring.miniposbackend.service.customer;
 
 import com.spring.miniposbackend.model.customer.Customer;
 import com.spring.miniposbackend.repository.customer.CustomerRepository;
-import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,7 +48,7 @@ public class CustomerService {
     }
 
     public Customer create(Customer customer) {
-        String password = BCrypt.hashpw(customer.getPassword(), BCrypt.gensalt());
+        String password = customer.getPassword();
         customer.setPassword(password);
         return customerRepository.save(customer);
     }

@@ -36,15 +36,15 @@ public class Seat extends AuditModel{
 	@Column(name = "code", nullable = false,length = 32)
     private String code;
 	
-	@Column(name = "order", nullable = false)
-    private Integer order;
+	@Column(name = "sequence", nullable = false)
+    private Integer sequence;
 	
 	@Column(name = "enable", nullable = false)
     @ColumnDefault("false")
     private boolean enable;
 	
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "branch_id", nullable = false)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
+    @JoinColumn(name = "branch_id")
     @JsonIgnore
     private Branch branch;
 }

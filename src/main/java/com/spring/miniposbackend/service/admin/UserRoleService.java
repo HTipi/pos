@@ -1,9 +1,6 @@
 package com.spring.miniposbackend.service.admin;
 
-import com.spring.miniposbackend.exception.CorporateNotFound;
-import com.spring.miniposbackend.exception.MessageNotFound;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
-import com.spring.miniposbackend.model.admin.User;
 import com.spring.miniposbackend.model.admin.UserRole;
 import com.spring.miniposbackend.repository.admin.RoleRepository;
 import com.spring.miniposbackend.repository.admin.UserRepository;
@@ -11,7 +8,6 @@ import com.spring.miniposbackend.repository.admin.UserRoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserRoleService {
@@ -37,12 +33,12 @@ public class UserRoleService {
         Boolean user = this.userRepository.existsById(userId);
 
         if (!user)
-            throw new MessageNotFound("The User is not found!", userId, "userId");
+            throw new ResourceNotFoundException("The User is not found!"+ userId);
 
         Boolean role = this.roleRepository.existsById(roleId);
 
         if (!role)
-            throw new MessageNotFound("The User is not found!", userId, "userId");
+            throw new ResourceNotFoundException("The User is not found!"+ userId);
 
         return this.userRepository.findById(userId)
                 .map(userData -> {

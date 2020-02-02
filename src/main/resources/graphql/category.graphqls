@@ -5,6 +5,7 @@ type Query {
     user(id: ID!): User
     users: [User]
     userRole(userRoleId: ID!): UserRole
+    deliveryContact(deliveryContactId: ID!): DeliveryContact
 
 }
 
@@ -15,6 +16,9 @@ type Mutation {
 
     createUserRole(userId: Int, roleId: Int, userRoleRequest: UserRoleInput): UserRole!
     updateUserRole(userId: Int, roleId: Int, userRoleRequest: UserRoleInput): UserRole!
+
+    createDeliveryContact(branchId: Int, deliveryContactRequest: DeliveryContactInput): DeliveryContact!
+    updateDeliveryContact(branchId: Int, deliveryContactRequest: DeliveryContactInput): DeliveryContact!
 
 }
 
@@ -47,6 +51,12 @@ type Corporate{
     nameKh: String!,
     category: Category,
     branches: [Branch],
+    enable: Boolean
+}
+
+input DeliveryContactInput{
+    id: ID!,
+    telephone: String!,
     enable: Boolean
 }
 
@@ -91,7 +101,6 @@ type User{
     confirmPassword: String!,
     telephone: String!,
     dateOfBirth: Date!,
-
     enable: Boolean
 }
 

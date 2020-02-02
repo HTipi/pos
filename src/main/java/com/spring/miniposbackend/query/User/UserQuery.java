@@ -16,14 +16,12 @@ public class UserQuery implements GraphQLQueryResolver {
     @Autowired
     private UserService userService;
 
-    public List<User> users()   {
-
-        return this.userService.getAllUsers();
-
-    }
-    public User user(int user_id){
-        return  this.userService.getUser(user_id);
+    public List<User> users() {
+        return this.userService.shows();
     }
 
+    public User user(int user_id) {
+        return this.userService.show(user_id);
+    }
 
 }

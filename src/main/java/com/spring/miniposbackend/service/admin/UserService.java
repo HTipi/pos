@@ -19,10 +19,7 @@ public class UserService {
     @Autowired
     private WebSecurityConfig webSecurity;
 
-//    @Value("${twilio.phone}")
-//    private String phone;
-
-    public List<User> shows(Integer userId) {
+    public List<User> shows() {
         return userRepository.findAll();
     }
 
@@ -32,28 +29,11 @@ public class UserService {
     }
 
     public User create(User user) {
-        user.setPassword(webSecurity.passwordEncoder().encode(user.getPassword()));
-        return userRepository.save(user);
-    }
-
-    public User createUser(User user) {
         String pwd = user.getPassword();
         String pwd_confirm = user.getConfirmPassword();
 
         if (!pwd.equals(pwd_confirm))
             throw new BadRequestException("Password not match");
-
-//        boolean role = this.corporateRoleRepository.existsById(role_id);
-//        if (!role)
-//            throw new NotFoundException("The Role not found", role_id);
-//        boolean unique_username = this.userRepository.existsByUser_name(user.getUser_name(), true);
-//        if (unique_username)
-//            throw new NotFoundException("The UserName is already taken", 0);
-//
-//        boolean unique_phone = this.userRepository.existsByUser_tel(user.getUser_tel(), true);
-//        if (unique_phone)
-//            throw new NotFoundException("The Phone number is already taken", 0);
-
 
         user.setPassword(webSecurity.passwordEncoder().encode(user.getPassword()));
 
@@ -74,6 +54,4 @@ public class UserService {
 
         return this.userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Not Found"+id));
     }
-
-
 }

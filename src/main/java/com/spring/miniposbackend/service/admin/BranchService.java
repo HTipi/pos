@@ -72,7 +72,7 @@ public class BranchService {
                 .orElseThrow(() -> new ResourceNotFoundException("Branch not found"+ id));
     }
 
-    public List<Branch> show() {
+    public List<Branch> shows() {
         return this.branchRepository.findAll();
     }
 

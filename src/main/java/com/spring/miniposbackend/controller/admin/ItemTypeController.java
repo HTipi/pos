@@ -24,27 +24,27 @@ public class ItemTypeController {
 	private ItemTypeService itemTypeService;
 	
 	@GetMapping
-	public List<ItemType> getItemTypes(){
+	public List<ItemType> getAll(){
 		return itemTypeService.shows();
 	}
 	
 	@GetMapping("active")
-	public List<ItemType> getActiveItemTypes(){
+	public List<ItemType> getAllActive(){
 		return itemTypeService.showActiveOnly();
 	}
 	
 	@GetMapping("{itemTypeId}")
-	public ItemType getItemType(@PathVariable Integer itemTypeId) {
+	public ItemType get(@PathVariable Integer itemTypeId) {
 		return itemTypeService.show(itemTypeId);
 	}
 	
 	@PostMapping
-	public ItemType createItemType(@RequestBody ItemType itemType) {
+	public ItemType create(@RequestBody ItemType itemType) {
 		return itemTypeService.create(itemType);
 	}
 	
 	@PutMapping("{itemTypeId}")
-	public ItemType updateItemType(@PathVariable Integer itemTypeId, @RequestBody ItemType itemType) {
+	public ItemType update(@PathVariable Integer itemTypeId, @RequestBody ItemType itemType) {
 		return itemTypeService.update(itemTypeId, itemType);
 	}
 	

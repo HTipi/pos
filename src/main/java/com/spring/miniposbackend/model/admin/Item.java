@@ -42,11 +42,14 @@ public class Item extends AuditModel{
 	@Column(name = "name_kh", nullable = false)
     private String nameKh;
 	
-	@Column(name = "image", nullable = false, length = 10, precision = 2)
+	@Column(name = "image", length = 10, precision = 2)
     private String image;
 	
 	@Column(name = "price", nullable = false, length = 10, precision = 2)
     private Float price;
+	
+	@Column(name = "discount", nullable = false,length = 3)
+    private Integer discount;
 	
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "branch_id", nullable = false)

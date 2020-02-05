@@ -58,9 +58,5 @@ public class CategoryService {
 					category.setEnable(false);
 					return categoryRepository.save(category);
 				}).orElseThrow(() -> new ResourceNotFoundException("Category is not exist" + categoryId));
-    }
-    
-    
-    
-    
+    } 
 }

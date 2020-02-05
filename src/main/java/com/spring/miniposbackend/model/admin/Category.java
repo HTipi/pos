@@ -21,9 +21,7 @@ import java.util.List;
 @Data
 @DynamicUpdate
 public class Category extends AuditModel {
-    /**
-     *
-     */
+	
     private static final long serialVersionUID = 1L;
 
     @Id

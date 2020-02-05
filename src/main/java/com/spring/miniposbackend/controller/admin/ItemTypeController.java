@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.spring.miniposbackend.model.admin.ItemType;
@@ -47,14 +48,14 @@ public class ItemTypeController {
 		return itemTypeService.update(itemTypeId, itemType);
 	}
 	
-	@PatchMapping("{itemTypeId}/enable")
-	public ItemType enableItemType(@PathVariable Integer itemTypeId) {
-		return itemTypeService.enable(itemTypeId);
-	}
-	
-	@PatchMapping("{itemTypeId}/disable")
-	public ItemType disableItemType(@PathVariable Integer itemTypeId) {
-		return itemTypeService.disable(itemTypeId);
+	@PatchMapping("{itemTypeId}")
+	public ItemType enableItemType(@PathVariable Integer itemTypeId,@RequestParam boolean enable) {
+		if(enable) {
+			return itemTypeService.enable(itemTypeId);
+		}else {
+			return itemTypeService.disable(itemTypeId);
+		}
+		
 	}
 	
 	

@@ -46,18 +46,10 @@ public class ItemTypeService {
 				}).orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
 	}
 	
-	public ItemType enable(Integer itemTypeId) {
+	public ItemType setEnable(Integer itemTypeId,boolean enable) {
         return  itemTypeRepository.findById(itemTypeId)
 				.map(itemType -> {
-					itemType.setEnable(true);
-					return itemTypeRepository.save(itemType);
-				}).orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
-    }
-    
-    public ItemType disable(Integer itemTypeId) {
-        return  itemTypeRepository.findById(itemTypeId)
-				.map(itemType -> {
-					itemType.setEnable(false);
+					itemType.setEnable(enable);
 					return itemTypeRepository.save(itemType);
 				}).orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
     }

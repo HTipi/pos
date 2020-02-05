@@ -17,7 +17,7 @@ import com.spring.miniposbackend.model.admin.ItemType;
 import com.spring.miniposbackend.service.admin.ItemTypeService;
 
 @RestController
-@RequestMapping("admin/item-type")
+@RequestMapping("item-type")
 public class ItemTypeController {
 
 	@Autowired
@@ -49,16 +49,7 @@ public class ItemTypeController {
 	}
 	
 	@PatchMapping("{itemTypeId}")
-	public ItemType enableItemType(@PathVariable Integer itemTypeId,@RequestParam boolean enable) {
-		if(enable) {
-			return itemTypeService.enable(itemTypeId);
-		}else {
-			return itemTypeService.disable(itemTypeId);
-		}
-		
+	public ItemType updateEnable(@PathVariable Integer itemTypeId,@RequestParam boolean enable) {
+		return itemTypeService.setEnable(itemTypeId, enable);
 	}
-	
-	
-	
-	
 }

@@ -80,19 +80,12 @@ public class ItemService {
     			.orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
     }
     
-    public Item enable(Long itemId) {
+    public Item setEnable(Long itemId,boolean enable) {
         return  itemRepository.findById(itemId)
 				.map(item -> {
-					item.setEnable(true);
+					item.setEnable(enable);
 					return itemRepository.save(item);
 				}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
     }
     
-    public Item disable(Long itemId) {
-        return  itemRepository.findById(itemId)
-				.map(item -> {
-					item.setEnable(false);
-					return itemRepository.save(item);
-				}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
-    }
 }

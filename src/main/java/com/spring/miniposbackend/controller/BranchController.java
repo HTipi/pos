@@ -19,7 +19,7 @@ public class BranchController {
         return this.branchService.shows();
     }
 
-    @GetMapping("/findByBranchId")
+    @GetMapping("{findBranchById}")
     public Branch show(@RequestParam Integer branchId) {
         return this.branchService.show(branchId);
     }
@@ -38,12 +38,12 @@ public class BranchController {
                 branchRequest);
     }
 
-    @GetMapping("/enableBranchById")
+    @GetMapping("enableBranchById")
     public Branch enable(@RequestParam Integer branchId) {
         return this.branchService.enable(branchId);
     }
 
-    @GetMapping("/disableBranchById")
+    @GetMapping("disableBranchById")
     public Branch disable(@RequestParam Integer branchId) {
         return this.branchService.disable(branchId);
     }

@@ -20,7 +20,7 @@ public class CategoryController {
         return this.categoryService.shows();
     }
 
-    @GetMapping("/findByCategoryId")
+    @GetMapping("/findCategoryById")
     public Category show(@RequestParam Integer categoryId) {
         return this.categoryService.show(categoryId);
     }

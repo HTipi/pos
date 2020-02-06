@@ -29,7 +29,7 @@ public class LogoService {
         return this.logoRepository.findAll();
     }
 
-    public Logo create(Logo data, int brn_id, int cop_id) {
+    public Logo create(int brn_id, int cop_id, Logo data) {
 
         Boolean branch = this.branchRepository.existsById(brn_id);
 

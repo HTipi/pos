@@ -1,4 +1,4 @@
-package com.spring.miniposbackend.controller;
+package com.spring.miniposbackend.controller.admin;
 
 import com.spring.miniposbackend.model.admin.Category;
 import com.spring.miniposbackend.repository.admin.CategoryRepository;
@@ -20,29 +20,29 @@ public class CategoryController {
         return this.categoryService.shows();
     }
 
-    @GetMapping("/findCategoryById")
-    public Category show(@RequestParam Integer categoryId) {
+    @GetMapping("active")
+    public List<Category> showAllActive(){
+        return this.categoryService.showActiveOnly();
+    }
+
+    @GetMapping("{categoryId}")
+    public Category show(@PathVariable Integer categoryId) {
         return this.categoryService.show(categoryId);
     }
 
-    @PostMapping("/createCategory")
+    @PostMapping
     public Category create(@RequestBody Category categoryRequest) {
         return this.categoryService.create(categoryRequest);
     }
 
-    @PostMapping("/updateCategory")
+    @PutMapping
     public Category update(@RequestBody Category categoryRequest) {
         return this.categoryService.update(categoryRequest.getId(), categoryRequest);
     }
 
-    @GetMapping("/enableCategoryById")
-    public Category enable(@RequestParam Integer categoryId) {
-        return this.categoryService.enable(categoryId);
-    }
-
-    @GetMapping("/disableCategoryById")
-    public Category disable(@RequestParam Integer categoryId) {
-        return this.categoryService.disable(categoryId);
+    @PatchMapping("{categoryId}")
+    public Category updateStatus(@PathVariable Integer categoryId, @RequestBody boolean status){
+        return this.categoryService.updateStatus(categoryId, status);
     }
 
 }

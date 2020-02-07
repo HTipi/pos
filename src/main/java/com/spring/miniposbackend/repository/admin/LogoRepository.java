@@ -5,6 +5,8 @@ import org.springframework.stereotype.Repository;
 
 import com.spring.miniposbackend.model.admin.Logo;
 
+import java.util.List;
+
 @Repository
 public interface LogoRepository extends JpaRepository<Logo,Integer>{
 

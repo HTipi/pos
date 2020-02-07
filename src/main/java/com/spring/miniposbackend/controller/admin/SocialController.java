@@ -1,4 +1,4 @@
-package com.spring.miniposbackend.controller;
+package com.spring.miniposbackend.controller.admin;
 
 import com.spring.miniposbackend.model.admin.Social;
 import com.spring.miniposbackend.service.admin.SocialService;
@@ -19,29 +19,29 @@ public class SocialController {
         return this.socialService.shows();
     }
 
-    @GetMapping("/findSocialById")
-    public Social show(@RequestParam Integer socialId) {
+    @GetMapping("active")
+    public List<Social> showAllActive() {
+        return this.socialService.showAllActive();
+    }
+
+    @GetMapping("{socialId}")
+    public Social show(@PathVariable Integer socialId) {
         return this.socialService.show(socialId);
     }
 
-    @PostMapping("/createSocial")
+    @PostMapping
     public Social create(@RequestBody Social socialRequest) {
         return this.socialService.create(socialRequest);
     }
 
-    @PostMapping("/updateSocial")
+    @PutMapping
     public Social update(@RequestBody Social socialRequest) {
         return this.socialService.update(socialRequest.getId(), socialRequest);
     }
 
-    @GetMapping("/enableSocialById")
-    public Social enable(@RequestParam Integer socialId) {
-        return this.socialService.enable(socialId);
-    }
-
-    @GetMapping("/disableSocialById")
-    public Social disable(@RequestParam Integer socialId) {
-        return this.socialService.enable(socialId);
+    @PatchMapping("{socialId}")
+    public Social updateStatus(@PathVariable Integer socialId, @RequestBody Boolean status) {
+        return this.socialService.updateStatus(socialId, status);
     }
 
 }

@@ -21,12 +21,16 @@ public class DeliveryContactService {
         return this.deliveryContactRepository.findAll();
     }
 
-    public DeliveryContact show(Long id) {
+    public List<DeliveryContact> showAllActive() {
+        return this.deliveryContactRepository.findAllActive();
+    }
+
+    public DeliveryContact show(Integer id) {
         return this.deliveryContactRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Delivery Contact not found with id " + id));
     }
 
-    public DeliveryContact enable(Long id) {
+    public DeliveryContact enable(Integer id) {
         return this.deliveryContactRepository.findById(id)
                 .map(deliveryContactData -> {
 
@@ -36,7 +40,7 @@ public class DeliveryContactService {
                 }).orElseThrow(() -> new ResourceNotFoundException("Delivery Contact not found with id " + id));
     }
 
-    public DeliveryContact disable(Long id) {
+    public DeliveryContact disable(Integer id) {
         return this.deliveryContactRepository.findById(id)
                 .map(deliveryContactData -> {
 
@@ -51,7 +55,7 @@ public class DeliveryContactService {
         boolean branch = this.branchRepository.existsById(branchId);
 
         if (!branch)
-            throw new ResourceNotFoundException("The Branch Id is not found!"+ branchId);
+            throw new ResourceNotFoundException("The Branch Id is not found!" + branchId);
 
         return this.branchRepository.findById(branchId)
                 .map(branchData -> {
@@ -61,6 +65,14 @@ public class DeliveryContactService {
 
                 }).orElseThrow(() -> new ResourceNotFoundException("Branch not found with id " + branchId));
 
+    }
+
+    public DeliveryContact updateStatus(Integer deliveryContactId, Boolean status) {
+        return this.deliveryContactRepository.findById(deliveryContactId)
+                .map(deliveryContact -> {
+                    deliveryContact.setEnable(status);
+                    return this.deliveryContactRepository.save(deliveryContact);
+                }).orElseThrow(() -> new ResourceNotFoundException("Branch not found with id " + deliveryContactId));
     }
 
 }

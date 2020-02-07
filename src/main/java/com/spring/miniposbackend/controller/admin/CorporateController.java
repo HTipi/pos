@@ -1,4 +1,4 @@
-package com.spring.miniposbackend.controller;
+package com.spring.miniposbackend.controller.admin;
 
 import com.spring.miniposbackend.model.admin.Branch;
 import com.spring.miniposbackend.model.admin.Corporate;
@@ -27,12 +27,17 @@ public class CorporateController {
         return this.corporateService.shows();
     }
 
-    @GetMapping("/findCorporateById")
-    public Corporate show(@RequestParam int corporateId) {
+    @GetMapping("active")
+    public List<Corporate> showAllActive(){
+        return this.corporateService.showAllActive();
+    }
+
+    @GetMapping("{corporateId}")
+    public Corporate show(@PathVariable int corporateId) {
         return this.corporateService.show(corporateId);
     }
 
-    @PostMapping("/createCorporate")
+    @PostMapping
     public Corporate create(@RequestBody Corporate corporateInput) {
 
         for (Branch branch : corporateInput.getBranches()) {
@@ -42,23 +47,19 @@ public class CorporateController {
         return corporateInput;
     }
 
-    @GetMapping("/enableCorporateById")
-    public Corporate enable(@RequestParam int corporateId) {
-        return this.corporateService.enable(corporateId);
+    @PatchMapping("{corporateId}")
+    public Corporate updateStatus(@PathVariable Integer corporateId, @RequestBody Boolean status){
+        return this.corporateService.updateStatus(corporateId,status);
     }
 
-    @GetMapping("/disableCorporateById")
-    public Corporate disable(@RequestParam int corporateId) {
-        return this.corporateService.disable(corporateId);
-    }
+//    @GetMapping("/enableCorporateById")
+//    public Corporate enable(@RequestParam int corporateId) {
+//        return this.corporateService.enable(corporateId);
+//    }
+//
+//    @GetMapping("/disableCorporateById")
+//    public Corporate disable(@RequestParam int corporateId) {
+//        return this.corporateService.disable(corporateId);
+//    }
 
 }
-
-//@Getter
-//@Setter
-//class CorporateInput {
-//    private String name;
-//    private String nameKh;
-//    private Integer categoryId;
-//    private List<Branch> branchedId;
-//}

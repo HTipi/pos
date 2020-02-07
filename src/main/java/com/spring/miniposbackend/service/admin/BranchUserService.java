@@ -1,6 +1,7 @@
 package com.spring.miniposbackend.service.admin;
 
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
+import com.spring.miniposbackend.model.admin.Branch;
 import com.spring.miniposbackend.model.admin.BranchUser;
 import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.admin.BranchUserRepository;
@@ -29,17 +30,21 @@ public class BranchUserService {
         return this.branchUserRepository.findAll();
     }
 
+    public List<BranchUser> showAllActive() {
+        return this.branchUserRepository.findAllActive();
+    }
+
     public BranchUser create(Integer branchId, Integer userId, BranchUser branchUserRequest) {
 
         Boolean branch = this.branchRepository.existsById(branchId);
 
         if (!branch)
-            throw new ResourceNotFoundException("The Branch is not found!"+ branchId);
+            throw new ResourceNotFoundException("The Branch is not found!" + branchId);
 
         Boolean user = this.userRepository.existsById(userId);
 
         if (!user)
-            throw new ResourceNotFoundException("The User is not found!"+userId);
+            throw new ResourceNotFoundException("The User is not found!" + userId);
 
         return this.branchRepository.findById(branchId)
                 .map(branchData -> {
@@ -74,6 +79,14 @@ public class BranchUserService {
                     branchUserData.setEnable(false);
                     return this.branchUserRepository.save(branchUserData);
 
+                }).orElseThrow(() -> new ResourceNotFoundException("Branch User not found with id " + branchUserId));
+    }
+
+    public BranchUser updateStatus(Long branchUserId, boolean status) {
+        return this.branchUserRepository.findById(branchUserId)
+                .map(branchUser -> {
+                    branchUser.setEnable(status);
+                    return this.branchUserRepository.save(branchUser);
                 }).orElseThrow(() -> new ResourceNotFoundException("Branch User not found with id " + branchUserId));
     }
 

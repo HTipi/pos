@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,15 +28,43 @@ public class AddressService {
     }
 
     public Address create(Address address) {
+
+        List<Address> addresses = new ArrayList<>();
+
+        if (address.getAddresses().size() > 0) {
+            for (Address a : address.getAddresses()) {
+                if (!this.addressRepository.existsById(a.getId()))
+                    throw new ResourceNotFoundException("The Address is not found!" + a.getId());
+
+                addresses.add(this.show(a.getId()));
+            }
+        }
+
+        address.setAddresses(addresses);
+
         return this.addressRepository.save(address);
     }
 
     public Address update(Integer addressId, Address addressRequest) {
+
+        List<Address> addresses = new ArrayList<>();
+
+        if (addressRequest.getAddresses().size() > 0) {
+            for (Address a : addressRequest.getAddresses()) {
+                if (!this.addressRepository.existsById(a.getId()))
+                    throw new ResourceNotFoundException("The Address is not found!" + a.getId());
+
+                addresses.add(this.show(a.getId()));
+            }
+        }
+
+        addressRequest.setAddresses(addresses);
+
         return this.addressRepository.findById(addressId)
                 .map(address -> {
                     addressRequest.setId(addressId);
                     return this.addressRepository.save(addressRequest);
-                }).orElseThrow(() -> new ResourceNotFoundException("Address is not exist"+ addressId));
+                }).orElseThrow(() -> new ResourceNotFoundException("Address is not exist" + addressId));
     }
 
     public Address delete(Integer addressId) {
@@ -43,7 +72,7 @@ public class AddressService {
                 .map(address -> {
                     this.addressRepository.deleteById(addressId);
                     return address;
-                }).orElseThrow(() -> new ResourceNotFoundException("Address is not exist"+ addressId));
+                }).orElseThrow(() -> new ResourceNotFoundException("Address is not exist" + addressId));
     }
 
 }

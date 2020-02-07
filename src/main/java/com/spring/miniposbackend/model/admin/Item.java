@@ -1,5 +1,7 @@
 package com.spring.miniposbackend.model.admin;
 
+import java.math.BigDecimal;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,6 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicUpdate;
@@ -29,7 +33,7 @@ public class Item extends AuditModel{
 	private static final long serialVersionUID = 1L;
 
 	@Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 	
@@ -39,17 +43,20 @@ public class Item extends AuditModel{
 	@Column(name = "name", nullable = false,length = 128)
     private String name;
 	
-	@Column(name = "name_kh", nullable = false)
+	@Column(name = "name_kh", nullable = false, length = 128)
     private String nameKh;
 	
-	@Column(name = "image", length = 10, precision = 2)
+	@Column(name = "image")
     private String image;
 	
-	@Column(name = "price", nullable = false, length = 10, precision = 2)
-    private Float price;
+	@Column(name = "price", nullable = false, precision = 10, scale = 2)
+    private BigDecimal price;
 	
-	@Column(name = "discount", nullable = false,length = 3)
-    private Integer discount;
+	@Column(name = "discount", nullable = false)
+	@Min(0)
+	@Max(100)
+	@ColumnDefault("0")
+    private Short discount;
 	
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "branch_id", nullable = false)

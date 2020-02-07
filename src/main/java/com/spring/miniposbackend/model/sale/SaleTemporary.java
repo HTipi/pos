@@ -1,5 +1,6 @@
 package com.spring.miniposbackend.model.sale;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.CascadeType;
@@ -12,8 +13,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 import org.hibernate.annotations.ColumnDefault;
+import org.springframework.data.annotation.CreatedDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.admin.Branch;
@@ -33,20 +39,23 @@ public class SaleTemporary {
     @Column(name = "id", nullable = false)
     private Integer id;
 	
-	@Column(name = "value_date", nullable = false)
+	@Temporal(TemporalType.TIMESTAMP)
+	@CreatedDate
+	@Column(name = "value_date", nullable = false, updatable = false)
     private Date valueDate;
 	
-	@Column(name = "price", nullable = false, length = 10, precision = 2)
-    private Float price;
+	@Column(name = "price", nullable = false, precision = 10, scale = 2)
+    private BigDecimal price;
 	
 	@Column(name = "quantity", nullable = false)
-    private Integer quantity;
+	@ColumnDefault("1")
+    private Short quantity;
 	
-	@Column(name = "discount", nullable = false, length = 10, precision = 2)
-    private Float discount;
-	
-	@Column(name = "total", nullable = false, length = 10, precision = 2)
-    private Float total;
+	@Column(name = "discount", nullable = false)
+	@Min(0)
+	@Max(100)
+	@ColumnDefault("0")
+    private Short discount;
 	
 	@Column(name = "is_printed", nullable = false)
     @ColumnDefault("false")
@@ -77,5 +86,13 @@ public class SaleTemporary {
 	
 	public String getItemNameKh() {
 		return item.getNameKh();
+	}
+	
+	public double getTotal() {
+		return price.doubleValue()*quantity-getDiscountAmount();
+	}
+	
+	public double getDiscountAmount() {
+		return Math.round(price.doubleValue()*quantity*discount/100)/100.0;
 	}
 }

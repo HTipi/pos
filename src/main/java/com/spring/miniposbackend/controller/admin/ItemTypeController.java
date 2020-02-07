@@ -48,7 +48,7 @@ public class ItemTypeController {
 		return itemTypeService.update(itemTypeId, itemType);
 	}
 	
-	@PatchMapping("{itemTypeId}")
+	@PatchMapping("{itemTypeId}/patch-enable")
 	public ItemType updateEnable(@PathVariable Integer itemTypeId,@RequestParam boolean enable) {
 		return itemTypeService.setEnable(itemTypeId, enable);
 	}

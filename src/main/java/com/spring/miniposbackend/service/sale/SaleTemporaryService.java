@@ -1,41 +1,39 @@
 package com.spring.miniposbackend.service.sale;
 
-import java.util.Map;
 import org.springframework.stereotype.Service;
 import com.spring.miniposbackend.model.sale.SaleTemporary;
 
 @Service
 public class SaleTemporaryService {
 
-	public void addItem(Map<String, Object> map) {
-		//Seat seat = S
-		
+	public void addItem(Integer branchId, Long seatId, Long itemId, Short quantity) {
+		//Seat seat, branch
 		SaleTemporary sale = new SaleTemporary();
 		sale.getSeat();
 		
 	}
 	
-	public void removeItem() {
+	public void removeItem(Long saleTempId) {
 		
 	}
 	
-	public void changeQuantity() {
+	public void changeQuantity(Long saleTempId, Short quantity) {
 		
 	}
 	
-	public void Print() {
+	public void Print(Long seatId) {
 		
 	}
 	
-	public void getBySeatId() {
+	public void getBySeatId(Long seatId) {
 		
 	}
 	
-	public void cancelBySeatId() {
+	public void cancelBySeatId(Long seatId) {
 		
 	}
 	
-	public void changeSeatId() {
+	public void changeSeatId(Long seatIdFrom, Long seatIdTo) {
 		
 	}
 	

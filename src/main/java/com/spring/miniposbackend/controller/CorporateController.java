@@ -27,7 +27,7 @@ public class CorporateController {
         return this.corporateService.shows();
     }
 
-    @GetMapping("/findByCorporateId")
+    @GetMapping("/findCorporateById")
     public Corporate show(@RequestParam int corporateId) {
         return this.corporateService.show(corporateId);
     }
@@ -40,6 +40,16 @@ public class CorporateController {
         }
 
         return corporateInput;
+    }
+
+    @GetMapping("/enableCorporateById")
+    public Corporate enable(@RequestParam int corporateId) {
+        return this.corporateService.enable(corporateId);
+    }
+
+    @GetMapping("/disableCorporateById")
+    public Corporate disable(@RequestParam int corporateId) {
+        return this.corporateService.disable(corporateId);
     }
 
 }

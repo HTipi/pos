@@ -2,6 +2,7 @@ package com.spring.miniposbackend.controller.admin;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,9 +25,13 @@ public class ItemController {
 	@Autowired
 	private ItemService itemService;
 	
-	@GetMapping("active")
-	public List<Item> getAllActive(){
-		return itemService.showActiveOnly();
+	@GetMapping
+	public List<Item> show(@RequestParam Optional<Boolean> enable){
+		if(enable.isPresent()) {
+			return itemService.shows(enable.get());
+		}else {
+			return itemService.shows();
+		}
 	}
 	
 	@GetMapping("{itemId}")

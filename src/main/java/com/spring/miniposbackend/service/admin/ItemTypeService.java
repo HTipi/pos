@@ -22,8 +22,8 @@ public class ItemTypeService {
 	}
 	
 	@Transactional(readOnly = true)
-	public List<ItemType> showActiveOnly(){
-		return itemTypeRepository.findAllActive();
+	public List<ItemType> shows(boolean enable){
+		return itemTypeRepository.findAll(enable);
 	}
 	
 	@Transactional(readOnly = true)

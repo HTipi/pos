@@ -29,6 +29,17 @@ public class ItemService {
         return itemRepository.findAll();
     }
 	
+    @Transactional(readOnly = true)
+    public List<Item> shows(boolean enable){
+        return itemRepository.findAll(enable);
+    }
+    
+    @Transactional(readOnly = true)
+    public Item show(Long itemId){
+        return itemRepository.findById(itemId)
+        		.orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
+    }
+    
 	@Transactional(readOnly = true)
     public List<Item> showByBranchId(Integer branchId, boolean enable){
 		return branchRepository.findById(branchId)
@@ -59,17 +70,6 @@ public class ItemService {
 							.orElseThrow(() -> new ResourceNotFoundException("Item Type does not exist"));
 				})
 				.orElseThrow(() -> new ResourceNotFoundException("Branch does not exist"));
-    }
-    
-    @Transactional(readOnly = true)
-    public List<Item> showActiveOnly(){
-        return itemRepository.findActive(true);
-    }
-    
-    @Transactional(readOnly = true)
-    public Item show(Long itemId){
-        return itemRepository.findById(itemId)
-        		.orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
     }
 
     @Transactional

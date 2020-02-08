@@ -37,7 +37,7 @@ public class Seat extends AuditModel{
     private String code;
 	
 	@Column(name = "sequence", nullable = false)
-    private Integer sequence;
+    private Integer sequence=1;
 	
 	@Column(name = "enable", nullable = false)
     @ColumnDefault("false")

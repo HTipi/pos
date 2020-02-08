@@ -9,7 +9,7 @@ import com.spring.miniposbackend.model.admin.Item;
 
 public interface ItemRepository extends JpaRepository<Item, Long>{
 	@Query(value = "select i from Item i where i.enable=?1")
-	List<Item> findActive(boolean enable);
+	List<Item> findAll(boolean enable);
 	
 	List<Item> findByBranchId(Integer branchId);
 	@Query(value = "select i from Item i where i.branch.id = ?1 and i.enable = ?2")

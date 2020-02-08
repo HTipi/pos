@@ -52,14 +52,4 @@ public class CorporateController {
         return this.corporateService.updateStatus(corporateId,status);
     }
 
-//    @GetMapping("/enableCorporateById")
-//    public Corporate enable(@RequestParam int corporateId) {
-//        return this.corporateService.enable(corporateId);
-//    }
-//
-//    @GetMapping("/disableCorporateById")
-//    public Corporate disable(@RequestParam int corporateId) {
-//        return this.corporateService.disable(corporateId);
-//    }
-
 }

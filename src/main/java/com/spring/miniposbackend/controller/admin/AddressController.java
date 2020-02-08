@@ -27,7 +27,7 @@ public class AddressController {
 
     @PostMapping
     public Address create(@RequestBody Address address){
-        return address;
+        return this.addressService.create(address);
     }
 
     @PutMapping("{addressId}")

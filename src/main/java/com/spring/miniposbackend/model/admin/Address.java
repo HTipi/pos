@@ -38,10 +38,10 @@ public class Address implements Serializable{
 	
 	@Column(name = "name_kh", nullable = false)
 	private String nameKh;
-	
+
 	@OneToMany(mappedBy = "address", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Address> addresses = new ArrayList<Address>();
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "parent_id", nullable = true)
 	private Address address;

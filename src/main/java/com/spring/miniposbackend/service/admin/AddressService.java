@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.constraints.Null;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,18 +30,28 @@ public class AddressService {
 
     public Address create(Address address) {
 
-        List<Address> addresses = new ArrayList<>();
+//        List<Address> addresses = new ArrayList<>();
+//
+//        if (address.getAddresses().size() > 0) {
+//            for (Address a : address.getAddresses()) {
+//                if (!this.addressRepository.existsById(a.getId()))
+//                    throw new ResourceNotFoundException("The Address is not found!" + a.getId());
+//
+//                addresses.add(this.show(a.getId()));
+//            }
+//        }
 
-        if (address.getAddresses().size() > 0) {
-            for (Address a : address.getAddresses()) {
-                if (!this.addressRepository.existsById(a.getId()))
-                    throw new ResourceNotFoundException("The Address is not found!" + a.getId());
+        if (address.getAddress() != null) {
+            this.addressRepository.findById(address.getAddress().getId())
+                    .map(address1 -> {
 
-                addresses.add(this.show(a.getId()));
-            }
+                        address.setAddress(address1);
+                        return this.addressRepository.save(address);
+
+                    }).orElseThrow(() -> new ResourceNotFoundException("Not Found" + address.getAddress().getId()));
         }
 
-        address.setAddresses(addresses);
+//        address.setAddresses(addresses);
 
         return this.addressRepository.save(address);
     }

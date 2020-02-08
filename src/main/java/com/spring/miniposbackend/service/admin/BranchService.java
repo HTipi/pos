@@ -39,29 +39,29 @@ public class BranchService {
         if (!this.addressRepository.existsById(addressId))
             throw new ResourceNotFoundException("The Address is not found!" + addressId);
 
-        List<DeliveryContact> deliveryContacts = new ArrayList<>();
+//        List<DeliveryContact> deliveryContacts = new ArrayList<>();
+//
+//        for (DeliveryContact d : branchRequest.getDeliveryContacts()) {
+//
+//            if (!this.deliveryContactRepository.existsById(d.getId()))
+//                throw new ResourceNotFoundException("The Delivery Contact is not found!" + d.getId());
+//
+//            deliveryContacts.add(this.deliveryContactService.show(d.getId()));
+//        }
 
-        for (DeliveryContact d : branchRequest.getDeliveryContacts()) {
-
-            if (!this.deliveryContactRepository.existsById(d.getId()))
-                throw new ResourceNotFoundException("The Delivery Contact is not found!" + d.getId());
-
-            deliveryContacts.add(this.deliveryContactService.show(d.getId()));
-        }
-
-        List<BranchUser> branchUsers = new ArrayList<>();
-
-        for (BranchUser b : branchRequest.getBranchUsers()) {
-
-            if (!this.branchUserRepository.existsById(b.getId()))
-                throw new ResourceNotFoundException("The Branch User is not found!" + b.getId());
-
-            branchUsers.add(this.branchUserService.show(b.getId()));
-
-        }
-
-        branchRequest.setDeliveryContacts(deliveryContacts);
-        branchRequest.setBranchUsers(branchUsers);
+//        List<BranchUser> branchUsers = new ArrayList<>();
+//
+//        for (BranchUser b : branchRequest.getBranchUsers()) {
+//
+//            if (!this.branchUserRepository.existsById(b.getId()))
+//                throw new ResourceNotFoundException("The Branch User is not found!" + b.getId());
+//
+//            branchUsers.add(this.branchUserService.show(b.getId()));
+//
+//        }
+//
+//        branchRequest.setDeliveryContacts(deliveryContacts);
+//        branchRequest.setBranchUsers(branchUsers);
 
         return this.corporateRepository.findById(corporateId)
                 .map(corporate -> {
@@ -70,7 +70,7 @@ public class BranchService {
                                 branchRequest.setCorporate(corporate);
                                 branchRequest.setAddress(address);
                                 return this.branchRepository.save(branchRequest);
-                            }).orElseThrow(() -> new ResourceNotFoundException("Address not foud" + addressId));
+                            }).orElseThrow(() -> new ResourceNotFoundException("Address not found" + addressId));
                 }).orElseThrow(() -> new ResourceNotFoundException("Not Found"));
     }
 
@@ -87,29 +87,29 @@ public class BranchService {
             throw new ResourceNotFoundException("The Address is not found!" + addressId);
 
 
-        List<DeliveryContact> deliveryContacts = new ArrayList<>();
+//        List<DeliveryContact> deliveryContacts = new ArrayList<>();
+//
+//        for (DeliveryContact d : branchRequest.getDeliveryContacts()) {
+//
+//            if (!this.deliveryContactRepository.existsById(d.getId()))
+//                throw new ResourceNotFoundException("The Delivery Contact is not found!" + d.getId());
+//
+//            deliveryContacts.add(this.deliveryContactService.show(d.getId()));
+//        }
 
-        for (DeliveryContact d : branchRequest.getDeliveryContacts()) {
-
-            if (!this.deliveryContactRepository.existsById(d.getId()))
-                throw new ResourceNotFoundException("The Delivery Contact is not found!" + d.getId());
-
-            deliveryContacts.add(this.deliveryContactService.show(d.getId()));
-        }
-
-        List<BranchUser> branchUsers = new ArrayList<>();
-
-        for (BranchUser b : branchRequest.getBranchUsers()) {
-
-            if (!this.branchUserRepository.existsById(b.getId()))
-                throw new ResourceNotFoundException("The Branch User is not found!" + b.getId());
-
-            branchUsers.add(this.branchUserService.show(b.getId()));
-
-        }
-
-        branchRequest.setDeliveryContacts(deliveryContacts);
-        branchRequest.setBranchUsers(branchUsers);
+//        List<BranchUser> branchUsers = new ArrayList<>();
+//
+//        for (BranchUser b : branchRequest.getBranchUsers()) {
+//
+//            if (!this.branchUserRepository.existsById(b.getId()))
+//                throw new ResourceNotFoundException("The Branch User is not found!" + b.getId());
+//
+//            branchUsers.add(this.branchUserService.show(b.getId()));
+//
+//        }
+//
+//        branchRequest.setDeliveryContacts(deliveryContacts);
+//        branchRequest.setBranchUsers(branchUsers);
 
 
         return this.corporateRepository.findById(corporateId).map(corporateData -> {

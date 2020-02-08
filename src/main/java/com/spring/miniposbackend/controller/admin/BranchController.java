@@ -31,7 +31,8 @@ public class BranchController {
 
     @PostMapping
     public Branch create(@RequestBody Branch branch) {
-        return this.branchService.create(branch.getCorporate().getId(), branch.getAddress().getId(), branch);
+        return branch;
+//        return this.branchService.create(branch.getCorporate().getId(), branch.getAddress().getId(), branch);
     }
 
     @PutMapping

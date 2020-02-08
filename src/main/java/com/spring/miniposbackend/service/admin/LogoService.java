@@ -22,10 +22,10 @@ public class LogoService {
 
     public Logo show(int logoId) {
         return this.logoRepository.findById(logoId)
-                .orElseThrow(() -> new ResourceNotFoundException("Not Found"+ logoId));
+                .orElseThrow(() -> new ResourceNotFoundException("Not Found" + logoId));
     }
 
-    public List<Logo> shows(){
+    public List<Logo> shows() {
         return this.logoRepository.findAll();
     }
 
@@ -34,13 +34,13 @@ public class LogoService {
         Boolean branch = this.branchRepository.existsById(brn_id);
 
         if (!branch)
-            throw new ResourceNotFoundException("The Branch is not found!"+ brn_id);
+            throw new ResourceNotFoundException("The Branch is not found!" + brn_id);
 
         Boolean corporate = this.corporateRepository.existsById(cop_id);
 
         if (!corporate)
-            throw new ResourceNotFoundException("The Corporate is not found!"+ cop_id);
-        		return this.branchRepository.findById(brn_id).map(post -> {
+            throw new ResourceNotFoundException("The Corporate is not found!" + cop_id);
+        return this.branchRepository.findById(brn_id).map(post -> {
             data.setBranch(post);
             return this.corporateRepository.findById(cop_id).map(post_cop -> {
                 data.setCorporate(post_cop);
@@ -48,6 +48,14 @@ public class LogoService {
             }).orElseThrow(() -> new ResourceNotFoundException("Not Found"));
 
         }).orElseThrow(() -> new ResourceNotFoundException("Not Found", new Throwable()));
+    }
+
+    public Logo delete(Integer logoId) {
+        return this.logoRepository.findById(logoId)
+                .map(logo -> {
+                    this.logoRepository.deleteById(logoId);
+                    return logo;
+                }).orElseThrow(() -> new ResourceNotFoundException("Not Found", new Throwable()));
     }
 
 }

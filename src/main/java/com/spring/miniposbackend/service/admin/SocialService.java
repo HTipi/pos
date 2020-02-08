@@ -20,6 +20,10 @@ public class SocialService {
         return this.socialRepository.findAll();
     }
 
+    public List<Social> showAllActive(){
+        return this.socialRepository.findAllActive();
+    }
+
     public Social show(int socialId) {
         return socialRepository.findById(socialId)
                 .orElseThrow(() -> new ResourceNotFoundException("Social not found with id" + socialId));
@@ -57,6 +61,14 @@ public class SocialService {
                     social.setSequence(socialRequest.getSequence());
                     social.setEnable(socialRequest.getEnable());
                     return socialRepository.save(social);
+                }).orElseThrow(() -> new ResourceNotFoundException("Social not found with id " + socialId));
+    }
+
+    public Social updateStatus(Integer socialId, Boolean status) {
+        return this.socialRepository.findById(socialId)
+                .map(social -> {
+                    social.setEnable(status);
+                    return this.socialRepository.save(social);
                 }).orElseThrow(() -> new ResourceNotFoundException("Social not found with id " + socialId));
     }
 

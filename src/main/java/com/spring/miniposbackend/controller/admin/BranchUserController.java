@@ -1,6 +1,7 @@
-package com.spring.miniposbackend.controller;
+package com.spring.miniposbackend.controller.admin;
 
 
+import com.spring.miniposbackend.model.admin.Branch;
 import com.spring.miniposbackend.model.admin.BranchUser;
 import com.spring.miniposbackend.service.admin.BranchUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,33 +21,43 @@ public class BranchUserController {
         return this.branchUserService.shows();
     }
 
-    @GetMapping("/findBranchUserById")
-    public BranchUser show(@RequestParam Long branchUserId) {
+    @GetMapping("active")
+    public List<BranchUser> showAllActive() {
+        return this.branchUserService.showAllActive();
+    }
+
+    @GetMapping("{branchUserId}")
+    public BranchUser show(@PathVariable Long branchUserId) {
         return this.branchUserService.show(branchUserId);
     }
 
-    @PostMapping("/createBranchUser")
+    @PostMapping
     public BranchUser createBranchUser(@RequestBody BranchUser branchUserRequest) {
         return this.branchUserService.create(branchUserRequest.getBranch().getId(),
                 branchUserRequest.getUser().getId(),
                 branchUserRequest);
     }
 
-    @PostMapping("/updateBranchUser")
+    @PutMapping
     public BranchUser updateBranchUser(@RequestBody BranchUser branchUserRequest) {
         return this.branchUserService.create(branchUserRequest.getBranch().getId(),
                 branchUserRequest.getUser().getId(),
                 branchUserRequest);
     }
 
-    @GetMapping("/enableBranchUserById")
-    public BranchUser enable(@RequestParam Long branchUserId) {
-        return this.branchUserService.enable(branchUserId);
+    @PatchMapping("{branchUserId}")
+    public BranchUser updateStatus(@PathVariable Long branchUserId, @RequestBody Boolean status) {
+        return this.branchUserService.updateStatus(branchUserId, status);
     }
 
-    @GetMapping("/disableBranchUserById")
-    public BranchUser disable(@RequestParam Long branchUserId) {
-        return this.branchUserService.disable(branchUserId);
-    }
+//    @GetMapping("/enableBranchUserById")
+//    public BranchUser enable(@RequestParam Long branchUserId) {
+//        return this.branchUserService.enable(branchUserId);
+//    }
+//
+//    @GetMapping("/disableBranchUserById")
+//    public BranchUser disable(@RequestParam Long branchUserId) {
+//        return this.branchUserService.disable(branchUserId);
+//    }
 
 }

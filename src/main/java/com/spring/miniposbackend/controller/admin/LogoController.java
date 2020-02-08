@@ -1,4 +1,4 @@
-package com.spring.miniposbackend.controller;
+package com.spring.miniposbackend.controller.admin;
 
 import com.spring.miniposbackend.model.admin.Logo;
 import com.spring.miniposbackend.service.admin.LogoService;
@@ -20,23 +20,28 @@ public class LogoController {
         return this.logoService.shows();
     }
 
-    @GetMapping("/{logoId}/findLogo")
+    @GetMapping("{logoId}")
     public Logo show(@PathVariable Integer logoId) {
         return this.logoService.show(logoId);
     }
 
-    @PostMapping("/createLogo")
+    @PostMapping
     public Logo createLogo(@RequestBody Logo logoRequest) {
         return this.logoService.create(logoRequest.getBranch().getId(),
                 logoRequest.getCorporate().getId(),
                 logoRequest);
     }
 
-    @PostMapping("/updateLogo")
-    public Logo updateLogo(@RequestBody Logo logoRequest){
+    @PutMapping
+    public Logo updateLogo(@RequestBody Logo logoRequest) {
         return this.logoService.create(logoRequest.getBranch().getId(),
                 logoRequest.getCorporate().getId(),
                 logoRequest);
+    }
+
+    @DeleteMapping("{logoId}")
+    public Logo delete(@PathVariable Integer logoId) {
+        return this.logoService.delete(logoId);
     }
 
 }

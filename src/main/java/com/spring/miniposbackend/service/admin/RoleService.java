@@ -14,13 +14,41 @@ public class RoleService {
     @Autowired
     private RoleRepository roleRepository;
 
-    public Role show(Integer roleId){
+    public Role show(Integer roleId) {
         return this.roleRepository.findById(roleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found with id " + roleId));
     }
 
-    public List<Role> shows(){
+    public List<Role> shows() {
         return this.roleRepository.findAll();
+    }
+
+    public List<Role> showAllActive() {
+        return this.roleRepository.findAllActive();
+    }
+
+    public Role create(Role role) {
+        return this.roleRepository.save(role);
+    }
+
+    public Role update(Integer roleId, Role role) {
+        return this.roleRepository.findById(roleId)
+                .map(roleData -> {
+
+                    roleData.setName(role.getName());
+                    roleData.setNameKh(role.getNameKh());
+
+                    return this.roleRepository.save(roleData);
+
+                }).orElseThrow(() -> new ResourceNotFoundException("Role not found with id " + roleId));
+    }
+
+    public Role updateStatus(Integer roleId, Boolean status) {
+        return this.roleRepository.findById(roleId)
+                .map(role -> {
+                    role.setEnable(status);
+                    return this.roleRepository.save(role);
+                }).orElseThrow(() -> new ResourceNotFoundException("Role not found with id " + roleId));
     }
 
 }

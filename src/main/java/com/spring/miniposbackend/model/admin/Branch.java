@@ -41,7 +41,6 @@ public class Branch extends AuditModel{
     @JoinColumn(name = "address_id", referencedColumnName = "id", nullable = false)
     @JsonIgnore
     private Address address;
-    
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "corporation_id",nullable = false)

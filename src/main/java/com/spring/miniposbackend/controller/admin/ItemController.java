@@ -39,7 +39,7 @@ public class ItemController {
 		return itemService.showByBranchId(branchId,true);
 	}
 	@GetMapping("by-type")
-	public List<Item> getByItem(@RequestParam Integer itemTypeId){
+	public List<Item> getByItemType(@RequestParam Integer itemTypeId){
 		return itemService.showByItemTypeId(itemTypeId,true);
 	}
 	

@@ -24,11 +24,6 @@ public class ItemController {
 	@Autowired
 	private ItemService itemService;
 	
-	@GetMapping("test")
-	public Short test() {
-		return new Item().getDiscount();
-	}
-	
 	@GetMapping("active")
 	public List<Item> getAllActive(){
 		return itemService.showActiveOnly();

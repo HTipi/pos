@@ -19,12 +19,12 @@ public class BranchController {
         return this.branchService.shows();
     }
 
-    @GetMapping("{findBranchById}")
-    public Branch show(@RequestParam Integer branchId) {
+    @GetMapping("{branchId}")
+    public Branch show(@PathVariable Integer branchId) {
         return this.branchService.show(branchId);
     }
 
-    @PostMapping("/createBranch")
+    @PostMapping
     public Branch create(@RequestBody Branch branchRequest) {
         return this.branchService.create(branchRequest.getCorporate().getId(),
                 branchRequest.getAddress().getId(),

@@ -33,16 +33,17 @@ public class ItemService {
     public List<Item> showByBranchId(Integer branchId, boolean enable){
 		return branchRepository.findById(branchId)
 				.map(branch -> {
-					return itemRepository.findByBranchId(branch, enable);
+					return itemRepository.findByBranchId(branchId, enable);
 				})
 				.orElseThrow(() -> new ResourceNotFoundException("Branch does not exist"));
+		
     }
 	
 	@Transactional(readOnly = true)
     public List<Item> showByItemTypeId(Integer itemTypeId, boolean enable){
 		return itemTypeRepository.findById(itemTypeId)
 				.map(itemType -> {
-					return itemRepository.findByItemTypeId(itemType, enable);
+					return itemRepository.findByItemTypeId(itemTypeId, enable);
 				})
 				.orElseThrow(() -> new ResourceNotFoundException("Item Type does not exist"));
 	}
@@ -53,7 +54,7 @@ public class ItemService {
 				.map(branch -> {
 					return itemTypeRepository.findById(itemTypeId)
 							.map(itemType -> {
-								return itemRepository.findByBranchItemTypeId(branch, itemType, enable);
+								return itemRepository.findByBranchItemTypeId(branchId, itemTypeId, enable);
 							})
 							.orElseThrow(() -> new ResourceNotFoundException("Item Type does not exist"));
 				})

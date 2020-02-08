@@ -13,16 +13,12 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
 import org.hibernate.annotations.ColumnDefault;
-import org.springframework.data.annotation.CreatedDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.spring.miniposbackend.model.admin.Branch;
 import com.spring.miniposbackend.model.admin.Item;
 import com.spring.miniposbackend.model.admin.Seat;
 
@@ -35,12 +31,10 @@ import lombok.Setter;
 public class SaleTemporary {
 
 	@Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
 	
-	@Temporal(TemporalType.TIMESTAMP)
-	@CreatedDate
 	@Column(name = "value_date", nullable = false, updatable = false)
     private Date valueDate;
 	
@@ -60,11 +54,6 @@ public class SaleTemporary {
 	@Column(name = "is_printed", nullable = false)
     @ColumnDefault("false")
     private boolean isPrinted;
-	
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "branch_id", nullable = false)
-    @JsonIgnore
-    private Branch branch;
 	
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "seat_id", nullable = false)

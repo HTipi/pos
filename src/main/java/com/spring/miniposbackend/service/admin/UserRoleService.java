@@ -23,6 +23,10 @@ public class UserRoleService {
         return this.userRoleRepository.findAll();
     }
 
+    public List<UserRole> showAllActive() {
+        return this.userRoleRepository.findAllActive();
+    }
+
     public UserRole show(Long userRoleId) {
         return this.userRoleRepository.findById(userRoleId)
                 .orElseThrow(() -> new ResourceNotFoundException("User Role not found with id " + userRoleId));
@@ -30,29 +34,53 @@ public class UserRoleService {
 
     public UserRole create(Integer userId, Integer roleId, UserRole userRole) {
 
-        Boolean user = this.userRepository.existsById(userId);
+        if (!this.userRepository.existsById(userId))
+            throw new ResourceNotFoundException("The User is not found!" + userId);
 
-        if (!user)
-            throw new ResourceNotFoundException("The User is not found!"+ userId);
 
-        Boolean role = this.roleRepository.existsById(roleId);
+        if (!this.roleRepository.existsById(roleId))
+            throw new ResourceNotFoundException("The User is not found!" + userId);
 
-        if (!role)
-            throw new ResourceNotFoundException("The User is not found!"+ userId);
+        if (!this.userRepository.existsById(userId))
+            throw new ResourceNotFoundException("The User is not found!" + userId);
 
-        return this.userRepository.findById(userId)
-                .map(userData -> {
+        return this.userRoleRepository.save(userRole);
 
-                    return this.roleRepository.findById(roleId)
-                            .map(roleData -> {
+    }
 
-                                userRole.setUser(userData);
-                                userRole.setRole(roleData);
-                                return this.userRoleRepository.save(userRole);
+    public UserRole update(Long userRoleId, Integer userId, Integer roleId, UserRole userRole) {
 
-                            }).orElseThrow(() -> new ResourceNotFoundException("Role Id not found with id " + roleId));
+        if (!this.userRepository.existsById(userId))
+            throw new ResourceNotFoundException("The User is not found!" + userId);
 
-                }).orElseThrow(() -> new ResourceNotFoundException("User not found with id " + userId));
+
+        if (!this.roleRepository.existsById(roleId))
+            throw new ResourceNotFoundException("The User is not found!" + userId);
+
+
+        if (!this.userRepository.existsById(userId))
+            throw new ResourceNotFoundException("The User is not found!" + userId);
+
+        return this.userRoleRepository.findById(userRoleId)
+                .map(userRoleData -> {
+
+                    userRoleData.setRole(userRole.getRole());
+                    userRoleData.setUser(userRole.getUser());
+
+                    return this.userRoleRepository.save(userRoleData);
+                }).orElseThrow(() -> new ResourceNotFoundException("User Role not found with id " + userRoleId));
+
+    }
+
+    public UserRole updateStatus(Long userRoleId, Boolean status) {
+        return this.userRoleRepository.findById(userRoleId)
+                .map(userRole -> {
+
+                    userRole.setEnable(status);
+
+                    return this.userRoleRepository.save(userRole);
+
+                }).orElseThrow(() -> new ResourceNotFoundException("User Role not found with id " + userRoleId));
     }
 
     public UserRole enable(Long userRoleId) {

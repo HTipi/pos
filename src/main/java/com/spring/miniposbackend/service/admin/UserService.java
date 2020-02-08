@@ -23,12 +23,17 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    public List<User> showAllActive() {
+        return this.userRepository.findAllActive();
+    }
+
     public User show(Integer userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id:" + userId));
     }
 
     public User create(User user) {
+
         String pwd = user.getPassword();
         String pwd_confirm = user.getConfirmPassword();
 
@@ -43,15 +48,50 @@ public class UserService {
             throw new InternalErrorException(e.getMessage());
         }
 
+    }
+
+    public User update(Integer userId, User user) {
+
+        String pwd = user.getPassword();
+        String pwd_confirm = user.getConfirmPassword();
+
+        if (!pwd.equals(pwd_confirm))
+            throw new BadRequestException("Password not match");
+
+        user.setPassword(webSecurity.passwordEncoder().encode(user.getPassword()));
+
+        try {
+
+            return this.userRepository.findById(userId)
+                    .map(userData -> {
+
+                        userData.setFirstName(user.getFirstName());
+                        userData.setLastName(user.getLastName());
+                        userData.setUsername(user.getUsername());
+                        userData.setNameKh(user.getNameKh());
+                        userData.setPassword(user.getPassword());
+                        userData.setTelephone(user.getTelephone());
+                        userData.setDateOfBirth(user.getDateOfBirth());
+
+                        return this.userRepository.save(userData);
+
+                    }).orElseThrow(() -> new ResourceNotFoundException("User not found with id:" + userId));
+
+
+        } catch (Exception e) {
+            throw new InternalErrorException(e.getMessage());
+        }
 
     }
 
-    public List<User> getAllUsers() {
-        return this.userRepository.findAll();
+    public User updateStatus(Integer userId, Boolean status) {
+
+        return this.userRepository.findById(userId)
+                .map(user -> {
+                    user.setEnable(status);
+                    return this.userRepository.save(user);
+                }).orElseThrow(() -> new ResourceNotFoundException("User not found with id:" + userId));
+
     }
 
-    public User getUser(int id) {
-
-        return this.userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Not Found"+id));
-    }
 }

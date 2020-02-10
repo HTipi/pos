@@ -1,6 +1,13 @@
 package com.spring.miniposbackend.controller.sale;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,8 +23,24 @@ public class SaleTemporaryController {
 	@Autowired
 	private SaleTemporaryService saleService;
 	
+	@GetMapping("by-seat")
+	public List<SaleTemporary> getBySeatId(@RequestParam Integer seatId, @RequestParam Optional<Boolean> isPrinted,@RequestParam Optional<Boolean> cancel){
+		return saleService.showBySeatId(seatId, isPrinted,cancel);
+	}
+	
 	@PostMapping
-	public SaleTemporary create(@RequestParam Long seatId, @RequestParam Long itemId, @RequestParam Short quantity) {
+	public SaleTemporary create(@RequestParam Integer seatId, @RequestParam Integer itemId, @RequestParam Short quantity) {
 		return saleService.addItem(seatId, itemId, quantity);
 	}
+	
+	@DeleteMapping("{saleTempId}")
+	public SaleTemporary remove(@PathVariable Long saleTempId){
+		return saleService.removeItem(saleTempId);
+	}
+	
+	@PatchMapping("{saleTempId}")
+	public SaleTemporary updateQuantity(@PathVariable Long saleTempId, @RequestParam Short quantity) {
+		return saleService.setQuantity(saleTempId, quantity);
+	}
+	
 }

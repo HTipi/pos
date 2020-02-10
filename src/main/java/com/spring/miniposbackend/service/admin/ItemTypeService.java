@@ -23,7 +23,7 @@ public class ItemTypeService {
 	
 	@Transactional(readOnly = true)
 	public List<ItemType> shows(boolean enable){
-		return itemTypeRepository.findAll(enable);
+		return itemTypeRepository.findAllWithEnable(enable);
 	}
 	
 	@Transactional(readOnly = true)

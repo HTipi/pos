@@ -35,7 +35,7 @@ public class ItemController {
 	}
 	
 	@GetMapping("{itemId}")
-	public Item get(@PathVariable Long itemId) {
+	public Item get(@PathVariable Integer itemId) {
 		return itemService.show(itemId);
 	}
 	
@@ -59,22 +59,22 @@ public class ItemController {
 	}
 	
 	@PutMapping("{itemId}")
-	public Item update(@PathVariable Long itemId,@RequestParam Integer branchId,@RequestParam Integer itemTypeId,@RequestBody Item item) {
+	public Item update(@PathVariable Integer itemId,@RequestParam Integer branchId,@RequestParam Integer itemTypeId,@RequestBody Item item) {
 		return itemService.update(itemId, branchId, itemTypeId, item);
 	}
 	
 	@PatchMapping("{itemId}/patch-price")
-	public Item updatePrice(@PathVariable Long itemId,@RequestParam BigDecimal price) {
+	public Item updatePrice(@PathVariable Integer itemId,@RequestParam BigDecimal price) {
 		return itemService.setPrice(itemId, price);
 	}
 
 	@PatchMapping("{itemId}/patch-discount")
-	public Item updateDiscount(@PathVariable Long itemId,@RequestParam Short discount) {
+	public Item updateDiscount(@PathVariable Integer itemId,@RequestParam Short discount) {
 		return itemService.setDiscount(itemId, discount);
 	}
 
 	@PatchMapping("{itemId}/patch-enable")
-	public Item updateEnable(@PathVariable Long itemId,@RequestParam boolean enable) {
+	public Item updateEnable(@PathVariable Integer itemId,@RequestParam boolean enable) {
 		return itemService.setEnable(itemId, enable);
 	}
 

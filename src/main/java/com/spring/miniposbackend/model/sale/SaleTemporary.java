@@ -33,7 +33,7 @@ public class SaleTemporary {
 	@Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Integer id;
+    private Long id;
 	
 	@Column(name = "value_date", nullable = false, updatable = false)
     private Date valueDate;
@@ -55,6 +55,10 @@ public class SaleTemporary {
     @ColumnDefault("false")
     private boolean isPrinted;
 	
+	@Column(name = "cancel", nullable = false)
+    @ColumnDefault("false")
+    private boolean cancel;
+	
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "seat_id", nullable = false)
     @JsonIgnore
@@ -73,15 +77,14 @@ public class SaleTemporary {
 		return item.getName();
 	}
 	
-	public String getItemNameKh() {
-		return item.getNameKh();
-	}
-	
-	public double getTotal() {
-		return price.doubleValue()*quantity-getDiscountAmount();
-	}
-	
 	public double getDiscountAmount() {
-		return Math.round(price.doubleValue()*quantity*discount/100)/100.0;
+		return Math.round(price.doubleValue()*quantity*discount/100*100)/100.0;
+	}
+	
+	public double getSubTotal() {
+		return Math.round(price.doubleValue()*quantity*100)/100.0;
+	}
+	public double getTotal() {
+		return getSubTotal()-getDiscountAmount();
 	}
 }

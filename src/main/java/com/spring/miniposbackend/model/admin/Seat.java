@@ -31,7 +31,7 @@ public class Seat extends AuditModel{
 	@Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private Integer id;
 	
 	@Column(name = "code", nullable = false,length = 32)
     private String code;

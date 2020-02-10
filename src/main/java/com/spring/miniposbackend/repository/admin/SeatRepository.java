@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.spring.miniposbackend.model.admin.Seat;
 
-public interface SeatRepository extends JpaRepository<Seat, Long>{
+public interface SeatRepository extends JpaRepository<Seat, Integer>{
 
 	@Query(value = "select s from Seat s where s.enable=?1")
 	List<Seat> findAll(boolean enable);

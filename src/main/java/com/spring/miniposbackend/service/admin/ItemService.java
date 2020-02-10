@@ -31,11 +31,11 @@ public class ItemService {
 	
     @Transactional(readOnly = true)
     public List<Item> shows(boolean enable){
-        return itemRepository.findAll(enable);
+        return itemRepository.findAllWithEnable(enable);
     }
     
     @Transactional(readOnly = true)
-    public Item show(Long itemId){
+    public Item show(Integer itemId){
         return itemRepository.findById(itemId)
         		.orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
     }
@@ -44,7 +44,7 @@ public class ItemService {
     public List<Item> showByBranchId(Integer branchId, boolean enable){
 		return branchRepository.findById(branchId)
 				.map(branch -> {
-					return itemRepository.findByBranchId(branchId, enable);
+					return itemRepository.findByBranchIdWithEnable(branchId, enable);
 				})
 				.orElseThrow(() -> new ResourceNotFoundException("Branch does not exist"));
 		
@@ -54,7 +54,7 @@ public class ItemService {
     public List<Item> showByItemTypeId(Integer itemTypeId, boolean enable){
 		return itemTypeRepository.findById(itemTypeId)
 				.map(itemType -> {
-					return itemRepository.findByItemTypeId(itemTypeId, enable);
+					return itemRepository.findByItemTypeIdWithEnable(itemTypeId, enable);
 				})
 				.orElseThrow(() -> new ResourceNotFoundException("Item Type does not exist"));
 	}
@@ -65,7 +65,7 @@ public class ItemService {
 				.map(branch -> {
 					return itemTypeRepository.findById(itemTypeId)
 							.map(itemType -> {
-								return itemRepository.findByBranchItemTypeId(branchId, itemTypeId, enable);
+								return itemRepository.findByBranchItemTypeIdWithEnable(branchId, itemTypeId, enable);
 							})
 							.orElseThrow(() -> new ResourceNotFoundException("Item Type does not exist"));
 				})
@@ -93,7 +93,7 @@ public class ItemService {
     }
     
     @Transactional
-    public Item update(Long itemId,Integer branchId, Integer itemTypeId,Item requestItem) {
+    public Item update(Integer itemId,Integer branchId, Integer itemTypeId,Item requestItem) {
     	return branchRepository.findById(branchId)
         		.map(branch -> {
         			return itemTypeRepository.findById(itemTypeId)
@@ -123,7 +123,7 @@ public class ItemService {
     }
     
     @Transactional
-    public Item setPrice(Long itemId, BigDecimal price) {
+    public Item setPrice(Integer itemId, BigDecimal price) {
     	return itemRepository.findById(itemId)
     			.map(item -> {
     				item.setPrice(price);
@@ -137,7 +137,7 @@ public class ItemService {
     }
     
     @Transactional
-    public Item setDiscount(Long itemId, Short discount) {
+    public Item setDiscount(Integer itemId, Short discount) {
     	return itemRepository.findById(itemId)
     			.map(item -> {
     				item.setDiscount(discount);
@@ -151,7 +151,7 @@ public class ItemService {
     }
     
     @Transactional
-    public Item setEnable(Long itemId,boolean enable) {
+    public Item setEnable(Integer itemId,boolean enable) {
         return  itemRepository.findById(itemId)
 				.map(item -> {
 					item.setEnable(enable);

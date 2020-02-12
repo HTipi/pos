@@ -35,20 +35,3 @@ public class UserRole extends AuditModel {
 	@Column(name = "enable", nullable = false, columnDefinition = "boolean default true")
 	private boolean enable;
 }
-
-
-//@Embeddable
-//class UserRoleId implements Serializable{
-//	
-//	private static final long serialVersionUID = 1L;
-//
-//	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-//    @JoinColumn(name = "user_id",nullable = false)
-//    @JsonIgnore
-//    private User user;
-//	
-//	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-//    @JoinColumn(name = "role_id",nullable = false)
-//    @JsonIgnore
-//    private Role role;
-//}

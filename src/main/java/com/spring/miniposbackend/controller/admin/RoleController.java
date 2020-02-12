@@ -29,8 +29,8 @@ public class RoleController {
         return this.roleService.create(role);
     }
 
-    @PutMapping("{roleId}")
-    public Role update(@PathVariable Integer roleId, @RequestBody Role role) {
+    @PutMapping
+    public Role update(@RequestParam Integer roleId, @RequestBody Role role) {
         return this.roleService.update(roleId, role);
     }
 

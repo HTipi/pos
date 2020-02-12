@@ -35,8 +35,8 @@ public class SocialController {
     }
 
     @PutMapping
-    public Social update(@RequestBody Social socialRequest) {
-        return this.socialService.update(socialRequest.getId(), socialRequest);
+    public Social update(@RequestParam Integer socialId, @RequestBody Social socialRequest) {
+        return this.socialService.update(socialId, socialRequest);
     }
 
     @PatchMapping("{socialId}")

@@ -13,4 +13,6 @@ import java.util.List;
 public interface UserRoleRepository extends JpaRepository<UserRole,Long> {
     @Query(value = "select ur from UserRole ur where ur.enable=true")
     List<UserRole> findAllActive();
+    @Query(value = "select ur from UserRole ur where ur.enable=true and ur.user.id = ?1")
+    List<UserRole> findAllByUserId(Long userId);
 }

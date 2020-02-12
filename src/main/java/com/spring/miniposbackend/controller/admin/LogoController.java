@@ -26,17 +26,24 @@ public class LogoController {
     }
 
     @PostMapping
-    public Logo createLogo(@RequestBody Logo logoRequest) {
-        return this.logoService.create(logoRequest.getBranch().getId(),
-                logoRequest.getCorporate().getId(),
+    public Logo createLogo(@RequestParam Integer corporateId,
+                           @RequestParam Integer branchId,
+                           @RequestBody Logo logoRequest) {
+
+        return this.logoService.create(corporateId,
+                branchId,
                 logoRequest);
+
     }
 
     @PutMapping
-    public Logo updateLogo(@RequestBody Logo logoRequest) {
-        return this.logoService.create(logoRequest.getBranch().getId(),
-                logoRequest.getCorporate().getId(),
-                logoRequest);
+    public Logo updateLogo(@RequestParam Integer logoId,
+                           @RequestParam Integer corporateId,
+                           @RequestParam Integer branchId,
+                           @RequestBody Logo logoRequest) {
+
+        return this.logoService.update(logoId, corporateId, branchId, logoRequest);
+
     }
 
     @DeleteMapping("{logoId}")

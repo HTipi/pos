@@ -15,6 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -39,6 +40,7 @@ public class Address implements Serializable{
 	@Column(name = "name_kh", nullable = false)
 	private String nameKh;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "address", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Address> addresses = new ArrayList<Address>();
 

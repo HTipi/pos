@@ -30,8 +30,8 @@ public class UserController {
         return this.userService.create(user);
     }
 
-    @PutMapping("{userId}")
-    public User update(@PathVariable Integer userId, @RequestBody User user) {
+    @PutMapping
+    public User update(@RequestParam Integer userId, @RequestBody User user) {
         return this.userService.update(userId, user);
     }
 

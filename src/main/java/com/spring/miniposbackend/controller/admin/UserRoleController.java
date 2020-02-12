@@ -16,27 +16,27 @@ public class UserRoleController {
     private UserRoleService userRoleService;
 
     @GetMapping
-    public List<UserRole> shows(){
+    public List<UserRole> shows() {
         return this.userRoleService.shows();
     }
 
     @GetMapping("active")
-    public List<UserRole> showAllActive(){
+    public List<UserRole> showAllActive() {
         return this.userRoleService.showAllActive();
     }
 
     @PostMapping
-    public UserRole create(@RequestBody UserRole userRole){
-        return this.userRoleService.create(userRole.getUser().getId(), userRole.getRole().getId(), userRole);
+    public UserRole create(@RequestParam Integer userId, @RequestParam Integer roleId, @RequestBody UserRole userRole) {
+        return this.userRoleService.create(userId, roleId, userRole);
     }
 
-    @PutMapping("{userRoleId}")
-    public UserRole update(@PathVariable Long userRoleId, @RequestBody UserRole userRole){
-        return this.userRoleService.update(userRoleId,userRole.getUser().getId(), userRole.getRole().getId(), userRole);
+    @PutMapping
+    public UserRole update(@RequestParam Long userRoleId, @RequestParam Integer userId, @RequestParam Integer roleId, @RequestBody UserRole userRole) {
+        return this.userRoleService.update(userRoleId, userId, roleId, userRole);
     }
 
     @PatchMapping("{userRoleId}")
-    public UserRole updateStatus(@PathVariable Long userRoleId, @RequestBody Boolean status){
+    public UserRole updateStatus(@PathVariable Long userRoleId, @RequestBody Boolean status) {
         return this.userRoleService.updateStatus(userRoleId, status);
     }
 }

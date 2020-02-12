@@ -25,15 +25,19 @@ public class AddressController {
         return this.addressService.show(addressId);
     }
 
+    @GetMapping("{parentId}")
+    public List<Address> getAddressByParentId(@PathVariable Integer parentId) {
+        return this.addressService.showsByPartnerId(parentId);
+    }
+
     @PostMapping
-    public Address create(@RequestBody Address address){
-        return this.addressService.create(address);
+    public Address create(@RequestParam Integer parentId, @RequestBody Address address) {
+        return this.addressService.create(parentId, address);
     }
 
-    @PutMapping("{addressId}")
-    public Address update(@PathVariable Integer addressId, @RequestBody Address address){
-        return this.addressService.update(addressId, address);
+    @PutMapping
+    public Address update(@RequestParam Integer addressId, @RequestParam Integer parentId, @RequestBody Address address) {
+        return this.addressService.update(addressId, parentId, address);
     }
-
 
 }

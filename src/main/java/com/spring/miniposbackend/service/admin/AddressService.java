@@ -25,57 +25,63 @@ public class AddressService {
     @Transactional(readOnly = true)
     public Address show(Integer addressId) {
         return this.addressRepository.findById(addressId)
-                .orElseThrow(() -> new ResourceNotFoundException("Not Found"+addressId));
+                .orElseThrow(() -> new ResourceNotFoundException("Not Found" + addressId));
     }
 
-    public Address create(Address address) {
+    public List<Address> showsByPartnerId(Integer parentId) {
+        return this.addressRepository.findAllAddressByParentId(parentId);
+    }
 
-//        List<Address> addresses = new ArrayList<>();
-//
-//        if (address.getAddresses().size() > 0) {
-//            for (Address a : address.getAddresses()) {
-//                if (!this.addressRepository.existsById(a.getId()))
-//                    throw new ResourceNotFoundException("The Address is not found!" + a.getId());
-//
-//                addresses.add(this.show(a.getId()));
-//            }
-//        }
+    public Address create(Integer parentId, Address addressRequest) {
 
-        if (address.getAddress() != null) {
-            this.addressRepository.findById(address.getAddress().getId())
-                    .map(address1 -> {
+        if (parentId > 0) {
+            return this.addressRepository.findById(parentId)
+                    .map(partnerAddress -> {
+                        addressRequest.setAddress(partnerAddress);
+                        return this.addressRepository.save(addressRequest);
+                    }).orElseThrow(() -> new ResourceNotFoundException("Not found with parent address id " + parentId));
+        } else {
+            return this.addressRepository.save(addressRequest);
+        }
 
-                        address.setAddress(address1);
+    }
+
+    public Address update(Integer addressId, Integer parentId, Address addressRequest) {
+
+        if (parentId > 0) {
+
+            if (!this.addressRepository.existsById(parentId))
+                throw new ResourceNotFoundException("The Parent Address Id is not found!" + parentId);
+
+            return this.addressRepository.findById(addressId)
+                    .map(address -> {
+
+                        return this.addressRepository.findById(parentId)
+                                .map(parentAddress -> {
+
+                                    address.setAddress(parentAddress);
+                                    address.setCode(addressRequest.getCode());
+                                    address.setName(addressRequest.getName());
+                                    address.setNameKh(addressRequest.getNameKh());
+
+                                    return this.addressRepository.save(address);
+
+                                }).orElseThrow(() -> new ResourceNotFoundException("Parent Address is not exist" + parentId));
+
+                    }).orElseThrow(() -> new ResourceNotFoundException("Address is not exist" + addressId));
+
+
+        } else {
+            return this.addressRepository.findById(addressId)
+                    .map(address -> {
+                        address.setCode(addressRequest.getCode());
+                        address.setName(addressRequest.getName());
+                        address.setNameKh(addressRequest.getNameKh());
                         return this.addressRepository.save(address);
 
-                    }).orElseThrow(() -> new ResourceNotFoundException("Not Found" + address.getAddress().getId()));
+                    }).orElseThrow(() -> new ResourceNotFoundException("Address is not exist" + addressId));
         }
 
-//        address.setAddresses(addresses);
-
-        return this.addressRepository.save(address);
-    }
-
-    public Address update(Integer addressId, Address addressRequest) {
-
-        List<Address> addresses = new ArrayList<>();
-
-        if (addressRequest.getAddresses().size() > 0) {
-            for (Address a : addressRequest.getAddresses()) {
-                if (!this.addressRepository.existsById(a.getId()))
-                    throw new ResourceNotFoundException("The Address is not found!" + a.getId());
-
-                addresses.add(this.show(a.getId()));
-            }
-        }
-
-        addressRequest.setAddresses(addresses);
-
-        return this.addressRepository.findById(addressId)
-                .map(address -> {
-                    addressRequest.setId(addressId);
-                    return this.addressRepository.save(addressRequest);
-                }).orElseThrow(() -> new ResourceNotFoundException("Address is not exist" + addressId));
     }
 
     public Address delete(Integer addressId) {

@@ -10,5 +10,6 @@ import java.util.List;
 
 @Repository
 public interface AddressRepository extends JpaRepository<Address, Integer>{
-
+    @Query(value = "select a from Address a where a.address.id = ?1")
+    List<Address> findAllAddressByParentId(Integer parentId);
 }

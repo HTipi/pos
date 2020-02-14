@@ -39,30 +39,6 @@ public class BranchService {
         if (!this.addressRepository.existsById(addressId))
             throw new ResourceNotFoundException("The Address is not found!" + addressId);
 
-//        List<DeliveryContact> deliveryContacts = new ArrayList<>();
-//
-//        for (DeliveryContact d : branchRequest.getDeliveryContacts()) {
-//
-//            if (!this.deliveryContactRepository.existsById(d.getId()))
-//                throw new ResourceNotFoundException("The Delivery Contact is not found!" + d.getId());
-//
-//            deliveryContacts.add(this.deliveryContactService.show(d.getId()));
-//        }
-
-//        List<BranchUser> branchUsers = new ArrayList<>();
-//
-//        for (BranchUser b : branchRequest.getBranchUsers()) {
-//
-//            if (!this.branchUserRepository.existsById(b.getId()))
-//                throw new ResourceNotFoundException("The Branch User is not found!" + b.getId());
-//
-//            branchUsers.add(this.branchUserService.show(b.getId()));
-//
-//        }
-//
-//        branchRequest.setDeliveryContacts(deliveryContacts);
-//        branchRequest.setBranchUsers(branchUsers);
-
         return this.corporateRepository.findById(corporateId)
                 .map(corporate -> {
                     return this.addressRepository.findById(addressId)
@@ -74,51 +50,33 @@ public class BranchService {
                 }).orElseThrow(() -> new ResourceNotFoundException("Not Found"));
     }
 
-    public Branch update(Integer corporateId, Integer addressId, Branch branchRequest) {
+    public Branch update(Integer branchId ,Integer corporateId, Integer addressId, Branch branchRequest) {
 
-        boolean corporate = this.corporateRepository.existsById(corporateId);
-
-        if (!corporate)
+        if (!this.corporateRepository.existsById(corporateId))
             throw new ResourceNotFoundException("The Corporate is not found!" + corporateId);
 
-        boolean address = this.addressRepository.existsById(addressId);
-
-        if (!address)
+        if (!this.addressRepository.existsById(addressId))
             throw new ResourceNotFoundException("The Address is not found!" + addressId);
 
-
-//        List<DeliveryContact> deliveryContacts = new ArrayList<>();
-//
-//        for (DeliveryContact d : branchRequest.getDeliveryContacts()) {
-//
-//            if (!this.deliveryContactRepository.existsById(d.getId()))
-//                throw new ResourceNotFoundException("The Delivery Contact is not found!" + d.getId());
-//
-//            deliveryContacts.add(this.deliveryContactService.show(d.getId()));
-//        }
-
-//        List<BranchUser> branchUsers = new ArrayList<>();
-//
-//        for (BranchUser b : branchRequest.getBranchUsers()) {
-//
-//            if (!this.branchUserRepository.existsById(b.getId()))
-//                throw new ResourceNotFoundException("The Branch User is not found!" + b.getId());
-//
-//            branchUsers.add(this.branchUserService.show(b.getId()));
-//
-//        }
-//
-//        branchRequest.setDeliveryContacts(deliveryContacts);
-//        branchRequest.setBranchUsers(branchUsers);
-
+        if(!this.branchRepository.existsById(branchId))
+            throw new ResourceNotFoundException("The Branch is not found!" + branchId);
 
         return this.corporateRepository.findById(corporateId).map(corporateData -> {
 
             return this.addressRepository.findById(addressId).map(addressData -> {
 
-                branchRequest.setCorporate(corporateData);
-                branchRequest.setAddress(addressData);
-                return this.branchRepository.save(branchRequest);
+                return this.branchRepository.findById(branchId)
+                        .map(branch -> {
+
+                            branch.setCorporate(corporateData);
+                            branch.setAddress(addressData);
+                            branch.setName(branchRequest.getName());
+                            branch.setNameKh(branchRequest.getNameKh());
+                            branch.setTelephone(branchRequest.getTelephone());
+                            branch.setMain(branchRequest.isMain());
+                            return this.branchRepository.save(branchRequest);
+
+                        }).orElseThrow(() -> new ResourceNotFoundException("Not Found"));
 
             }).orElseThrow(() -> new ResourceNotFoundException("Not Found"));
 

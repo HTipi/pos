@@ -30,14 +30,13 @@ public class BranchController {
     }
 
     @PostMapping
-    public Branch create(@RequestBody Branch branch) {
-        return branch;
-//        return this.branchService.create(branch.getCorporate().getId(), branch.getAddress().getId(), branch);
+    public Branch create(@RequestParam Integer corporateId,@RequestParam Integer addressId, @RequestBody Branch branch) {
+        return this.branchService.create(corporateId, addressId, branch);
     }
 
     @PutMapping
-    public Branch update(@RequestBody Branch branch){
-        return this.branchService.update(branch.getCorporate().getId(), branch.getAddress().getId(), branch);
+    public Branch update(@RequestParam Integer branchId, @RequestParam Integer corporateId,@RequestParam Integer addressId,@RequestBody Branch branch){
+        return this.branchService.update(branchId, corporateId, addressId, branch);
     }
 
     @PatchMapping("{branchId}")

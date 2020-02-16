@@ -8,6 +8,7 @@ import com.spring.miniposbackend.model.admin.DeliveryContact;
 import com.spring.miniposbackend.repository.admin.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,11 +85,13 @@ public class BranchService {
 
     }
 
+    @Transactional(readOnly = true)
     public Branch show(int id) {
         return this.branchRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Branch not found" + id));
     }
 
+    @Transactional(readOnly = true)
     public List<Branch> shows() {
         return this.branchRepository.findAll();
     }
@@ -103,6 +106,7 @@ public class BranchService {
 
     }
 
+    @Transactional(readOnly = true)
     public List<Branch> showAllActive() {
         return this.branchRepository.findAllActive();
     }
@@ -115,6 +119,11 @@ public class BranchService {
                     return this.branchRepository.save(branch);
                 }).orElseThrow(() -> new ResourceNotFoundException("Branch not found with id " + branchId));
 
+    }
+
+    @Transactional(readOnly = true)
+    public List<Branch> showAllActiveMainBranch(){
+        return this.branchRepository.findAllActiveMainBranch();
     }
 
     public Branch updateStatus(Integer branchId, Boolean status) {

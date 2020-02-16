@@ -13,5 +13,7 @@ import java.util.List;
 public interface BranchRepository extends JpaRepository<Branch,Integer> {
     @Query(value = "select b from Branch b where b.enable=true")
     List<Branch> findAllActive();
+    @Query(value = "select b from Branch b where b.enable=true and b.isMain=true")
+    List<Branch> findAllActiveMainBranch();
 
 }

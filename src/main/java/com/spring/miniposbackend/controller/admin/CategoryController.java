@@ -21,7 +21,7 @@ public class CategoryController {
     }
 
     @GetMapping("active")
-    public List<Category> showAllActive(){
+    public List<Category> showAllActive() {
         return this.categoryService.showActiveOnly();
     }
 
@@ -36,12 +36,12 @@ public class CategoryController {
     }
 
     @PutMapping
-    public Category update(@RequestBody Category categoryRequest) {
-        return this.categoryService.update(categoryRequest.getId(), categoryRequest);
+    public Category update(@RequestParam Integer categoryId, @RequestBody Category categoryRequest) {
+        return this.categoryService.update(categoryId, categoryRequest);
     }
 
     @PatchMapping("{categoryId}")
-    public Category updateStatus(@PathVariable Integer categoryId, @RequestBody boolean status){
+    public Category updateStatus(@PathVariable Integer categoryId, @RequestBody boolean status) {
         return this.categoryService.updateStatus(categoryId, status);
     }
 

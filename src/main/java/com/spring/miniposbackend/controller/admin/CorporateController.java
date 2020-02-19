@@ -28,8 +28,13 @@ public class CorporateController {
     }
 
     @GetMapping("active")
-    public List<Corporate> showAllActive(){
+    public List<Corporate> showAllActive() {
         return this.corporateService.showAllActive();
+    }
+
+    @GetMapping("active-by-categoryId/{categoryId}")
+    public List<Corporate> showAllActiveByCategoryId(@PathVariable Integer categoryId) {
+        return this.corporateService.showAllActiveByCategoryId(categoryId);
     }
 
     @GetMapping("{corporateId}")
@@ -47,9 +52,14 @@ public class CorporateController {
         return corporateInput;
     }
 
+    @PutMapping
+    public Corporate update(@RequestParam Integer corporateId, @RequestParam Integer categoryId, @RequestBody Corporate corporate) {
+        return this.corporateService.update(corporateId, categoryId, corporate);
+    }
+
     @PatchMapping("{corporateId}")
-    public Corporate updateStatus(@PathVariable Integer corporateId, @RequestBody Boolean status){
-        return this.corporateService.updateStatus(corporateId,status);
+    public Corporate updateStatus(@PathVariable Integer corporateId, @RequestBody Boolean status) {
+        return this.corporateService.updateStatus(corporateId, status);
     }
 
 }

@@ -24,6 +24,11 @@ public class DeliveryContactController {
         return this.deliveryContactService.showAllActive();
     }
 
+    @GetMapping("active-by-branchId/{branchId}")
+    public List<DeliveryContact> showAllActiveByBranchId(@PathVariable Integer branchId) {
+        return this.deliveryContactService.showAllActiveByBranchId(branchId);
+    }
+
     @GetMapping("{deliveryContactId}")
     public DeliveryContact show(@PathVariable Integer deliveryContactId) {
         return this.deliveryContactService.show(deliveryContactId);
@@ -34,6 +39,10 @@ public class DeliveryContactController {
         return this.deliveryContactService.create(deliveryContact.getBranch().getId(), deliveryContact);
     }
 
+    @PutMapping
+    public DeliveryContact update(@RequestParam Integer deliveryContactId, @RequestParam Integer branchId, DeliveryContact deliveryContact){
+        return this.deliveryContactService.update(deliveryContactId, branchId, deliveryContact);
+    }
 
     @PatchMapping("{deliveryContactId}")
     public DeliveryContact updateStatus(@PathVariable Integer deliveryContactId, @RequestBody boolean status) {

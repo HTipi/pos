@@ -33,7 +33,7 @@ public class Item extends AuditModel{
 	private static final long serialVersionUID = 1L;
 
 	@Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy= GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Integer id;
 	

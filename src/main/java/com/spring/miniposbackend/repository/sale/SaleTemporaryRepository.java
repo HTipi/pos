@@ -22,11 +22,4 @@ public interface SaleTemporaryRepository extends JpaRepository<SaleTemporary, Lo
 	List<SaleTemporary> findByItemId(Integer itemId, boolean isPrinted);
 	@Query(value = "select s from SaleTemporary s where s.item.id = ?1 and s.isPrinted = ?2 and s.cancel = ?3")
 	List<SaleTemporary> findByItemId(Integer itemId, boolean isPrinted, boolean cancel);
-	
-	
-//	@Query(value = "upate SaleTemporary s set s.isPrinted=true where s.seat.id= ?1 and s.isPrinted=false")
-//	List<SaleTemporary> print(Integer seatId);
-	
-//	Integer changeSeat(Long seatId, Long newSeatId);
-	
 }

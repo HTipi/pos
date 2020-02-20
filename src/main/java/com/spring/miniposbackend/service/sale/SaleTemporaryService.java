@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.model.sale.SaleTemporary;
 import com.spring.miniposbackend.repository.admin.ItemRepository;
@@ -28,8 +29,14 @@ public class SaleTemporaryService {
 		
 		return seatRepository.findById(seatId)
 		.map(seat -> {
+			if(!seat.isEnable()) {
+				throw new ConflictException("Seat is disable");
+			}
 			return itemRepository.findById(itemId)
 					.map(item -> {
+						if(!item.isEnable()) {
+							throw new ConflictException("Item is disable");
+						}
 						SaleTemporary sale = new SaleTemporary();
 						sale.setSeat(seat);
 						sale.setItem(item);
@@ -38,9 +45,10 @@ public class SaleTemporaryService {
 						sale.setPrice(item.getPrice());
 						sale.setDiscount(item.getDiscount());
 						sale.setPrinted(false);
+						sale.setCancel(false);
 						return saleRepository.save(sale);
 					})
-					.orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
+					.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
 		})
 		.orElseThrow(() -> new ResourceNotFoundException("Seat does not exist"));
 	}
@@ -48,17 +56,23 @@ public class SaleTemporaryService {
 	public SaleTemporary removeItem(Long saleTempId) {
 		return saleRepository.findById(saleTempId)
                 .map(sale -> {
+                	if(sale.isPrinted()) {
+                		throw new ConflictException("Record is already printed");
+                	}
                 	sale.setCancel(true);
                 	return saleRepository.save(sale);
-                }).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
+                }).orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
 	}
 	
 	public SaleTemporary setQuantity(Long saleTempId, Short quantity) {
 		return saleRepository.findById(saleTempId)
                 .map(sale -> {
+                	if(sale.isPrinted()) {
+                		throw new ConflictException("Record is already printed");
+                	}
                 	sale.setQuantity(quantity);
                 	return saleRepository.save(sale);
-                }).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
+                }).orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
 	}
 
 //	public List<SaleTemporary> Print(Integer seatId) {

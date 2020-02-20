@@ -8,6 +8,7 @@ import com.spring.miniposbackend.repository.admin.CategoryRepository;
 import com.spring.miniposbackend.repository.admin.CorporateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,15 +25,22 @@ public class CorporateService {
     @Autowired
     private BranchService branchService;
 
-
+    @Transactional(readOnly = true)
     public List<Corporate> shows() {
         return this.corporateRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public List<Corporate> showAllActive() {
         return this.corporateRepository.findAllActive();
     }
 
+    @Transactional(readOnly = true)
+    public List<Corporate> showAllActiveByCategoryId(Integer categoryId){
+        return this.corporateRepository.findAllActiveByCategoryId(categoryId);
+    }
+
+    @Transactional(readOnly = true)
     public Corporate show(int corporateId) {
         return this.corporateRepository.findById(corporateId)
                 .orElseThrow(() -> new ResourceNotFoundException("Coporate not found with id " + corporateId));
@@ -40,28 +48,40 @@ public class CorporateService {
 
     public Corporate create(int categoryId, Corporate corporate) {
 
-        boolean category = this.categoryRepository.existsById(categoryId);
-
-        if (!category)
+        if (!this.categoryRepository.existsById(categoryId))
             throw new ResourceNotFoundException("The Category Id is not found!" + categoryId);
-
-        List<Branch> branches = new ArrayList<>();
-
-        for (Branch b : branches) {
-
-            if (!this.branchRepository.existsById(b.getId()))
-                throw new ResourceNotFoundException("The Branch is not found!" + b.getId());
-
-            branches.add(this.branchService.show(b.getId()));
-
-        }
-
-        corporate.setBranches(branches);
 
         return this.categoryRepository.findById(categoryId).map(post -> {
             corporate.setCategory(post);
             return this.corporateRepository.save(corporate);
         }).orElseThrow(() -> new ResourceNotFoundException("Not Found"));
+
+    }
+
+    public  Corporate update(Integer corporateId, Integer categoryId, Corporate corporateRequest) {
+
+        if (!this.categoryRepository.existsById(categoryId))
+            throw new ResourceNotFoundException("The Category Id is not found!" + categoryId);
+
+        if (!this.corporateRepository.existsById(corporateId))
+            throw new ResourceNotFoundException("The Corporate Id is not found!" + corporateId);
+
+        return this.categoryRepository.findById(categoryId)
+                .map(category -> {
+
+                    return this.corporateRepository.findById(corporateId)
+                            .map(corporate -> {
+
+                                corporate.setCategory(category);
+                                corporate.setNameKh(corporateRequest.getNameKh());
+                                corporate.setName(corporateRequest.getName());
+
+                                return this.corporateRepository.save(corporate);
+
+                            }).orElseThrow(() -> new ResourceNotFoundException("Not Found"));
+
+                }).orElseThrow(() -> new ResourceNotFoundException("Not Found"));
+
     }
 
     public Corporate enable(Integer coporateId) {

@@ -24,6 +24,11 @@ public class BranchController {
         return this.branchService.showAllActive();
     }
 
+    @GetMapping("main-branch")
+    public List<Branch> showAllActiveMainBranch(){
+        return this.branchService.showAllActiveMainBranch();
+    }
+
     @GetMapping("{branchId}")
     public Branch get(@PathVariable Integer branchId) {
         return this.branchService.show(branchId);

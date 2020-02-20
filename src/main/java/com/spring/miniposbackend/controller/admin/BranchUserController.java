@@ -26,38 +26,34 @@ public class BranchUserController {
         return this.branchUserService.showAllActive();
     }
 
+    @GetMapping("by-branchId")
+    public List<BranchUser> showAllActiveByBranchId(@RequestParam Integer branchId){
+        return this.branchUserService.showAllActiveByBranchId(branchId);
+    }
+
+    @GetMapping("by-userId")
+    public List<BranchUser> showAllActiveByUserId(@RequestParam Integer userId){
+        return this.branchUserService.showAllActiveByUserId(userId);
+    }
+
     @GetMapping("{branchUserId}")
     public BranchUser show(@PathVariable Long branchUserId) {
         return this.branchUserService.show(branchUserId);
     }
 
     @PostMapping
-    public BranchUser createBranchUser(@RequestBody BranchUser branchUserRequest) {
-        return this.branchUserService.create(branchUserRequest.getBranch().getId(),
-                branchUserRequest.getUser().getId(),
-                branchUserRequest);
+    public BranchUser createBranchUser(@RequestParam Integer branchId, @RequestParam Integer userId,@RequestBody BranchUser branchUserRequest) {
+        return this.branchUserService.create(branchId, userId, branchUserRequest);
     }
 
     @PutMapping
-    public BranchUser updateBranchUser(@RequestBody BranchUser branchUserRequest) {
-        return this.branchUserService.create(branchUserRequest.getBranch().getId(),
-                branchUserRequest.getUser().getId(),
-                branchUserRequest);
+    public BranchUser updateBranchUser(@RequestParam Long branchUserId, @RequestParam Integer branchId, @RequestParam Integer userId ,@RequestBody BranchUser branchUserRequest) {
+        return this.branchUserService.update(branchUserId, branchId, userId, branchUserRequest);
     }
 
     @PatchMapping("{branchUserId}")
     public BranchUser updateStatus(@PathVariable Long branchUserId, @RequestBody Boolean status) {
         return this.branchUserService.updateStatus(branchUserId, status);
     }
-
-//    @GetMapping("/enableBranchUserById")
-//    public BranchUser enable(@RequestParam Long branchUserId) {
-//        return this.branchUserService.enable(branchUserId);
-//    }
-//
-//    @GetMapping("/disableBranchUserById")
-//    public BranchUser disable(@RequestParam Long branchUserId) {
-//        return this.branchUserService.disable(branchUserId);
-//    }
 
 }

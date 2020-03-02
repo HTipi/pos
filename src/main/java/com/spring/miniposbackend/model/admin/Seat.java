@@ -33,8 +33,8 @@ public class Seat extends AuditModel{
     @Column(name = "id", nullable = false)
     private Integer id;
 	
-	@Column(name = "code", nullable = false,length = 32)
-    private String code;
+	@Column(name = "name", nullable = false,length = 32)
+    private String name;
 	
 	@Column(name = "sequence", nullable = false)
     private Integer sequence=1;

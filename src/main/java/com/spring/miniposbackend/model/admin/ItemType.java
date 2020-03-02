@@ -14,6 +14,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicUpdate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.AuditModel;
 
 import lombok.Getter;
@@ -37,7 +38,11 @@ public class ItemType extends AuditModel{
 	@Column(name = "name_kh", nullable = false,length = 128)
     private String nameKh;
 	
+	@Column(name = "image")
+    private String image;
+	
 	@OneToMany(mappedBy = "itemType", fetch = FetchType.LAZY)
+	@JsonIgnore
 	private List<Item> items;
 	
 	@Column(name = "enable", nullable = false)

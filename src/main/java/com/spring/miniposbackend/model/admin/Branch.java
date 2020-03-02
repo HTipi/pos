@@ -38,12 +38,12 @@ public class Branch extends AuditModel{
     private boolean isMain;
     
     @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "address_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "address_id", referencedColumnName = "id", nullable = true)
     @JsonIgnore
     private Address address;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "corporation_id",nullable = false)
+    @JoinColumn(name = "corporate_id",nullable = false)
     @JsonIgnore
     private Corporate corporate;
 

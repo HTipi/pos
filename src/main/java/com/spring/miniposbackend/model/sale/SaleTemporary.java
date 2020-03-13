@@ -77,6 +77,10 @@ public class SaleTemporary {
 		return item.getName();
 	}
 	
+	public Integer getSeat_id() {
+		return seat.getId();
+	}
+	
 	public double getDiscountAmount() {
 		return Math.round(price.doubleValue()*quantity*discount/100*100)/100.0;
 	}

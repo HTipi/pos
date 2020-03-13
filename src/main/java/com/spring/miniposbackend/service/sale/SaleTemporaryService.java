@@ -1,11 +1,14 @@
 package com.spring.miniposbackend.service.sale;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
@@ -25,32 +28,40 @@ public class SaleTemporaryService {
 	@Autowired
 	private SaleTemporaryRepository saleRepository;
 	
-	public SaleTemporary addItem(Integer seatId, Integer itemId, Short quantity) {
-		
-		return seatRepository.findById(seatId)
-		.map(seat -> {
-			if(!seat.isEnable()) {
-				throw new ConflictException("Seat is disable");
-			}
-			return itemRepository.findById(itemId)
-					.map(item -> {
-						if(!item.isEnable()) {
-							throw new ConflictException("Item is disable");
+	@Transactional
+	public List<SaleTemporary> addItem(List<Map<String, Integer>> requestItem) {
+		List<SaleTemporary> list = new ArrayList<SaleTemporary>();
+		for(int i=0; i<requestItem.size();i++) {
+			Integer seatId = requestItem.get(i).get("seatId");
+			Integer itemId = requestItem.get(i).get("itemId");
+			Short quantity = requestItem.get(1).get("quantity").shortValue();
+			SaleTemporary saleTemp=  seatRepository.findById(seatId)
+					.map(seat -> {
+						if(!seat.isEnable()) {
+							throw new ConflictException("Seat is disable");
 						}
-						SaleTemporary sale = new SaleTemporary();
-						sale.setSeat(seat);
-						sale.setItem(item);
-						sale.setValueDate(new Date());
-						sale.setQuantity(quantity);
-						sale.setPrice(item.getPrice());
-						sale.setDiscount(item.getDiscount());
-						sale.setPrinted(false);
-						sale.setCancel(false);
-						return saleRepository.save(sale);
+						return itemRepository.findById(itemId)
+								.map(item -> {
+									if(!item.isEnable()) {
+										throw new ConflictException("Item is disable");
+									}
+									SaleTemporary sale = new SaleTemporary();
+									sale.setSeat(seat);
+									sale.setItem(item);
+									sale.setValueDate(new Date());
+									sale.setQuantity(quantity);
+									sale.setPrice(item.getPrice());
+									sale.setDiscount(item.getDiscount());
+									sale.setPrinted(false);
+									sale.setCancel(false);
+									return saleRepository.save(sale);
+								})
+								.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
 					})
-					.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
-		})
-		.orElseThrow(() -> new ResourceNotFoundException("Seat does not exist"));
+					.orElseThrow(() -> new ResourceNotFoundException("Seat does not exist"));
+			list.add(saleTemp);
+		}
+		return list;
 	}
 	
 	public SaleTemporary removeItem(Long saleTempId) {

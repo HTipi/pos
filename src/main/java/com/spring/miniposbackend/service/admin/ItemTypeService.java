@@ -32,6 +32,11 @@ public class ItemTypeService {
 				.orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
 	}
 	
+	
+	public List<ItemType> showByCorporateId(Integer corporateId, boolean enable){
+		return itemTypeRepository.findByCorporateIdWithEnable(corporateId,enable);
+	}
+	
 	public ItemType create(ItemType itemType) {
 		return itemTypeRepository.save(itemType);
 	}
@@ -41,6 +46,7 @@ public class ItemTypeService {
 				.map(itemType -> {
 					itemType.setName(requestItemType.getName());
 					itemType.setNameKh(requestItemType.getNameKh());
+					itemType.setImage(requestItemType.getImage());
 					itemType.setEnable(requestItemType.isEnable());
 					return itemTypeRepository.save(itemType);
 				}).orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));

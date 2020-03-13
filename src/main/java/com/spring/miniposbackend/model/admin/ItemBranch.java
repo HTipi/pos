@@ -25,29 +25,30 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "items")
+@Table(name = "item_branches")
 @Setter @Getter
 @DynamicUpdate
-public class Item extends AuditModel{
+public class ItemBranch extends AuditModel{
 
 	private static final long serialVersionUID = 1L;
-
 	@Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     @Column(name = "id", nullable = false)
-    private Integer id;
+    private Long id;
 	
-	@Column(name = "code", nullable = false,length = 32)
-    private String code;
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "item_id", nullable = false)
+	@JsonIgnore
+	Item item;
 	
-	@Column(name = "name", nullable = false,length = 128)
-    private String name;
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "branch_id", nullable = false)
+	@JsonIgnore
+	Branch branch;
 	
-	@Column(name = "name_kh", nullable = false, length = 128)
-    private String nameKh;
-	
-	@Column(name = "image", length = 64)
-    private String image;
+	@Column(name = "user_item_configuration", nullable = false)
+    @ColumnDefault("false")
+    private boolean useItemConfiguration;
 	
 	@Column(name = "price", nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
@@ -57,17 +58,4 @@ public class Item extends AuditModel{
 	@Max(100)
 	@ColumnDefault("0")
     private Short discount;
-	
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "item_type_id", nullable = false)
-    @JsonIgnore
-    private ItemType itemType;
-	
-	@Column(name = "enable", nullable = false)
-    @ColumnDefault("false")
-    private boolean enable;
-	
-	public Integer getItemType_id() {
-		return itemType.getId();
-	}
 }

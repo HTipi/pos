@@ -1,14 +1,15 @@
 package com.spring.miniposbackend.model.admin;
 
-import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.ColumnDefault;
@@ -38,12 +39,13 @@ public class ItemType extends AuditModel{
 	@Column(name = "name_kh", nullable = false,length = 128)
     private String nameKh;
 	
-	@Column(name = "image")
+	@Column(name = "image",length = 64)
     private String image;
 	
-	@OneToMany(mappedBy = "itemType", fetch = FetchType.LAZY)
-	@JsonIgnore
-	private List<Item> items;
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "corporate_id",nullable = false)
+    @JsonIgnore
+    private Corporate corporate;
 	
 	@Column(name = "enable", nullable = false)
     @ColumnDefault("false")

@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.spring.miniposbackend.exception.BadRequestException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.model.admin.Item;
-import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.admin.ItemRepository;
 import com.spring.miniposbackend.repository.admin.ItemTypeRepository;
 
@@ -19,8 +18,6 @@ public class ItemService {
 	
 	@Autowired
 	private ItemRepository itemRepository;
-	@Autowired
-	private BranchRepository branchRepository;
 	@Autowired
 	private ItemTypeRepository itemTypeRepository;
 		
@@ -34,20 +31,14 @@ public class ItemService {
         return itemRepository.findAllWithEnable(enable);
     }
     
+    public List<Item> showByCorpoateId(Integer corporateId, boolean enable){
+        return itemRepository.findByCorporateId(corporateId, enable);
+    }
+    
     @Transactional(readOnly = true)
     public Item show(Integer itemId){
         return itemRepository.findById(itemId)
         		.orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
-    }
-    
-	@Transactional(readOnly = true)
-    public List<Item> showByBranchId(Integer branchId, boolean enable){
-		return branchRepository.findById(branchId)
-				.map(branch -> {
-					return itemRepository.findByBranchIdWithEnable(branchId, enable);
-				})
-				.orElseThrow(() -> new ResourceNotFoundException("Branch does not exist"));
-		
     }
 	
 	@Transactional(readOnly = true)
@@ -58,68 +49,45 @@ public class ItemService {
 				})
 				.orElseThrow(() -> new ResourceNotFoundException("Item Type does not exist"));
 	}
-	
-	@Transactional(readOnly = true)
-    public List<Item> showByBranchItemTypeId(Integer branchId, Integer itemTypeId, boolean enable){
-		return branchRepository.findById(branchId)
-				.map(branch -> {
-					return itemTypeRepository.findById(itemTypeId)
-							.map(itemType -> {
-								return itemRepository.findByBranchItemTypeIdWithEnable(branchId, itemTypeId, enable);
-							})
-							.orElseThrow(() -> new ResourceNotFoundException("Item Type does not exist"));
-				})
-				.orElseThrow(() -> new ResourceNotFoundException("Branch does not exist"));
-    }
 
     @Transactional
-    public Item create(Integer branchId, Integer itemTypeId,Item item) {
-        return branchRepository.findById(branchId)
-        		.map(branch -> {
-        			return itemTypeRepository.findById(itemTypeId)
-        					.map(itemType ->{
-        						item.setBranch(branch);
-        						item.setItemType(itemType);
-        						try {
+    public Item create(Integer itemTypeId,Item item) {
+        return itemTypeRepository.findById(itemTypeId)
+				.map(itemType ->{
+					item.setItemType(itemType);
+					try {
+						return itemRepository.save(item);
+					}catch (Exception e) {
+						throw new BadRequestException(e.getMessage());
+					}
+					
+				})
+				.orElseThrow(() -> new ResourceNotFoundException("Item Type does not exist"));
+    }
+    
+    @Transactional
+    public Item update(Integer itemId, Integer itemTypeId,Item requestItem) {
+    	return itemTypeRepository.findById(itemTypeId)
+				.map(itemType ->{
+					return itemRepository.findById(itemId)
+							.map(item -> {
+								item.setItemType(itemType);
+								item.setCode(requestItem.getCode());
+								item.setName(requestItem.getName());
+								item.setNameKh(requestItem.getNameKh());
+								item.setPrice(requestItem.getPrice());
+								item.setDiscount(requestItem.getDiscount());
+								item.setEnable(requestItem.isEnable());
+								try {
         							return itemRepository.save(item);
         						}catch (Exception e) {
 									throw new BadRequestException(e.getMessage());
 								}
-        						
-        					})
-        					.orElseThrow(() -> new ResourceNotFoundException("Item Type does not exist"));
-        		})
-        		.orElseThrow(() -> new ResourceNotFoundException("Branch does not exist "));
-    }
-    
-    @Transactional
-    public Item update(Integer itemId,Integer branchId, Integer itemTypeId,Item requestItem) {
-    	return branchRepository.findById(branchId)
-        		.map(branch -> {
-        			return itemTypeRepository.findById(itemTypeId)
-        					.map(itemType ->{
-        						return itemRepository.findById(itemId)
-        								.map(item -> {
-        									item.setBranch(branch);
-        									item.setItemType(itemType);
-        									item.setCode(requestItem.getCode());
-        									item.setName(requestItem.getName());
-        									item.setNameKh(requestItem.getNameKh());
-        									item.setPrice(requestItem.getPrice());
-        									item.setDiscount(requestItem.getDiscount());
-        									item.setEnable(requestItem.isEnable());
-        									try {
-        	        							return itemRepository.save(item);
-        	        						}catch (Exception e) {
-        										throw new BadRequestException(e.getMessage());
-        									}
-        								})
-        								.orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
-        					
-        					})
-        					.orElseThrow(() -> new ResourceNotFoundException("Item Type does not exist"));
-        		})
-        		.orElseThrow(() -> new ResourceNotFoundException("Branch does not exist "));
+							})
+							.orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
+				
+				})
+				.orElseThrow(() -> new ResourceNotFoundException("Item Type does not exist"));
     }
     
     @Transactional

@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
+import com.spring.miniposbackend.exception.UnprocessableEntityException;
 import com.spring.miniposbackend.model.sale.SaleTemporary;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
 import com.spring.miniposbackend.repository.admin.SeatRepository;
@@ -36,6 +37,9 @@ public class SaleTemporaryService {
 					Integer seatId = requestItem.get("seatId");
 					Long itemId = requestItem.get("itemId").longValue();
 					Short quantity = requestItem.get("quantity").shortValue();
+					if(quantity<1) {
+						throw new UnprocessableEntityException("Quantity must be greater than 0");
+					}
 					SaleTemporary saleTemp =  seatRepository.findById(seatId)
 							.map(seat -> {
 								if(!seat.isEnable()) {

@@ -19,7 +19,7 @@ import javax.validation.constraints.Min;
 import org.hibernate.annotations.ColumnDefault;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.spring.miniposbackend.model.admin.Item;
+import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.model.admin.Seat;
 
 import lombok.Getter;
@@ -65,16 +65,16 @@ public class SaleTemporary {
     private Seat seat;
 	
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "item_id", nullable = false)
+    @JoinColumn(name = "item_branch_id", nullable = false)
     @JsonIgnore
-    private Item item;
+    private ItemBranch itemBranch;
 	
 	public String getItemCode() {
-		return item.getCode();
+		return itemBranch.getCode();
 	}
 	
 	public String getItemName() {
-		return item.getName();
+		return itemBranch.getName();
 	}
 	
 	public Integer getSeat_id() {

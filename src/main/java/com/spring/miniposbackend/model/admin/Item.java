@@ -66,8 +66,4 @@ public class Item extends AuditModel{
 	@Column(name = "enable", nullable = false)
     @ColumnDefault("false")
     private boolean enable;
-	
-	public Integer getItemType_id() {
-		return itemType.getId();
-	}
 }

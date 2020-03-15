@@ -17,9 +17,4 @@ public interface SaleTemporaryRepository extends JpaRepository<SaleTemporary, Lo
 	List<SaleTemporary> findBySeatIdWithisPrinted(Integer seatId, boolean isPrinted);
 	@Query(value = "select s from SaleTemporary s where s.seat.id = ?1 and s.isPrinted = ?2 and s.cancel = ?3")
 	List<SaleTemporary> findBySeatIdWithIsPrintedCancel(Integer seatId, boolean isPrinted, boolean cancel);
-	List<SaleTemporary> findByItemId(Integer itemId);
-	@Query(value = "select s from SaleTemporary s where s.item.id = ?1 and s.isPrinted = ?2")
-	List<SaleTemporary> findByItemId(Integer itemId, boolean isPrinted);
-	@Query(value = "select s from SaleTemporary s where s.item.id = ?1 and s.isPrinted = ?2 and s.cancel = ?3")
-	List<SaleTemporary> findByItemId(Integer itemId, boolean isPrinted, boolean cancel);
 }

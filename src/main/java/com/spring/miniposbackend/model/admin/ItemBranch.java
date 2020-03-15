@@ -21,18 +21,14 @@ import org.hibernate.annotations.DynamicUpdate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.AuditModel;
 
-import lombok.Getter;
-import lombok.Setter;
-
 @Entity
 @Table(name = "item_branches")
-@Setter @Getter
 @DynamicUpdate
 public class ItemBranch extends AuditModel{
 
 	private static final long serialVersionUID = 1L;
 	@Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 	
@@ -46,9 +42,13 @@ public class ItemBranch extends AuditModel{
 	@JsonIgnore
 	Branch branch;
 	
-	@Column(name = "user_item_configuration", nullable = false)
-    @ColumnDefault("false")
+	@Column(name = "use_item_configuration", nullable = false)
+    @ColumnDefault("true")
     private boolean useItemConfiguration;
+	
+	@Column(name = "enable", nullable = false)
+    @ColumnDefault("false")
+    private boolean enable;
 	
 	@Column(name = "price", nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
@@ -58,4 +58,44 @@ public class ItemBranch extends AuditModel{
 	@Max(100)
 	@ColumnDefault("0")
     private Short discount;
+	
+	public Long getId() {
+		return id;
+	}
+	
+	public String getCode() {
+		return item.getCode();
+	}
+	public String getName() {
+		return item.getName();
+	}
+	public String getNameKh() {
+		return item.getNameKh();
+	}
+	public String getImage() {
+		return item.getImage();
+	}
+	public BigDecimal getPrice() {
+		if(useItemConfiguration) {
+			return item.getPrice();
+		}else {
+			return price;
+		}
+	}
+	
+	public Short getDiscount() {
+		if(useItemConfiguration) {
+			return item.getDiscount();
+		}else {
+			return discount;
+		}
+	}
+	
+	public boolean isEnable() {
+		return enable;
+	}
+	
+	public Integer getItemTypeId() {
+		return item.getItemType().getId();
+	}
 }

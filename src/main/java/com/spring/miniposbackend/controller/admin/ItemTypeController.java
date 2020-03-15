@@ -1,7 +1,6 @@
 package com.spring.miniposbackend.controller.admin;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,20 +23,21 @@ public class ItemTypeController {
 	@Autowired
 	private ItemTypeService itemTypeService;
 	
-	@GetMapping
-	public List<ItemType> getAll(@RequestParam Optional<Boolean> enable){
-		if(enable.isPresent()) {
-			return itemTypeService.shows(enable.get());
-		}else {
-			return itemTypeService.shows();
-		}
-		
-	}
 	
 	@GetMapping("by-corporate")
 	public List<ItemType> getByCorporate(@RequestParam Integer corporateId){ // will get from user
 		return itemTypeService.showByCorporateId(corporateId,true);
 	}
+	
+//	@GetMapping
+//	public List<ItemType> getAll(@RequestParam Optional<Boolean> enable){
+//		if(enable.isPresent()) {
+//			return itemTypeService.shows(enable.get());
+//		}else {
+//			return itemTypeService.shows();
+//		}
+//		
+//	}
 	
 //	@GetMapping("{itemTypeId}")
 //	public ItemType get(@PathVariable Integer itemTypeId) {

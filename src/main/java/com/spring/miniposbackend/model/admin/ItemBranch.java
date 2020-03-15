@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
@@ -22,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.AuditModel;
 
 @Entity
-@Table(name = "item_branches")
+@Table(name = "item_branches", uniqueConstraints = @UniqueConstraint(columnNames = {"item_id","branch_id"}))
 @DynamicUpdate
 public class ItemBranch extends AuditModel{
 

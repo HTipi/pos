@@ -16,6 +16,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
+import com.spring.miniposbackend.model.admin.User;
 import org.hibernate.annotations.ColumnDefault;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -63,6 +64,11 @@ public class SaleTemporary {
     @JoinColumn(name = "seat_id", nullable = false)
     @JsonIgnore
     private Seat seat;
+
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "user_id", nullable = false)
+	@JsonIgnore
+	private User user;
 	
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "item_branch_id", nullable = false)
@@ -79,6 +85,9 @@ public class SaleTemporary {
 	
 	public Integer getSeat_id() {
 		return seat.getId();
+	}
+	public Integer getUser_id() {
+		return user.getId();
 	}
 	
 	public double getDiscountAmount() {

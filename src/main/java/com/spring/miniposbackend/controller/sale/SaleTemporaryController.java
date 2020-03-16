@@ -29,6 +29,11 @@ public class SaleTemporaryController {
 	public List<SaleTemporary> getBySeatId(@RequestParam Integer seatId, @RequestParam Optional<Boolean> isPrinted,@RequestParam Optional<Boolean> cancel){
 		return saleService.showBySeatId(seatId, isPrinted,cancel);
 	}
+
+	@GetMapping("by-user")
+	public List<SaleTemporary> getByUserId(@RequestParam Integer userId, @RequestParam Optional<Boolean> isPrinted,@RequestParam Optional<Boolean> cancel){
+		return saleService.showByUserId(userId, isPrinted,cancel);
+	}
 	
 	@PostMapping
 	public List<SaleTemporary> create(@RequestBody List<Map<String, Integer>> requestItem) {
@@ -38,6 +43,11 @@ public class SaleTemporaryController {
 	@DeleteMapping("{saleTempId}")
 	public SaleTemporary remove(@PathVariable Long saleTempId){
 		return saleService.removeItem(saleTempId);
+	}
+
+	@DeleteMapping("{seatId}")
+	public List<SaleTemporary> removeBySeat(@PathVariable Integer seatId){
+		return saleService.removeItemBySeat(seatId);
 	}
 	
 	@PatchMapping("{saleTempId}")

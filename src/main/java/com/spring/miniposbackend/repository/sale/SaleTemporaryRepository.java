@@ -3,6 +3,7 @@ package com.spring.miniposbackend.repository.sale;
 
 import java.util.List;
 
+import com.spring.miniposbackend.model.sale.Sale;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -17,4 +18,11 @@ public interface SaleTemporaryRepository extends JpaRepository<SaleTemporary, Lo
 	List<SaleTemporary> findBySeatIdWithisPrinted(Integer seatId, boolean isPrinted);
 	@Query(value = "select s from SaleTemporary s where s.seat.id = ?1 and s.isPrinted = ?2 and s.cancel = ?3")
 	List<SaleTemporary> findBySeatIdWithIsPrintedCancel(Integer seatId, boolean isPrinted, boolean cancel);
+	@Query(
+			value = "select * from Sales_temp where seat_id=(select seat_id from Sales_temp where user_id=?1 order by value_date desc limit 1)",
+			nativeQuery = true)
+	List<SaleTemporary> findByUserId(Integer userId);
+
+	@Query(value = "delete from SaleTemporary s where s.seat.id=?1")
+	List<SaleTemporary> deleteBySeatId(Integer seatId);
 }

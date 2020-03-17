@@ -36,8 +36,8 @@ public class SaleTemporaryService {
     public List<SaleTemporary> addItem(List<Map<String, Integer>> requestItems) {
         List<SaleTemporary> list = new ArrayList<SaleTemporary>();
         for (int i = 0; i < requestItems.size(); i++) {
-            for (int j = i+1; j <requestItems.size() ; j++) {
-                if(requestItems.get(i).get("itemId").equals(requestItems.get(j).get("itemId"))){
+            for (int j = i + 1; j < requestItems.size(); j++) {
+                if (requestItems.get(i).get("itemId").equals(requestItems.get(j).get("itemId"))) {
                     throw new UnprocessableEntityException("itemId is duplicated");
                 }
             }
@@ -94,6 +94,7 @@ public class SaleTemporaryService {
                     return saleRepository.save(sale);
                 }).orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
     }
+
     public List<SaleTemporary> removeItemBySeat(Integer seatId) {
         return saleRepository.deleteBySeatId(seatId);
     }
@@ -102,16 +103,22 @@ public class SaleTemporaryService {
         return saleRepository.findById(saleTempId)
                 .map(sale -> {
                     if (sale.isPrinted()) {
+                        if (sale.getQuantity() > quantity)
                         throw new ConflictException("Record is already printed");
                     }
                     sale.setQuantity(quantity);
                     return saleRepository.save(sale);
                 }).orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
     }
-
-//	public List<SaleTemporary> Print(Integer seatId) {
-//		return saleRepository.print(seatId);
-//	}
+    @Transactional
+    public boolean printBySeat(Integer seatId) {
+        List<SaleTemporary> list = saleRepository.findBySeatId(seatId);
+        list.forEach(saleTemporary -> {
+            saleTemporary.setPrinted(true);
+            saleRepository.save(saleTemporary);
+        });
+        return true;
+    }
 
 
     public List<SaleTemporary> showBySeatId(Integer seatId, Optional<Boolean> isPrinted, Optional<Boolean> cancel) {
@@ -128,7 +135,7 @@ public class SaleTemporaryService {
 
     public List<SaleTemporary> showByUserId(Integer userId, Optional<Boolean> isPrinted, Optional<Boolean> cancel) {
 
-            return saleRepository.findByUserId(userId);
+        return saleRepository.findByUserId(userId);
 
     }
 //	

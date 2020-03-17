@@ -54,5 +54,9 @@ public class SaleTemporaryController {
 	public SaleTemporary updateQuantity(@PathVariable Long saleTempId, @RequestParam Short quantity) {
 		return saleService.setQuantity(saleTempId, quantity);
 	}
+	@PatchMapping("{seatId}")
+	public boolean printBySeat(@PathVariable Integer seatId) {
+		return saleService.printBySeat(seatId);
+	}
 	
 }

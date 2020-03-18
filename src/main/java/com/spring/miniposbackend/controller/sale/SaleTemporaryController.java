@@ -40,7 +40,7 @@ public class SaleTemporaryController {
 		return saleService.addItem(requestItem);
 	}
 	
-	@DeleteMapping("{saleTempId}")
+	@DeleteMapping("item/{saleTempId}")
 	public SaleTemporary remove(@PathVariable Long saleTempId){
 		return saleService.removeItem(saleTempId);
 	}

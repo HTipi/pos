@@ -50,8 +50,8 @@ public class SaleTemporaryController {
 		return saleService.removeItemBySeat(seatId);
 	}
 	
-	@PatchMapping("{saleTempId}")
-	public SaleTemporary updateQuantity(@PathVariable Long saleTempId, @RequestParam Short quantity) {
+	@PatchMapping("qty/{saleTempId}")
+	public SaleTemporary updateQuantity(@PathVariable Long saleTempId, @RequestParam(value = "quantity") Short quantity) {
 		return saleService.setQuantity(saleTempId, quantity);
 	}
 	@PatchMapping("{seatId}")

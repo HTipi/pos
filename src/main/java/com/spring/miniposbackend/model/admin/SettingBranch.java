@@ -10,7 +10,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "setting_branches")
+@Table(name = "setting_branches", uniqueConstraints = @UniqueConstraint(columnNames = {"setting_id","branch_id"}))
 @Setter
 @Getter
 @DynamicUpdate

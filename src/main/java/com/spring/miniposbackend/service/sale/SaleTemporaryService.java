@@ -38,7 +38,7 @@ public class SaleTemporaryService {
         for (int i = 0; i < requestItems.size(); i++) {
             for (int j = i + 1; j < requestItems.size(); j++) {
                 if (requestItems.get(i).get("itemId").equals(requestItems.get(j).get("itemId"))) {
-                    throw new UnprocessableEntityException("itemId is duplicated");
+                    throw new UnprocessableEntityException("itemId are duplicated");
                 }
             }
         }
@@ -104,20 +104,28 @@ public class SaleTemporaryService {
                 .map(sale -> {
                     if (sale.isPrinted()) {
                         if (sale.getQuantity() > quantity)
-                        throw new ConflictException("Record is already printed");
+                            throw new ConflictException("Record is already printed");
+                    }
+                    if (sale.getQuantity() < 1) {
+                        throw new ConflictException("Qty must be greater than one");
                     }
                     sale.setQuantity(quantity);
                     return saleRepository.save(sale);
                 }).orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
     }
+
     @Transactional
-    public boolean printBySeat(Integer seatId) {
-        List<SaleTemporary> list = saleRepository.findBySeatId(seatId);
-        list.forEach(saleTemporary -> {
-            saleTemporary.setPrinted(true);
-            saleRepository.save(saleTemporary);
-        });
-        return true;
+    public boolean printBySeat(Integer seatId) throws Exception {
+        try {
+            List<SaleTemporary> list = saleRepository.findBySeatId(seatId);
+            list.forEach(saleTemporary -> {
+                saleTemporary.setPrinted(true);
+                saleRepository.save(saleTemporary);
+            });
+            return true;
+        } catch (Exception ex){
+            throw new Exception(ex.getMessage());
+        }
     }
 
 
@@ -134,9 +142,15 @@ public class SaleTemporaryService {
     }
 
     public List<SaleTemporary> showByUserId(Integer userId, Optional<Boolean> isPrinted, Optional<Boolean> cancel) {
-
-        return saleRepository.findByUserId(userId);
-
+        if (isPrinted.isPresent()) {
+            if (cancel.isPresent()) {
+                return saleRepository.findByUserIdWithIsPrintedCancel(userId, isPrinted.get(), cancel.get());
+            } else {
+                return saleRepository.findByUserIdWithisPrinted(userId, isPrinted.get());
+            }
+        } else {
+            return saleRepository.findByUserId(userId);
+        }
     }
 //	
 //	public void cancelBySeatId(Long seatId) {

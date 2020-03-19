@@ -16,6 +16,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
+import com.spring.miniposbackend.model.admin.Item;
 import com.spring.miniposbackend.model.admin.User;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -28,76 +29,83 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "sales_temp")
-@Setter @Getter
+@Setter
+@Getter
 public class SaleTemporary {
 
-	@Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;
-	
-	@Column(name = "value_date", nullable = false, updatable = false)
+
+    @Column(name = "value_date", nullable = false, updatable = false)
     private Date valueDate;
-	
-	@Column(name = "price", nullable = false, precision = 10, scale = 2)
+
+    @Column(name = "price", nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
-	
-	@Column(name = "quantity", nullable = false)
-	@ColumnDefault("1")
+
+    @Column(name = "quantity", nullable = false)
+    @ColumnDefault("1")
     private Short quantity;
-	
-	@Column(name = "discount", nullable = false)
-	@Min(0)
-	@Max(100)
-	@ColumnDefault("0")
+
+    @Column(name = "discount", nullable = false)
+    @Min(0)
+    @Max(100)
+    @ColumnDefault("0")
     private Short discount;
-	
-	@Column(name = "is_printed", nullable = false)
+
+    @Column(name = "is_printed", nullable = false)
     @ColumnDefault("false")
     private boolean isPrinted;
-	
-	@Column(name = "cancel", nullable = false)
+
+    @Column(name = "cancel", nullable = false)
     @ColumnDefault("false")
     private boolean cancel;
-	
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "seat_id", nullable = false)
     @JsonIgnore
     private Seat seat;
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name = "user_id", nullable = false)
-	@JsonIgnore
-	private User user;
-	
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "item_branch_id", nullable = false)
     @JsonIgnore
     private ItemBranch itemBranch;
-	
-	public String getItemCode() {
-		return itemBranch.getCode();
-	}
-	
-	public String getItemName() {
-		return itemBranch.getName();
-	}
-	
-	public Integer getSeat_id() {
-		return seat.getId();
-	}
-	public Integer getUser_id() {
-		return user.getId();
-	}
-	
-	public double getDiscountAmount() {
-		return Math.round(price.doubleValue()*quantity*discount/100*100)/100.0;
-	}
-	
-	public double getSubTotal() {
-		return Math.round(price.doubleValue()*quantity*100)/100.0;
-	}
-	public double getTotal() {
-		return getSubTotal()-getDiscountAmount();
-	}
+
+    public String getItemCode() {
+        return itemBranch.getCode();
+    }
+
+    public String getItemName() {
+        return itemBranch.getName();
+    }
+
+    public Long getItemId() {
+        return itemBranch.getId();
+    }
+
+    public Integer getSeat_id() {
+        return seat.getId();
+    }
+
+    public Integer getUser_id() {
+        return user.getId();
+    }
+
+    public double getDiscountAmount() {
+        return Math.round(price.doubleValue() * quantity * discount / 100 * 100) / 100.0;
+    }
+
+    public double getSubTotal() {
+        return Math.round(price.doubleValue() * quantity * 100) / 100.0;
+    }
+
+    public double getTotal() {
+        return getSubTotal() - getDiscountAmount();
+    }
 }

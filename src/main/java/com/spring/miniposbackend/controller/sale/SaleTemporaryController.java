@@ -56,7 +56,13 @@ public class SaleTemporaryController {
 	}
 	@PatchMapping("{seatId}")
 	public boolean printBySeat(@PathVariable Integer seatId) {
-		return saleService.printBySeat(seatId);
+		try {
+			return saleService.printBySeat(seatId);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
 	
 }

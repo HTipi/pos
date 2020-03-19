@@ -1,6 +1,7 @@
 package com.spring.miniposbackend.controller.admin;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +27,7 @@ public class ItemTypeController {
 	
 	@GetMapping("by-corporate")
 	public List<ItemType> getByCorporate(@RequestParam Integer corporateId){ // will get from user
-		return itemTypeService.showByCorporateId(corporateId,true);
+		return itemTypeService.showByCorporateId(corporateId, Optional.of(true));
 	}
 	
 //	@GetMapping

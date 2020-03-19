@@ -3,6 +3,7 @@ package com.spring.miniposbackend.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,11 +28,12 @@ public class InitController {
 	public Map<String, Object> init(){
 //		int userId=1;
 		int branchId = 1;
+		int corporateId = 1;
 		Map<String, Object> map = new HashMap<String, Object>();
 		// load itemType along with item;
 		// load branch along with seat
 		
-		List<ItemType> itemTypes = itemTypeService.shows(true);
+		List<ItemType> itemTypes = itemTypeService.showByCorporateId(corporateId, Optional.of(true));
 		List<Seat> seats = seatService.showByBranchId(branchId);
 		map.put("itemTypes", itemTypes);
 		map.put("seats", seats);

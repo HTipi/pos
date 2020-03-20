@@ -51,10 +51,6 @@ public class Branch extends AuditModel{
     @JsonIgnore
     private List<DeliveryContact> deliveryContacts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "branch", fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<BranchUser> branchUsers = new ArrayList<>();
-
     @Column(name = "enable", nullable = false)
     @ColumnDefault("true")
     private boolean enable;

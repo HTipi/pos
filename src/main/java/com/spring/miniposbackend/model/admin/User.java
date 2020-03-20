@@ -6,12 +6,12 @@ import lombok.Setter;
 
 import javax.persistence.*;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.AuditModel;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -25,35 +25,42 @@ public class User extends AuditModel{
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Column(name = "first_name", nullable = false)
+    @Column(name = "first_name", nullable = false, length = 32)
     private String firstName;
 
-    @Column(name = "last_name", nullable = false)
+    @Column(name = "last_name", nullable = false, length = 32)
     private String lastName;
 
-    @Column(name = "username", nullable = false, unique = true)
+    @Column(name = "username", nullable = false, unique = true, length = 128)
     private String username;
-
-    @Column(name = "name_kh", nullable = false)
-    private String nameKh;
 
     @Column(name = "password", nullable = false)
     private String password;
 
     @Transient
     private String confirmPassword;
+    
+    @Column(name="api_token", nullable = false)
+    private String apiToken;
 
-    @Column(name = "telephone", nullable = false)
+    @Column(name = "telephone", nullable = false, length = 32)
     private String telephone;
 
     @Column(name = "date_of_birth", nullable = false)
     private Date dateOfBirth;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "branch_id",nullable = false)
     @JsonIgnore
-    private List<BranchUser> branchUsers = new ArrayList<>();
+    private Branch branch;
+    
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "role_id",nullable = false)
+    @JsonIgnore
+    private Role role;
 
-    @Column(name = "enable", nullable = false, columnDefinition = "boolean default true")
+    @Column(name = "enable", nullable = false)
+    @ColumnDefault("false")
     private boolean enable;
 
 }

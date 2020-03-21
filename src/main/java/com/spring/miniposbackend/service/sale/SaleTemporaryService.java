@@ -42,6 +42,7 @@ public class SaleTemporaryService {
                 }
             }
         }
+        
         requestItems.forEach(
                 (requestItem) -> {
                     Integer seatId = requestItem.get("seatId");

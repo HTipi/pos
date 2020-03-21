@@ -50,6 +50,7 @@ public class SaleTemporaryController {
 		return saleService.removeItemBySeat(seatId);
 	}
 	
+	
 	@PatchMapping("qty/{saleTempId}")
 	public SaleTemporary updateQuantity(@PathVariable Long saleTempId, @RequestParam(value = "quantity") Short quantity) {
 		return saleService.setQuantity(saleTempId, quantity);
@@ -61,8 +62,9 @@ public class SaleTemporaryController {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		}
-		return false;
+		
 	}
 	
 }

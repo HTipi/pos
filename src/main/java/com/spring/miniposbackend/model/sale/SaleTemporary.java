@@ -92,6 +92,9 @@ public class SaleTemporary {
     public Integer getSeat_id() {
         return seat.getId();
     }
+    public String getSeat_name() {
+    	return seat.getName();
+    }
 
     public Integer getUser_id() {
         return user.getId();

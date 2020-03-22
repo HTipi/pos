@@ -40,7 +40,7 @@ public class User extends AuditModel{
     @Transient
     private String confirmPassword;
     
-    @Column(name="api_token", nullable = false)
+    @Column(name="api_token", nullable = true)
     private String apiToken;
 
     @Column(name = "telephone", nullable = false, length = 32)

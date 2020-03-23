@@ -1,4 +1,4 @@
-package com.spring.miniposbackend.config;
+package com.spring.miniposbackend.util;
 
 
 import java.io.Serializable;

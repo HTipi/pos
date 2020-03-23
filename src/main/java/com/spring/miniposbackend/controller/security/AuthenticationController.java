@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.spring.miniposbackend.config.JwtTokenUtil;
 import com.spring.miniposbackend.model.security.JwtRequest;
 import com.spring.miniposbackend.model.security.JwtResponse;
 import com.spring.miniposbackend.service.security.JwtUserDetailsService;
+import com.spring.miniposbackend.util.JwtTokenUtil;
 
 
 @RestController
@@ -50,7 +50,7 @@ public class AuthenticationController {
 			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 		} catch (DisabledException e) {
 			throw new Exception("USER_DISABLED", e);
-		} catch (BadCredentialsException e) {
+		}  catch (BadCredentialsException e) {
 			throw new Exception("INVALID_CREDENTIALS", e);
 		}
 	}

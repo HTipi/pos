@@ -16,8 +16,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.spring.miniposbackend.service.security.JwtUserDetailsService;
+import com.spring.miniposbackend.util.JwtTokenUtil;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -38,17 +40,21 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		String jwtToken = null;
 		// JWT Token is in the form "Bearer token". Remove Bearer word and get
 		// only the Token
-		if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-			jwtToken = requestTokenHeader.substring(7);
-			try {
-				username = jwtTokenUtil.getUsernameFromToken(jwtToken);
-			} catch (IllegalArgumentException e) {
-				System.out.println("Unable to get JWT Token");
-			} catch (ExpiredJwtException e) {
-				System.out.println("JWT Token has expired");
+		if(!request.getRequestURI().contentEquals("/authenticate")) {
+			if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
+				jwtToken = requestTokenHeader.substring(7);
+				try {
+					username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+				} catch (IllegalArgumentException e) {
+					System.out.println("Unable to get JWT Token");
+				} catch (ExpiredJwtException e) {
+					System.out.println("JWT Token has expired");
+				} catch (JwtException e) {
+					System.out.println("OUT: " + e.getMessage());
+				}
+			} else {
+				logger.warn("JWT Token does not begin with Bearer String");
 			}
-		} else {
-			logger.warn("JWT Token does not begin with Bearer String");
 		}
 
 		// Once we get the token validate it.

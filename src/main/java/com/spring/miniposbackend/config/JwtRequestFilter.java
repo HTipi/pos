@@ -8,9 +8,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -40,7 +43,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		String jwtToken = null;
 		// JWT Token is in the form "Bearer token". Remove Bearer word and get
 		// only the Token
-		if(!request.getRequestURI().contentEquals("/authenticate")) {
+		if (!request.getRequestURI().contentEquals("/authenticate")) {
 			if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
 				jwtToken = requestTokenHeader.substring(7);
 				try {
@@ -50,7 +53,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 				} catch (ExpiredJwtException e) {
 					System.out.println("JWT Token has expired");
 				} catch (JwtException e) {
-					System.out.println("OUT: " + e.getMessage());
+					System.out.println("Invalid to: " + e.getMessage());
 				}
 			} else {
 				logger.warn("JWT Token does not begin with Bearer String");
@@ -59,24 +62,38 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 		// Once we get the token validate it.
 		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+			try {
+				UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
+				validateUserDetails(userDetails);
+				if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
 
-			UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
+					UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+							userDetails, null, userDetails.getAuthorities());
+					usernamePasswordAuthenticationToken
+							.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+					// After setting the Authentication in the context, we specify
+					// that the current user is authenticated. So it passes the
+					// Spring Security Configurations successfully.
+					SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+				}
+			} catch (UsernameNotFoundException e) {
+				System.out.println(e.getMessage());
 
-			// if token is valid configure Spring Security to manually set
-			// authentication
-			if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
-
-				UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-						userDetails, null, userDetails.getAuthorities());
-				usernamePasswordAuthenticationToken
-						.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-				// After setting the Authentication in the context, we specify
-				// that the current user is authenticated. So it passes the
-				// Spring Security Configurations successfully.
-				SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+			} catch (LockedException e) {
+				System.out.println(e.getMessage());
+			} catch (DisabledException e) {
+				System.out.println(e.getMessage());
 			}
 		}
 		chain.doFilter(request, response);
 	}
 
+	private void validateUserDetails(UserDetails userDetails) throws DisabledException, LockedException {
+		if (!userDetails.isEnabled()) {
+			throw new DisabledException("USER_DISABLED");
+		}
+		if (!userDetails.isAccountNonLocked()) {
+			throw new LockedException("USER_LOCKED");
+		}
+	}
 }

@@ -5,4 +5,4 @@
 .project
 postgres.iml
 mini-pos-backend.iml
-/src/main/resources/application.properties
+src/main/resources/application.properties

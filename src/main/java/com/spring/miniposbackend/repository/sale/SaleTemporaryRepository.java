@@ -36,8 +36,10 @@ public interface SaleTemporaryRepository extends JpaRepository<SaleTemporary, Lo
             nativeQuery = true)
     List<SaleTemporary> findByUserIdWithisPrinted(Integer seatId, boolean isPrinted);
 
-    @Query(value = "delete from SaleTemporary s where s.seat.id=?1")
-    List<SaleTemporary> deleteBySeatId(Integer seatId);
+    
+    @Modifying
+    @Query(value = "delete from Sales_temp where seat_id=?1", nativeQuery = true)
+    void deleteBySeatId(Integer seatId);
     
     
     @Modifying

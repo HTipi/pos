@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.spring.miniposbackend.model.admin.Item;
 
-public interface ItemRepository extends JpaRepository<Item, Integer>{
+public interface ItemRepository extends JpaRepository<Item, Long>{
 	@Query(value = "select i from Item i where i.enable=?1")
 	List<Item> findAllWithEnable(boolean enable);
 	List<Item> findByItemTypeId(Integer itemTypeId);

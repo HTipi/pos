@@ -1,5 +1,6 @@
 package com.spring.miniposbackend.model.sale;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.CascadeType;
@@ -20,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.AuditModel;
 import com.spring.miniposbackend.model.admin.Branch;
 import com.spring.miniposbackend.model.admin.Item;
+import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.model.admin.User;
 
 import lombok.Getter;
@@ -42,16 +44,16 @@ public class SaleDetail extends AuditModel {
     private Date valueDate;
 	
 	@Column(name = "price", nullable = false, length = 10, precision = 2)
-    private Float price;
+    private BigDecimal price;
 	
 	@Column(name = "quantity", nullable = false)
-    private Integer quantity;
+    private Short quantity;
 	
 	@Column(name = "discount", nullable = false, length = 10, precision = 2)
-    private Float discount;
+    private Double discount;
 	
 	@Column(name = "total", nullable = false, length = 10, precision = 2)
-    private Float total;
+    private Double total;
 	
 	@Column(name = "reverse", nullable = false)
     @ColumnDefault("false")
@@ -76,19 +78,19 @@ public class SaleDetail extends AuditModel {
     private User user;
 	
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "item_id", nullable = false)
+    @JoinColumn(name = "item_branch_id", nullable = false)
     @JsonIgnore
-    private Item item;
+    private ItemBranch itemBranch;
 	
 	public String getItemCode() {
-		return item.getCode();
+		return itemBranch.getCode();
 	}
 	
 	public String getItemName() {
-		return item.getName();
+		return itemBranch.getName();
 	}
 	
 	public String getItemNameKh() {
-		return item.getNameKh();
+		return itemBranch.getNameKh();
 	}
 }

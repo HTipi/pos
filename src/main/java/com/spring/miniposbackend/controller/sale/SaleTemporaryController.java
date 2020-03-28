@@ -44,11 +44,6 @@ public class SaleTemporaryController {
 	public SaleTemporary remove(@PathVariable Long saleTempId){
 		return saleService.removeItem(saleTempId);
 	}
-
-	@DeleteMapping("{seatId}")
-	public List<SaleTemporary> removeBySeat(@PathVariable Integer seatId){
-		return saleService.removeItemBySeat(seatId);
-	}
 	
 	
 	@PatchMapping("qty/{saleTempId}")

@@ -90,9 +90,6 @@ public class SaleTemporaryService {
 		}).orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
 	}
 
-	public List<SaleTemporary> removeItemBySeat(Integer seatId) {
-		return saleRepository.deleteBySeatId(seatId);
-	}
 
 	public SaleTemporary setQuantity(Long saleTempId, Short quantity) {
 		return saleRepository.findById(saleTempId).map(sale -> {

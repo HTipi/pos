@@ -50,6 +50,10 @@ public class Sale extends AuditModel{
 	@Column(name = "reverse_date", nullable = true)
     private Date reverseDate;
 	
+	@Column(name = "total", nullable = true, length = 10, precision = 2)
+	@ColumnDefault("0")
+    private Double total;
+	
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "branch_id", nullable = false)
     @JsonIgnore

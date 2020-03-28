@@ -9,7 +9,8 @@ import com.spring.miniposbackend.model.sale.Sale;
 
 @Repository
 public interface SaleRepository extends JpaRepository<Sale, Long> {
-	public List<Sale> findByBranchId(Integer branchId);
-	public List<Sale> findByUserId(Integer userId);
+	 List<Sale> findByBranchId(Integer branchId);
+	 List<Sale> findByUserId(Integer userId);
+	 
 
 }

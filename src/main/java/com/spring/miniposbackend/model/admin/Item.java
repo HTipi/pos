@@ -35,7 +35,7 @@ public class Item extends AuditModel{
 	@Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     @Column(name = "id", nullable = false)
-    private Integer id;
+    private Long id;
 	
 	@Column(name = "code", nullable = false,length = 32)
     private String code;

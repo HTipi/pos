@@ -9,6 +9,5 @@ import com.spring.miniposbackend.model.sale.SaleDetail;
 
 @Repository
 public interface SaleDetailRepository extends JpaRepository<SaleDetail, Long>{
-	public List<SaleDetail> findBySaleId(Long saleId);
-	public List<SaleDetail> findByItemId(Long itemId);
+	 List<SaleDetail> findBySaleId(Long saleId);
 }

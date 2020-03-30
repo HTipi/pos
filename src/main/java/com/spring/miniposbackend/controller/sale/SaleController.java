@@ -4,16 +4,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.spring.miniposbackend.modelview.SaleTransaction;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.spring.miniposbackend.model.sale.Sale;
-import com.spring.miniposbackend.model.sale.SaleTemporary;
 import com.spring.miniposbackend.service.sale.SaleService;
 
 @RestController
@@ -25,8 +20,8 @@ public class SaleController {
 	private SaleService saleService;
 	
 	@GetMapping("by-user")
-	public List<Sale> getByUserId(@RequestParam Integer userId){
-		return saleService.showSaleByUser(userId);
+	public List<SaleTransaction> getByUserId(@RequestParam Integer userId){
+		return saleService.showSaleTranByUser(userId);
 	}
 	
 	@GetMapping("by-branch")
@@ -38,10 +33,12 @@ public class SaleController {
 	public Sale create(@RequestParam Integer seatId, @RequestParam Integer branchId,@RequestParam Integer userId) {
 		return saleService.create(seatId,branchId,userId);
 	}
-	
-	
-	
-	
-	
+
+	@PatchMapping("{saleId}")
+	public Sale reverseSale(@PathVariable Long saleId) {
+
+		return saleService.reverseSale(saleId);
+	}
+
 
 }

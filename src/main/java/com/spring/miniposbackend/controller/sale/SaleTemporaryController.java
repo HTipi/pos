@@ -55,7 +55,6 @@ public class SaleTemporaryController {
 		try {
 			return saleService.printBySeat(seatId);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}

@@ -6,7 +6,6 @@ import com.spring.miniposbackend.model.sale.Receipt;
 
 @Repository
 public interface ReceiptRepository extends JpaRepository<Receipt, Integer> {
-	 
-	 
+
 
 }

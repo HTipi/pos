@@ -117,7 +117,7 @@ public class SaleService {
         });
         return saleRepository.save(sale);
     }
-    @Transactional
+    @Transactional(readOnly = true)
     public List<SaleTransaction> showSaleTranByUser(Integer userId) {
         List<SaleTransaction> saleTransactions = new ArrayList<>();
         List<Sale> saleList = saleRepository.findByUserId(userId);
@@ -136,7 +136,7 @@ public class SaleService {
                 saleTransaction.setItemName(saleDetail.getItemName());
                 saleTransaction.setPrice(saleDetail.getPrice());
                 saleTransaction.setQuantity(saleDetail.getQuantity());
-                saleTransaction.setSaleInvoice(sale.getReceiptNumber());
+                saleTransaction.setReceiptNumber(sale.getReceiptNumber());
                 saleTransaction.setTotal(sale.getTotal());
                 saleTransaction.setReverse(sale.isReverse());
                 saleTransaction.setReverseDate(saleDetail.getReverseDate());

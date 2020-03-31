@@ -31,7 +31,7 @@ public class SaleTransaction{
     private Date reverseDate;
 
 
-    private String saleInvoice;
+    private String receiptNumber;
 	
 
     private String branchName;

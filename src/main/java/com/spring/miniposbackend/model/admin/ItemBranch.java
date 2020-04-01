@@ -73,9 +73,7 @@ public class ItemBranch extends AuditModel{
 	public String getNameKh() {
 		return item.getNameKh();
 	}
-	public String getImage() {
-		return item.getImage();
-	}
+
 	public BigDecimal getPrice() {
 		if(useItemConfiguration) {
 			return item.getPrice();

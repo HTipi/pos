@@ -1,6 +1,5 @@
 package com.spring.miniposbackend.model.admin;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.AuditModel;
 import lombok.Getter;
 import lombok.Setter;

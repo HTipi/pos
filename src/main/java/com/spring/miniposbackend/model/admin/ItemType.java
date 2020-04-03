@@ -47,6 +47,9 @@ public class ItemType extends AuditModel{
     @JsonIgnore
     private Corporate corporate;
 	
+	@Column(name ="version", nullable = false)
+	private Short version= 1;
+	
 	@Column(name = "enable", nullable = false)
     @ColumnDefault("false")
     private boolean enable;

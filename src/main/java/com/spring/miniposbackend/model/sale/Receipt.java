@@ -31,20 +31,15 @@ public class Receipt extends AuditModel{
 	@Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private Integer id;
 	
 	@Column(name = "receipt_number", nullable = false,length = 32)
-    private Integer receiptNumber;
+    private Long receiptNumber;
 	
 	
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "branch_id", nullable = false)
+    @JoinColumn(name = "branch_id", unique = true, nullable = false)
     @JsonIgnore
     private Branch branch;
-	
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "sale_id", nullable = false)
-    @JsonIgnore
-    private Sale sale;
 	
 }

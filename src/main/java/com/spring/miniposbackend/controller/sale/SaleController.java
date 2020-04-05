@@ -24,6 +24,11 @@ public class SaleController {
 		return saleService.showSaleTranByUser(userId);
 	}
 	
+	@GetMapping("summary/by-user")
+	public List<Sale> getSaleByUserId(@RequestParam Integer userId){
+		return saleService.showSaleByUser(userId);
+	}
+	
 	@GetMapping("by-branch")
 	public List<Sale> getByBranchId(@RequestParam Integer branchId){
 		return saleService.showSaleByBranch(branchId);

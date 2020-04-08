@@ -43,6 +43,9 @@ public class SaleService {
 
     @Autowired
     private ItemBranchRepository itemRepository;
+    
+    @Autowired
+    private ReceiptService receiptService;
 
     public List<Sale> showSaleByUser(Integer userId) {
         return saleRepository.findByUserId(userId);
@@ -69,7 +72,7 @@ public class SaleService {
         sale.setBranch(branch);
         sale.setUser(user);
         sale.setTotal(0.00);
-        sale.setReceiptNumber("0000001");
+        sale.setReceiptNumber("0");
         sale.setValueDate(today);
         final Sale saleResult = saleRepository.save(sale);
         saleTemps.forEach((saleTemp) -> {
@@ -96,6 +99,8 @@ public class SaleService {
             sum += listsales.get(i).getTotal();
         }
         saleResult.setTotal(sum);
+        String receiptNum = receiptService.getReceiptNumberByBranchId(branchId).toString();
+        sale.setReceiptNumber(receiptNum);
         return saleRepository.save(saleResult);
     }
 

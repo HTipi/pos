@@ -64,6 +64,11 @@ public class ItemBranch extends AuditModel{
 		return id;
 	}
 	
+	@JsonIgnore
+	public Item getItem() {
+		return item;
+	}
+	
 	public String getCode() {
 		return item.getCode();
 	}
@@ -73,7 +78,9 @@ public class ItemBranch extends AuditModel{
 	public String getNameKh() {
 		return item.getNameKh();
 	}
-
+	public String getImage() {
+		return item.getImage();
+	}
 	public BigDecimal getPrice() {
 		if(useItemConfiguration) {
 			return item.getPrice();
@@ -96,5 +103,9 @@ public class ItemBranch extends AuditModel{
 	
 	public Integer getItemTypeId() {
 		return item.getItemType().getId();
+	}
+	
+	public Short getVersion() {
+		return item.getVersion();
 	}
 }

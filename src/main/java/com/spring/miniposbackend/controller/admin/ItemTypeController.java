@@ -1,16 +1,15 @@
 package com.spring.miniposbackend.controller.admin;
 
-import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 //import org.springframework.web.bind.annotation.PatchMapping;
 //import org.springframework.web.bind.annotation.PathVariable;
 //import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.miniposbackend.model.admin.ItemType;
+import com.spring.miniposbackend.modelview.ImageRequest;
+import com.spring.miniposbackend.modelview.ImageResponse;
 import com.spring.miniposbackend.service.admin.ItemTypeService;
 
 @RestController
@@ -37,16 +38,23 @@ public class ItemTypeController {
 	}
 	
 	@PostMapping("{itemTypeId}/upload")
-	public BodyBuilder uploadImage(@PathVariable Integer itemTypeId, @RequestParam("imageFile") MultipartFile file) {
-		if( itemTypeService.uploadImage(itemTypeId, file)) {
-			return ResponseEntity.status(HttpStatus.OK);
-		}else {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+	public ItemType uploadImage(@PathVariable Integer itemTypeId, @RequestParam("imageFile") MultipartFile file) {
+		return itemTypeService.uploadImage(itemTypeId, file);
 	}
 	
 	@GetMapping("{itemTypeId}/get-image")
-	public String getImage(@PathVariable Integer itemTypeId) {
-		return Base64.getEncoder().encodeToString(itemTypeService.getImage(itemTypeId));
+	public ImageResponse getImage(@PathVariable Integer itemTypeId) {
+		return itemTypeService.getImage(itemTypeId);
 	}
+	
+	@GetMapping("image-list")
+	public List<ImageResponse> getImages(@RequestParam Integer corporateId){
+		return itemTypeService.getImages(corporateId);
+	}
+	
+	@GetMapping("image-update")
+	public List<ImageResponse> getUpdatedImages(@Valid @RequestBody List<ImageRequest> requestImages){
+		return itemTypeService.getImages(requestImages);
+	}
+	
 }

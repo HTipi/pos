@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.model.admin.Branch;
-import com.spring.miniposbackend.model.admin.Item;
 import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.model.admin.User;
 import com.spring.miniposbackend.model.sale.Sale;
@@ -19,7 +18,6 @@ import com.spring.miniposbackend.model.sale.SaleDetail;
 import com.spring.miniposbackend.model.sale.SaleTemporary;
 import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
-import com.spring.miniposbackend.repository.admin.ItemRepository;
 import com.spring.miniposbackend.repository.admin.UserRepository;
 import com.spring.miniposbackend.repository.sale.SaleDetailRepository;
 import com.spring.miniposbackend.repository.sale.SaleRepository;

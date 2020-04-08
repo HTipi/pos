@@ -1,29 +1,29 @@
-package com.spring.miniposbackend.controller.admin;
-
-//import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-//import org.springframework.web.bind.annotation.PatchMapping;
-//import org.springframework.web.bind.annotation.PathVariable;
-//import org.springframework.web.bind.annotation.PostMapping;
-//import org.springframework.web.bind.annotation.PutMapping;
-//import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.spring.miniposbackend.model.admin.Item;
-import com.spring.miniposbackend.service.admin.ItemService;
-
-@RestController
-@RequestMapping("item")
-public class ItemController {
-
-	@Autowired
-	private ItemService itemService;
+//package com.spring.miniposbackend.controller.admin;
+//
+////import java.math.BigDecimal;
+//import java.util.List;
+//import java.util.Optional;
+//
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.web.bind.annotation.GetMapping;
+////import org.springframework.web.bind.annotation.PatchMapping;
+////import org.springframework.web.bind.annotation.PathVariable;
+////import org.springframework.web.bind.annotation.PostMapping;
+////import org.springframework.web.bind.annotation.PutMapping;
+////import org.springframework.web.bind.annotation.RequestBody;
+//import org.springframework.web.bind.annotation.RequestMapping;
+//import org.springframework.web.bind.annotation.RequestParam;
+//import org.springframework.web.bind.annotation.RestController;
+//
+//import com.spring.miniposbackend.model.admin.Item;
+//import com.spring.miniposbackend.service.admin.ItemService;
+//
+//@RestController
+//@RequestMapping("item")
+//public class ItemController {
+//
+//	@Autowired
+//	private ItemService itemService;
 	
 //	@GetMapping
 //	public List<Item> show(@RequestParam Optional<Boolean> enable){
@@ -34,10 +34,10 @@ public class ItemController {
 //		}
 //	}
 	
-	@GetMapping("by-corporate")
-	public List<Item> getCorporate(@RequestParam Integer corporateId){
-		return itemService.showByCorpoateId(corporateId, Optional.of(true));
-	}
+//	@GetMapping("by-corporate")
+//	public List<Item> getCorporate(@RequestParam Integer corporateId){
+//		return itemService.showByCorpoateId(corporateId, Optional.of(true));
+//	}
 	
 //	@GetMapping("{itemId}")
 //	public Item get(@PathVariable Integer itemId) {
@@ -74,5 +74,5 @@ public class ItemController {
 //		return itemService.setEnable(itemId, enable);
 //	}
 
-	
-}
+//	
+//}

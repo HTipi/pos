@@ -46,9 +46,8 @@ public class Item extends AuditModel{
 	@Column(name = "name_kh", nullable = false, length = 128)
     private String nameKh;
 	
-	@JsonIgnore
-	@Column(name = "image", length = 1000)
-	private byte[] image;
+	@Column(name = "image",length = 64)
+    private String image;
 	
 	@Column(name = "price", nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
@@ -65,7 +64,7 @@ public class Item extends AuditModel{
     private ItemType itemType;
 	
 	@Column(name ="version", nullable = false)
-	private Short version= 1;
+	private Short version= 0;
 	
 	@Column(name = "enable", nullable = false)
     @ColumnDefault("false")

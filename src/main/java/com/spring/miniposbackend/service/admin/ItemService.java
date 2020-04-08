@@ -1,10 +1,17 @@
 package com.spring.miniposbackend.service.admin;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
@@ -14,12 +21,15 @@ import com.spring.miniposbackend.repository.admin.ItemRepository;
 
 @Service
 public class ItemService {
-	
+
 	@Autowired
 	private ItemRepository itemRepository;
 	@Autowired
 	private CorporateRepository corporateReposity;
-			
+
+	@Value("${file.path.image.item}")
+	private String imagePath;
+
 //	@Transactional(readOnly = true)
 //    public List<Item> shows(){
 //        return itemRepository.findAll();
@@ -29,30 +39,56 @@ public class ItemService {
 //    public List<Item> shows(boolean enable){
 //        return itemRepository.findAllWithEnable(enable);
 //    }
-    
-    public List<Item> showByCorpoateId(Integer corporateId, Optional<Boolean> enable){
-    	return corporateReposity.findById(corporateId)
-    			.map(corporate -> {
-    				if(!corporate.isEnable()) {
-						throw new ConflictException("Corporate is disable");
-					}
-    				if(enable.isPresent()) {
-    					return itemRepository.findByCorporateIdWithEnable(corporateId, enable.get());
-    				}else {
-    					return itemRepository.findByCorporateId(corporateId);
-    				}
-    			})
-    			.orElseThrow(() -> new ResourceNotFoundException("Corporate does not exist"));
-    			
-        
-    }
-    
+
+	public List<Item> showByCorpoateId(Integer corporateId, Optional<Boolean> enable) {
+		return corporateReposity.findById(corporateId).map(corporate -> {
+			if (!corporate.isEnable()) {
+				throw new ConflictException("Corporate is disable");
+			}
+			if (enable.isPresent()) {
+				return itemRepository.findByCorporateIdWithEnable(corporateId, enable.get());
+			} else {
+				return itemRepository.findByCorporateId(corporateId);
+			}
+		}).orElseThrow(() -> new ResourceNotFoundException("Corporate does not exist"));
+
+	}
+
+	public Item uploadImage(Long itemId, MultipartFile file) {
+		return itemRepository.findById(itemId).map(item -> {
+			if (file.isEmpty()) {
+				throw new ResourceNotFoundException("File content does not exist");
+			}
+			try {
+				// read and write the file to the selected location-
+				String baseLocation = Paths.get("").toAbsolutePath().toString() + "/" + imagePath;
+				File directory = new File(baseLocation);
+				if (!directory.exists()) {
+					directory.mkdirs();
+				}
+				String fileName = file.getOriginalFilename();
+				String newFileName = item.getId() + fileName.substring(fileName.lastIndexOf("."));
+				Path path = Paths.get(baseLocation + "/" + newFileName);
+				Files.write(path, file.getBytes());
+				item.setImage(newFileName);
+				item.setVersion((short) (item.getVersion() + 1));
+				return itemRepository.save(item);
+			} catch (IOException e) {
+				throw new ConflictException("Upable to upload File");
+
+			} catch (Exception e) {
+				throw new ConflictException(e.getMessage());
+			}
+		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
+	}
+
+
 //    @Transactional(readOnly = true)
 //    public Item show(Integer itemId){
 //        return itemRepository.findById(itemId)
 //        		.orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 //    }
-	
+
 //	@Transactional(readOnly = true)
 //    public List<Item> showByItemTypeId(Integer itemTypeId, boolean enable){
 //		return itemTypeRepository.findById(itemTypeId)
@@ -76,7 +112,7 @@ public class ItemService {
 //				})
 //				.orElseThrow(() -> new ResourceNotFoundException("Item Type does not exist"));
 //    }
-    
+
 //    @Transactional
 //    public Item update(Integer itemId, Integer itemTypeId,Item requestItem) {
 //    	return itemTypeRepository.findById(itemTypeId)
@@ -101,7 +137,7 @@ public class ItemService {
 //				})
 //				.orElseThrow(() -> new ResourceNotFoundException("Item Type does not exist"));
 //    }
-    
+
 //    @Transactional
 //    public Item setPrice(Integer itemId, BigDecimal price) {
 //    	return itemRepository.findById(itemId)
@@ -142,5 +178,5 @@ public class ItemService {
 //					}
 //				}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 //    }
-    
+
 }

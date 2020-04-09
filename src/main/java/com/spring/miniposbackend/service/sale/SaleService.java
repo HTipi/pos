@@ -145,7 +145,7 @@ public class SaleService {
                 saleTransaction.setPrice(Double.parseDouble(saleDetail.getPrice().toString()));
                 saleTransaction.setQuantity(saleDetail.getQuantity());
                 saleTransaction.setReceiptNumber(sale.getReceiptNumber());
-                saleTransaction.setTotal(sale.getTotal());
+                saleTransaction.setTotal(saleDetail.getTotal());
                 saleTransaction.setReverse(sale.isReverse());
                 saleTransaction.setReverseDate(saleDetail.getReverseDate());
                 saleTransaction.setValueDate(sale.getValueDate());

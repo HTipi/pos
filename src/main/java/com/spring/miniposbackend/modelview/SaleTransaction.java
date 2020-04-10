@@ -16,7 +16,7 @@ public class SaleTransaction{
     private Date valueDate;
 	
 
-    private BigDecimal price;
+    private Double price;
 	
 
     private Short quantity;

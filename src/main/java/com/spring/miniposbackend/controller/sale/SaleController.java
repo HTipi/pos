@@ -14,29 +14,28 @@ import com.spring.miniposbackend.service.sale.SaleService;
 @RestController
 @RequestMapping("sale")
 public class SaleController {
-	
-	
+
 	@Autowired
 	private SaleService saleService;
-	
+
 	@GetMapping("by-user")
-	public List<SaleTransaction> getByUserId(@RequestParam Integer userId){
-		return saleService.showSaleTranByUser(userId);
+	public List<SaleTransaction> getByUserId(@RequestParam Integer userId, @RequestParam Optional<Long> saleId) {
+		return saleService.showSaleTranByUser(userId, saleId);
 	}
-	
+
 	@GetMapping("summary/by-user")
-	public List<Sale> getSaleByUserId(@RequestParam Integer userId){
+	public List<Sale> getSaleByUserId(@RequestParam Integer userId) {
 		return saleService.showSaleByUser(userId);
 	}
-	
+
 	@GetMapping("by-branch")
-	public List<Sale> getByBranchId(@RequestParam Integer branchId){
+	public List<Sale> getByBranchId(@RequestParam Integer branchId) {
 		return saleService.showSaleByBranch(branchId);
 	}
-	
+
 	@PostMapping
-	public Sale create(@RequestParam Integer seatId, @RequestParam Integer branchId,@RequestParam Integer userId) {
-		return saleService.create(seatId,branchId,userId);
+	public Sale create(@RequestParam Integer seatId, @RequestParam Integer branchId, @RequestParam Integer userId) {
+		return saleService.create(seatId, branchId, userId);
 	}
 
 	@PatchMapping("{saleId}")
@@ -44,6 +43,5 @@ public class SaleController {
 
 		return saleService.reverseSale(saleId);
 	}
-
 
 }

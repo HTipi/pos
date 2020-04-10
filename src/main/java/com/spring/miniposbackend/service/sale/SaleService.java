@@ -3,6 +3,7 @@ package com.spring.miniposbackend.service.sale;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import com.spring.miniposbackend.modelview.SaleTransaction;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,9 +122,13 @@ public class SaleService {
         return saleRepository.save(sale);
     }
     @Transactional(readOnly = true)
-    public List<SaleTransaction> showSaleTranByUser(Integer userId) {
+    public List<SaleTransaction> showSaleTranByUser(Integer userId, Optional<Long> saleId) {
         List<SaleTransaction> saleTransactions = new ArrayList<>();
-        List<Sale> saleList = saleRepository.findByUserId(userId);
+        List<Sale> saleList = new ArrayList<>();
+        if (saleId.isPresent())
+        	 saleList = saleRepository.findByIdWithUserId(userId,saleId.get());
+        else
+         saleList = saleRepository.findByUserId(userId);
 
         if (saleList.size() == 0) {
             throw new ResourceNotFoundException("Record does not exist");
@@ -137,10 +142,10 @@ public class SaleService {
                 saleTransaction.setBranchName(saleDetail.getBranch().getName());
                 saleTransaction.setDiscount(saleDetail.getDiscount());
                 saleTransaction.setItemName(saleDetail.getItemName());
-                saleTransaction.setPrice(saleDetail.getPrice());
+                saleTransaction.setPrice(Double.parseDouble(saleDetail.getPrice().toString()));
                 saleTransaction.setQuantity(saleDetail.getQuantity());
                 saleTransaction.setReceiptNumber(sale.getReceiptNumber());
-                saleTransaction.setTotal(sale.getTotal());
+                saleTransaction.setTotal(saleDetail.getTotal());
                 saleTransaction.setReverse(sale.isReverse());
                 saleTransaction.setReverseDate(saleDetail.getReverseDate());
                 saleTransaction.setValueDate(sale.getValueDate());

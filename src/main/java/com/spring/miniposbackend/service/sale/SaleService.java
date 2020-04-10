@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import com.spring.miniposbackend.modelview.SaleTransaction;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,8 +49,15 @@ public class SaleService {
     @Autowired
     private ReceiptService receiptService;
 
-    public List<Sale> showSaleByUser(Integer userId) {
+    public List<Sale> showSaleByUser(Integer userId, @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> date) {
+    	
+    	if (date.isPresent()) {
+    		System.out.println(date);
+    		return saleRepository.findByIdWithValueDate(userId, date.get());
+    	}
         return saleRepository.findByUserId(userId);
+        
+        
     }
 
     public List<Sale> showSaleByBranch(Integer branchId) {

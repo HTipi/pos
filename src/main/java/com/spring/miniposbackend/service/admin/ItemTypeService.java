@@ -71,7 +71,7 @@ public class ItemTypeService {
 			}
 			try {
 				// read and write the file to the selected location-
-				String baseLocation = Paths.get("").toAbsolutePath().toString() + "/" + imagePath;
+				String baseLocation = String.format("%s/"+imagePath, System.getProperty("catalina.base"));
 				File directory = new File(baseLocation);
 				if (!directory.exists()) {
 					directory.mkdirs();
@@ -87,7 +87,7 @@ public class ItemTypeService {
 				throw new ConflictException("Upable to upload File");
 
 			} catch (Exception e) {
-				throw new ConflictException(e.getMessage());
+				throw new ConflictException("Exception :"+e.getMessage());
 			}
 		}).orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
 	}
@@ -103,7 +103,7 @@ public class ItemTypeService {
 			return new ImageResponse(itemType.getId().longValue(), null, itemType.getVersion());
 		}
 		try {
-			String fileLocation = Paths.get("").toAbsolutePath().toString() + "/" + imagePath + "/"
+			String fileLocation = String.format("%s/"+imagePath, System.getProperty("catalina.base"))+ "/"
 					+ itemType.getImage();
 			File file = new File(fileLocation);
 			byte[] bArray = new byte[(int) file.length()];

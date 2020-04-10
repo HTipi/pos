@@ -2,7 +2,6 @@ package com.spring.miniposbackend.service.admin;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -58,7 +57,7 @@ public class ItemBranchService {
 			return new ImageResponse(itemBranch.getId(), null, itemBranch.getVersion());
 		}
 		try {
-			String fileLocation = Paths.get("").toAbsolutePath().toString() + "/" + imagePath + "/" + itemBranch.getImage();
+			String fileLocation = String.format("%s/"+imagePath, System.getProperty("catalina.base")) + "/" + itemBranch.getImage();
 			File file = new File(fileLocation);
 			byte[] bArray = new byte[(int) file.length()];
 			FileInputStream fis = new FileInputStream(file);

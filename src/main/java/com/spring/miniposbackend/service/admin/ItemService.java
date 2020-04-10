@@ -61,7 +61,7 @@ public class ItemService {
 			}
 			try {
 				// read and write the file to the selected location-
-				String baseLocation = Paths.get("").toAbsolutePath().toString() + "/" + imagePath;
+				String baseLocation = String.format("%s/"+imagePath, System.getProperty("catalina.base"));
 				File directory = new File(baseLocation);
 				if (!directory.exists()) {
 					directory.mkdirs();

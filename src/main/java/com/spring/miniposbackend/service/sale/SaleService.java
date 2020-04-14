@@ -64,8 +64,6 @@ public class SaleService {
         return saleRepository.findByBranchId(branchId);
     }
 
-    Date today = new Date();
-
     @Transactional
     public Sale create(Integer seatId, Integer branchId, Integer userId) {
         User user = userRepository.findById(userId)
@@ -82,7 +80,7 @@ public class SaleService {
         sale.setUser(user);
         sale.setTotal(0.00);
         sale.setReceiptNumber("0");
-        sale.setValueDate(today);
+        sale.setValueDate(new Date());
         final Sale saleResult = saleRepository.save(sale);
         saleTemps.forEach((saleTemp) -> {
 
@@ -93,7 +91,7 @@ public class SaleService {
             saleDeail.setBranch(branch);
             saleDeail.setUser(user);
             saleDeail.setSale(saleResult);
-            saleDeail.setValueDate(today);
+            saleDeail.setValueDate(new Date());
             saleDeail.setDiscount(saleTemp.getDiscountAmount());
             saleDeail.setPrice(saleTemp.getPrice());
             saleDeail.setQuantity(saleTemp.getQuantity());
@@ -117,13 +115,13 @@ public class SaleService {
     public Sale reverseSale(Long saleId) {
         Sale sale = saleRepository.findById(saleId).orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
         sale.setReverse(true);
-        sale.setReverseDate(today);
+        sale.setReverseDate(new Date());
         List<SaleDetail> saleDetail = saleDetailRepository.findBySaleId(saleId);
         if (saleDetail.size() == 0) {
             throw new ResourceNotFoundException("Record does not exist");
         }
         saleDetail.forEach((sales) -> {
-            sales.setReverseDate(today);
+            sales.setReverseDate(new Date());
             sales.setReverse(true);
             saleDetailRepository.save(sales);
         });

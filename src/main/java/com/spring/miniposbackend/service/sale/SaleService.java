@@ -156,6 +156,7 @@ public class SaleService {
                 saleTransaction.setReverseDate(saleDetail.getReverseDate());
                 saleTransaction.setValueDate(sale.getValueDate());
                 saleTransaction.setUserName(sale.getUser().getFullName());
+                saleTransaction.setItemId(saleDetail.getItemBranch().getId());
                 saleTransactions.add(saleTransaction);
             });
         });

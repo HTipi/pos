@@ -41,7 +41,7 @@ public class SaleController {
 		return saleService.create(seatId, branchId, userId);
 	}
 
-	@PatchMapping("{saleId}")
+	@PatchMapping("reverse/{saleId}")
 	public Sale reverseSale(@PathVariable Long saleId) {
 
 		return saleService.reverseSale(saleId);

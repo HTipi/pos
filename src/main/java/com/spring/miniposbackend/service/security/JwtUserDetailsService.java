@@ -15,23 +15,18 @@ public class JwtUserDetailsService implements UserDetailsService {
 
 	@Autowired
 	private UserRepository userRepository;
-	@Autowired RoleRepository roleRepository;
-	
+	@Autowired
+	RoleRepository roleRepository;
+
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		
-		com.spring.miniposbackend.model.admin.User user = userRepository.findFirstByUsername(username);
-		if(user == null) {
-			throw new UsernameNotFoundException("USER_NOT_FOUND");
-		}else {
-			String roleName = roleRepository.findById(user.getRole().getId()).orElse(null).getName();
-			UserDetails userDetails = User.withUsername(user.getUsername())
-					.password(user.getPassword())
-					.disabled(!user.isEnable())
-					.accountLocked(user.isLock())
-					.roles(roleName).build();
-			return userDetails;
-		}
-		
+
+		com.spring.miniposbackend.model.admin.User user = userRepository.findFirstByUsername(username)
+				.orElseThrow(() -> new UsernameNotFoundException("USER_NOT_FOUND"));
+		String roleName = roleRepository.findById(user.getRole().getId()).orElse(null).getName();
+		UserDetails userDetails = User.withUsername(user.getUsername()).password(user.getPassword())
+				.disabled(!user.isEnable()).accountLocked(user.isLock()).roles(roleName).build();
+		return userDetails;
+
 	}
 }

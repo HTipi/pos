@@ -32,8 +32,8 @@ public class ItemTypeController {
 	@Autowired
 	private ItemTypeService itemTypeService;
 	
-	@GetMapping("by-corporate")
-	public List<ItemType> getByCorporate(@RequestParam Integer corporateId){ // will get from user
+	@PostMapping("by-corporate")
+	public List<ItemType> getByCorporate(@RequestParam("cop") Integer corporateId){ // will get from user
 		return itemTypeService.showByCorporateId(corporateId, Optional.of(true));
 	}
 	

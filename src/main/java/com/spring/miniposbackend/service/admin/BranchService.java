@@ -1,25 +1,91 @@
-//package com.spring.miniposbackend.service.admin;
-//
-//
-//import com.spring.miniposbackend.exception.ResourceNotFoundException;
-//import com.spring.miniposbackend.model.admin.Branch;
-//import com.spring.miniposbackend.repository.admin.*;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Service;
+package com.spring.miniposbackend.service.admin;
+
+import com.spring.miniposbackend.exception.ConflictException;
+import com.spring.miniposbackend.exception.ResourceNotFoundException;
+import com.spring.miniposbackend.model.admin.Branch;
+import com.spring.miniposbackend.modelview.ImageResponse;
+import com.spring.miniposbackend.repository.admin.BranchRepository;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 //import org.springframework.transaction.annotation.Transactional;
 //
 //import java.util.List;
 //
-//@Service
-//public class BranchService {
-//
-//    @Autowired
-//    private BranchRepository branchRepository;
+@Service
+public class BranchService {
+
+    @Autowired
+    private BranchRepository branchRepository;
 //    @Autowired
 //    private CorporateRepository corporateRepository;
 //    @Autowired
 //    private AddressRepository addressRepository;
-//
+    
+	@Value("${file.path.image.branch}")
+	private String imagePath;
+    
+    public Branch uploadImage(Integer branchId, MultipartFile file) {
+		return branchRepository.findById(branchId).map(branch -> {
+			if (file.isEmpty()) {
+				throw new ResourceNotFoundException("File content does not exist");
+			}
+			try {
+				// read and write the file to the selected location-
+				String baseLocation = String.format("%s/"+imagePath, System.getProperty("catalina.base"));
+				File directory = new File(baseLocation);
+				if (!directory.exists()) {
+					directory.mkdirs();
+				}
+				String fileName = file.getOriginalFilename();
+				String newFileName = branch.getId() + fileName.substring(fileName.lastIndexOf("."));
+				Path path = Paths.get(baseLocation + "/" + newFileName);
+				Files.write(path, file.getBytes());
+				branch.setLogo(newFileName);
+				return branchRepository.save(branch);
+			} catch (IOException e) {
+				throw new ConflictException("Upable to upload File");
+
+			} catch (Exception e) {
+				throw new ConflictException("Exception :"+e.getMessage());
+			}
+		}).orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
+	}
+    
+    public ImageResponse getImage(Integer branchId) {
+		return branchRepository.findById(branchId).map(branch -> {
+			return getImage(branch);
+		}).orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
+	}
+    
+	public ImageResponse getImage(Branch branch) {
+		if(branch.getLogo().isEmpty()) {
+			return new ImageResponse(branch.getId().longValue(), null, null);
+		}
+		try {
+			String fileLocation = String.format("%s/"+imagePath, System.getProperty("catalina.base"))+ "/"
+					+ branch.getLogo();
+			File file = new File(fileLocation);
+			byte[] bArray = new byte[(int) file.length()];
+			FileInputStream fis = new FileInputStream(file);
+			fis.read(bArray);
+			fis.close();
+			return new ImageResponse(branch.getId().longValue(), bArray, null);
+
+		} catch (Exception e) {
+			return new ImageResponse(branch.getId().longValue(), null, null);
+		}
+	}
+    
 //    public Branch create(Integer corporateId, Integer addressId, Branch branchRequest) {
 //
 //        if (!this.corporateRepository.existsById(corporateId))
@@ -124,4 +190,4 @@
 //
 //    }
 //
-//}
+}

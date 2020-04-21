@@ -40,6 +40,8 @@ public class SaleTransaction{
     private String userName;
 
     private String itemName;
+    
+    private Long itemId;
 	
 
 }

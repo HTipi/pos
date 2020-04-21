@@ -50,7 +50,7 @@ public class ItemBranchController {
 		return itemBranchService.getImages(branchId);
 	}
 	
-	@GetMapping("image-update")
+	@PostMapping("image-update")
 	public List<ImageResponse> getUpdatedImages(@Valid @RequestBody List<ImageRequest> requestImages){
 		return itemBranchService.getImages(requestImages);
 	}

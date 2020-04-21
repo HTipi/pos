@@ -15,6 +15,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.AuditModel;
@@ -39,6 +40,7 @@ public class Sale extends AuditModel{
 	
 	@Column(name = "receipt_number", nullable = false,length = 32)
     private String receiptNumber;
+	
 	
 	@Column(name = "value_date", nullable = false)
     private Date valueDate;

@@ -1,11 +1,13 @@
 package com.spring.miniposbackend.controller.sale;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import com.spring.miniposbackend.modelview.SaleTransaction;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import com.spring.miniposbackend.model.sale.Sale;
@@ -24,8 +26,9 @@ public class SaleController {
 	}
 
 	@GetMapping("summary/by-user")
-	public List<Sale> getSaleByUserId(@RequestParam Integer userId) {
-		return saleService.showSaleByUser(userId);
+	public List<Sale> getSaleByUserId(@RequestParam Integer userId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> date) {
+		
+		return saleService.showSaleByUser(userId,date);
 	}
 
 	@GetMapping("by-branch")
@@ -38,7 +41,7 @@ public class SaleController {
 		return saleService.create(seatId, branchId, userId);
 	}
 
-	@PatchMapping("{saleId}")
+	@PatchMapping("reverse/{saleId}")
 	public Sale reverseSale(@PathVariable Long saleId) {
 
 		return saleService.reverseSale(saleId);

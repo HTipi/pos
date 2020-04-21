@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import com.spring.miniposbackend.modelview.SaleTransaction;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,15 +49,20 @@ public class SaleService {
     @Autowired
     private ReceiptService receiptService;
 
-    public List<Sale> showSaleByUser(Integer userId) {
+    public List<Sale> showSaleByUser(Integer userId, @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> date) {
+    	
+    	if (date.isPresent()) {
+    		System.out.println(date);
+    		return saleRepository.findByIdWithValueDate(userId, date.get());
+    	}
         return saleRepository.findByUserId(userId);
+        
+        
     }
 
     public List<Sale> showSaleByBranch(Integer branchId) {
         return saleRepository.findByBranchId(branchId);
     }
-
-    Date today = new Date();
 
     @Transactional
     public Sale create(Integer seatId, Integer branchId, Integer userId) {
@@ -74,7 +80,7 @@ public class SaleService {
         sale.setUser(user);
         sale.setTotal(0.00);
         sale.setReceiptNumber("0");
-        sale.setValueDate(today);
+        sale.setValueDate(new Date());
         final Sale saleResult = saleRepository.save(sale);
         saleTemps.forEach((saleTemp) -> {
 
@@ -85,7 +91,7 @@ public class SaleService {
             saleDeail.setBranch(branch);
             saleDeail.setUser(user);
             saleDeail.setSale(saleResult);
-            saleDeail.setValueDate(today);
+            saleDeail.setValueDate(new Date());
             saleDeail.setDiscount(saleTemp.getDiscountAmount());
             saleDeail.setPrice(saleTemp.getPrice());
             saleDeail.setQuantity(saleTemp.getQuantity());
@@ -109,13 +115,13 @@ public class SaleService {
     public Sale reverseSale(Long saleId) {
         Sale sale = saleRepository.findById(saleId).orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
         sale.setReverse(true);
-        sale.setReverseDate(today);
+        sale.setReverseDate(new Date());
         List<SaleDetail> saleDetail = saleDetailRepository.findBySaleId(saleId);
         if (saleDetail.size() == 0) {
             throw new ResourceNotFoundException("Record does not exist");
         }
         saleDetail.forEach((sales) -> {
-            sales.setReverseDate(today);
+            sales.setReverseDate(new Date());
             sales.setReverse(true);
             saleDetailRepository.save(sales);
         });
@@ -150,6 +156,7 @@ public class SaleService {
                 saleTransaction.setReverseDate(saleDetail.getReverseDate());
                 saleTransaction.setValueDate(sale.getValueDate());
                 saleTransaction.setUserName(sale.getUser().getFullName());
+                saleTransaction.setItemId(saleDetail.getItemBranch().getId());
                 saleTransactions.add(saleTransaction);
             });
         });

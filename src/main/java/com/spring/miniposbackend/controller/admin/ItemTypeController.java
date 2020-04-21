@@ -52,7 +52,7 @@ public class ItemTypeController {
 		return itemTypeService.getImages(corporateId);
 	}
 	
-	@GetMapping("image-update")
+	@PostMapping("image-update")
 	public List<ImageResponse> getUpdatedImages(@Valid @RequestBody List<ImageRequest> requestImages){
 		return itemTypeService.getImages(requestImages);
 	}

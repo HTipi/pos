@@ -1,7 +1,5 @@
 package com.spring.miniposbackend.service.admin;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +14,7 @@ import com.spring.miniposbackend.modelview.ImageRequest;
 import com.spring.miniposbackend.modelview.ImageResponse;
 import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
+import com.spring.miniposbackend.util.ImageUtil;
 
 @Service
 public class ItemBranchService {
@@ -24,6 +23,9 @@ public class ItemBranchService {
 	private ItemBranchRepository itemBranchRepository;
 	@Autowired
 	private BranchRepository branchRepository;
+	@Autowired
+	private ImageUtil imageUtil;
+	
 
 	@Value("${file.path.image.item}")
 	private String imagePath;
@@ -57,12 +59,9 @@ public class ItemBranchService {
 			return new ImageResponse(itemBranch.getId(), null, itemBranch.getVersion());
 		}
 		try {
-			String fileLocation = String.format("%s/"+imagePath, System.getProperty("catalina.base")) + "/" + itemBranch.getImage();
-			File file = new File(fileLocation);
-			byte[] bArray = new byte[(int) file.length()];
-			FileInputStream fis = new FileInputStream(file);
-			fis.read(bArray);
-			fis.close();
+			String fileLocation = String.format("%s/"+imagePath, System.getProperty("catalina.base"))+ "/"
+					+ itemBranch.getImage();
+			byte[] bArray = imageUtil.getImage(fileLocation);
 			return new ImageResponse(itemBranch.getId(), bArray, itemBranch.getVersion());
 
 		} catch (Exception e) {

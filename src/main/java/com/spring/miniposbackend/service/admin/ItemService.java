@@ -1,10 +1,6 @@
 package com.spring.miniposbackend.service.admin;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +14,7 @@ import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.model.admin.Item;
 import com.spring.miniposbackend.repository.admin.CorporateRepository;
 import com.spring.miniposbackend.repository.admin.ItemRepository;
+import com.spring.miniposbackend.util.ImageUtil;
 
 @Service
 public class ItemService {
@@ -26,6 +23,8 @@ public class ItemService {
 	private ItemRepository itemRepository;
 	@Autowired
 	private CorporateRepository corporateReposity;
+	@Autowired
+	private ImageUtil imageUtil;
 
 	@Value("${file.path.image.item}")
 	private String imagePath;
@@ -62,15 +61,8 @@ public class ItemService {
 			try {
 				// read and write the file to the selected location-
 				String baseLocation = String.format("%s/"+imagePath, System.getProperty("catalina.base"));
-				File directory = new File(baseLocation);
-				if (!directory.exists()) {
-					directory.mkdirs();
-				}
-				String fileName = file.getOriginalFilename();
-				String newFileName = item.getId() + fileName.substring(fileName.lastIndexOf("."));
-				Path path = Paths.get(baseLocation + "/" + newFileName);
-				Files.write(path, file.getBytes());
-				item.setImage(newFileName);
+				String fileName = imageUtil.uploadImage(baseLocation, item.getId().toString(), file);
+				item.setImage(fileName);
 				item.setVersion((short) (item.getVersion() + 1));
 				return itemRepository.save(item);
 			} catch (IOException e) {

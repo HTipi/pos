@@ -5,13 +5,9 @@ import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.model.admin.Branch;
 import com.spring.miniposbackend.modelview.ImageResponse;
 import com.spring.miniposbackend.repository.admin.BranchRepository;
+import com.spring.miniposbackend.util.ImageUtil;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +22,10 @@ public class BranchService {
 
     @Autowired
     private BranchRepository branchRepository;
+    
+    @Autowired
+    private ImageUtil imageUtil;
+    
 //    @Autowired
 //    private CorporateRepository corporateRepository;
 //    @Autowired
@@ -42,15 +42,8 @@ public class BranchService {
 			try {
 				// read and write the file to the selected location-
 				String baseLocation = String.format("%s/"+imagePath, System.getProperty("catalina.base"));
-				File directory = new File(baseLocation);
-				if (!directory.exists()) {
-					directory.mkdirs();
-				}
-				String fileName = file.getOriginalFilename();
-				String newFileName = branch.getId() + fileName.substring(fileName.lastIndexOf("."));
-				Path path = Paths.get(baseLocation + "/" + newFileName);
-				Files.write(path, file.getBytes());
-				branch.setLogo(newFileName);
+				String fileName = imageUtil.uploadImage(baseLocation, branch.getId().toString(), file);
+				branch.setLogo(fileName);
 				return branchRepository.save(branch);
 			} catch (IOException e) {
 				throw new ConflictException("Upable to upload File");
@@ -58,13 +51,13 @@ public class BranchService {
 			} catch (Exception e) {
 				throw new ConflictException("Exception :"+e.getMessage());
 			}
-		}).orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
+		}).orElseThrow(() -> new ResourceNotFoundException("Branch does not exist"));
 	}
     
     public ImageResponse getImage(Integer branchId) {
 		return branchRepository.findById(branchId).map(branch -> {
 			return getImage(branch);
-		}).orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
+		}).orElseThrow(() -> new ResourceNotFoundException("Branch does not exist"));
 	}
     
 	public ImageResponse getImage(Branch branch) {
@@ -74,11 +67,7 @@ public class BranchService {
 		try {
 			String fileLocation = String.format("%s/"+imagePath, System.getProperty("catalina.base"))+ "/"
 					+ branch.getLogo();
-			File file = new File(fileLocation);
-			byte[] bArray = new byte[(int) file.length()];
-			FileInputStream fis = new FileInputStream(file);
-			fis.read(bArray);
-			fis.close();
+			byte[] bArray = imageUtil.getImage(fileLocation);
 			return new ImageResponse(branch.getId().longValue(), bArray, null);
 
 		} catch (Exception e) {

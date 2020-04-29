@@ -1,11 +1,14 @@
 package com.spring.miniposbackend.controller.admin;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,6 +34,13 @@ public class ItemTypeController {
 
 	@Autowired
 	private ItemTypeService itemTypeService;
+	
+	
+	@GetMapping("me")
+	public Object getProfile() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		return auth.getPrincipal();
+	}
 	
 	@GetMapping("by-corporate")
 	public List<ItemType> getByCorporate(@RequestParam("corporateId") Integer corporateId){ // will get from user

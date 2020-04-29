@@ -83,6 +83,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 				System.out.println(e.getMessage());
 			} catch (DisabledException e) {
 				System.out.println(e.getMessage());
+			} catch(Exception e) {
+				System.out.println(e.getMessage());
 			}
 		}
 		chain.doFilter(request, response);
@@ -95,5 +97,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		if (!userDetails.isAccountNonLocked()) {
 			throw new LockedException("USER_LOCKED");
 		}
+//		if (!userDetails.isAccountNonExpired()) {
+//			throw new LockedException("AccountExcept");
+//		}
+//		if (!userDetails.isCredentialsNonExpired()) {
+//			throw new LockedException("CredentialExpire");
+//		}
 	}
 }

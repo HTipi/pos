@@ -1,11 +1,6 @@
 package com.spring.miniposbackend.service.admin;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +17,7 @@ import com.spring.miniposbackend.modelview.ImageRequest;
 import com.spring.miniposbackend.modelview.ImageResponse;
 import com.spring.miniposbackend.repository.admin.CorporateRepository;
 import com.spring.miniposbackend.repository.admin.ItemTypeRepository;
+import com.spring.miniposbackend.util.ImageUtil;
 
 @Service
 public class ItemTypeService {
@@ -30,6 +26,8 @@ public class ItemTypeService {
 	private ItemTypeRepository itemTypeRepository;
 	@Autowired
 	private CorporateRepository corporateRepository;
+	@Autowired
+	private ImageUtil imageUtil;
 
 	@Value("${file.path.image.item-type}")
 	private String imagePath;
@@ -72,15 +70,8 @@ public class ItemTypeService {
 			try {
 				// read and write the file to the selected location-
 				String baseLocation = String.format("%s/"+imagePath, System.getProperty("catalina.base"));
-				File directory = new File(baseLocation);
-				if (!directory.exists()) {
-					directory.mkdirs();
-				}
-				String fileName = file.getOriginalFilename();
-				String newFileName = itemType.getId() + fileName.substring(fileName.lastIndexOf("."));
-				Path path = Paths.get(baseLocation + "/" + newFileName);
-				Files.write(path, file.getBytes());
-				itemType.setImage(newFileName);
+				String fileName = imageUtil.uploadImage(baseLocation, itemType.getId().toString(), file);
+				itemType.setImage(fileName);
 				itemType.setVersion((short) (itemType.getVersion() + 1));
 				return itemTypeRepository.save(itemType);
 			} catch (IOException e) {
@@ -105,11 +96,7 @@ public class ItemTypeService {
 		try {
 			String fileLocation = String.format("%s/"+imagePath, System.getProperty("catalina.base"))+ "/"
 					+ itemType.getImage();
-			File file = new File(fileLocation);
-			byte[] bArray = new byte[(int) file.length()];
-			FileInputStream fis = new FileInputStream(file);
-			fis.read(bArray);
-			fis.close();
+			byte[] bArray = imageUtil.getImage(fileLocation);
 			return new ImageResponse(itemType.getId().longValue(), bArray, itemType.getVersion());
 
 		} catch (Exception e) {

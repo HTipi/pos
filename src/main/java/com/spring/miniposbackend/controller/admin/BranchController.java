@@ -29,8 +29,8 @@ public class BranchController {
 	}
 	
 	@GetMapping("{branchId}/get-image")
-	public ImageResponse getImage(@PathVariable Integer itemTypeId) {
-		return branchService.getImage(itemTypeId);
+	public ImageResponse getImage(@PathVariable Integer branchId) {
+		return branchService.getImage(branchId);
 	}
     
 //    @GetMapping

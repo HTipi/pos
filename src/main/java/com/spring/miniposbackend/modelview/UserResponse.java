@@ -2,7 +2,6 @@ package com.spring.miniposbackend.modelview;
 
 import com.spring.miniposbackend.model.admin.Branch;
 import com.spring.miniposbackend.model.admin.Corporate;
-//import com.spring.miniposbackend.model.admin.Role;
 import com.spring.miniposbackend.model.admin.User;
 
 public class UserResponse {
@@ -15,7 +14,6 @@ public class UserResponse {
 	
 	public UserResponse(User user, byte[] image) {
 		this.user = user;
-//		role = user.getRole();
 		branch = user.getBranch();
 		corporate = branch.getCorporate();
 		this.image = image;

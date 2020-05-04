@@ -53,13 +53,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		// We don't need CSRF for this example
 		httpSecurity.csrf().disable()
 				// dont authenticate this particular request
-				//.authorizeRequests().antMatchers("/authenticate").permitAll().
-				.authorizeRequests().antMatchers("/**").permitAll().
+				.authorizeRequests().antMatchers("/authenticate").permitAll()
+				.antMatchers("/item-type/upload").permitAll()
+				.antMatchers("/item/upload").permitAll()
+//				.antMatchers("/").authenticated()
+				//.authorizeRequests().antMatchers("/**").permitAll()
 				// all other requests need to be authenticated
-				anyRequest().authenticated().and().
+				.anyRequest().authenticated().and()
 				// make sure we use stateless session; session won't be used to
 				// store user's state.
-				exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
+				.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
 		// Add a filter to validate the tokens with every request

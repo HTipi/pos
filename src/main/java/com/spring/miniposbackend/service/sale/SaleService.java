@@ -12,18 +12,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
+import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.model.admin.Branch;
 import com.spring.miniposbackend.model.admin.ItemBranch;
+import com.spring.miniposbackend.model.admin.Seat;
 import com.spring.miniposbackend.model.admin.User;
 import com.spring.miniposbackend.model.sale.Sale;
 import com.spring.miniposbackend.model.sale.SaleDetail;
 import com.spring.miniposbackend.model.sale.SaleTemporary;
 import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
+import com.spring.miniposbackend.repository.admin.SeatRepository;
 import com.spring.miniposbackend.repository.admin.UserRepository;
 import com.spring.miniposbackend.repository.sale.SaleDetailRepository;
 import com.spring.miniposbackend.repository.sale.SaleRepository;
 import com.spring.miniposbackend.repository.sale.SaleTemporaryRepository;
+import com.spring.miniposbackend.util.UserProfileUtil;
 
 @Service
 public class SaleService {
@@ -47,7 +51,13 @@ public class SaleService {
     private ItemBranchRepository itemRepository;
     
     @Autowired
+    private SeatRepository seatRepository;
+    
+    @Autowired
     private ReceiptService receiptService;
+    
+	@Autowired
+	private UserProfileUtil userProfile;
 
     public List<Sale> showSaleByUser(Integer userId, @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> date) {
     	
@@ -70,6 +80,13 @@ public class SaleService {
                 .orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
         Branch branch = branchRepository.findById(branchId)
                 .orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
+        Seat seat = seatRepository.findById(seatId)
+        		.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
+        
+        if(seat.getBranch().getId()!=userProfile.getProfile().getBranch().getId()) {
+        	throw new UnauthorizedException("Transaction is unauthorized");
+        }
+        
         List<SaleTemporary> saleTemps = saleTemporaryRepository.findBySeatId(seatId);
         if (saleTemps.size() == 0) {
             throw new ResourceNotFoundException("Seat not found");
@@ -114,6 +131,10 @@ public class SaleService {
     @Transactional
     public Sale reverseSale(Long saleId) {
         Sale sale = saleRepository.findById(saleId).orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
+        
+        if(sale.getBranch().getId()!=userProfile.getProfile().getBranch().getId()) {
+        	throw new UnauthorizedException("Reverse is unauthorized");
+        }
         sale.setReverse(true);
         sale.setReverseDate(new Date());
         List<SaleDetail> saleDetail = saleDetailRepository.findBySaleId(saleId);

@@ -13,11 +13,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
+import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.exception.UnprocessableEntityException;
+import com.spring.miniposbackend.model.admin.ItemBranch;
+import com.spring.miniposbackend.model.admin.Seat;
 import com.spring.miniposbackend.model.sale.SaleTemporary;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
 import com.spring.miniposbackend.repository.admin.SeatRepository;
 import com.spring.miniposbackend.repository.sale.SaleTemporaryRepository;
+import com.spring.miniposbackend.util.UserProfileUtil;
 
 @Service
 public class SaleTemporaryService {
@@ -31,6 +35,9 @@ public class SaleTemporaryService {
     private SaleTemporaryRepository saleRepository;
     @Autowired
     private UserRepository userRepository;
+    
+	@Autowired
+	private UserProfileUtil userProfile;
 
     @Transactional
     public List<SaleTemporary> addItem(List<Map<String, Integer>> requestItems) {
@@ -59,6 +66,9 @@ public class SaleTemporaryService {
                     if (!item.isEnable()) {
                         throw new ConflictException("Item is disable");
                     }
+                    if((item.getBranch().getId()!=userProfile.getProfile().getBranch().getId()) || !item.isEnable()) {
+                    	throw new UnauthorizedException("Item is unauthorized");
+                    }
                     SaleTemporary sale = new SaleTemporary();
                     sale.setSeat(seat);
                     sale.setItemBranch(item);
@@ -85,6 +95,10 @@ public class SaleTemporaryService {
             if (sale.isPrinted()) {
                 throw new ConflictException("Record is already printed");
             }
+            ItemBranch itemBranch = sale.getItemBranch();
+            if((itemBranch.getBranch().getId()!=userProfile.getProfile().getBranch().getId()) || !itemBranch.isEnable()) {
+            	throw new UnauthorizedException("Item is unauthorized");
+            }
             //sale.setCancel(true);
             saleRepository.deleteBySaleTempId(saleTempId);
             return sale;
@@ -100,6 +114,10 @@ public class SaleTemporaryService {
             }
             if (sale.getQuantity() < 1) {
                 throw new ConflictException("Qty must be greater than one");
+            }
+            ItemBranch itemBranch = sale.getItemBranch();
+            if((itemBranch.getBranch().getId()!=userProfile.getProfile().getBranch().getId()) || !itemBranch.isEnable()) {
+            	throw new UnauthorizedException("Item is unauthorized");
             }
             sale.setQuantity(quantity);
             return saleRepository.save(sale);
@@ -121,6 +139,11 @@ public class SaleTemporaryService {
     }
 
     public List<SaleTemporary> showBySeatId(Integer seatId, Optional<Boolean> isPrinted, Optional<Boolean> cancel) {
+    	Seat seat = seatRepository.findById(seatId)
+        		.orElseThrow(() -> new ResourceNotFoundException("Seat does not exist"));
+        if(seat.getBranch().getId()!=userProfile.getProfile().getBranch().getId()) {
+        	throw new UnauthorizedException("Transaction is unauthorized");
+        }
         if (isPrinted.isPresent()) {
             if (cancel.isPresent()) {
                 return saleRepository.findBySeatIdWithIsPrintedCancel(seatId, isPrinted.get(), cancel.get());

@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.spring.miniposbackend.service.admin.UserService;
 import com.spring.miniposbackend.service.security.JwtUserDetailsService;
 import com.spring.miniposbackend.util.JwtTokenUtil;
 
@@ -32,6 +33,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
+	@Autowired
+	UserService userService;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -47,7 +50,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 			if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
 				jwtToken = requestTokenHeader.substring(7);
 				try {
-					username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+					if (userService.showByApiToken(jwtToken) != null) {
+						username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+					} else {
+						username = null;
+					}
 				} catch (IllegalArgumentException e) {
 					System.out.println("Unable to get JWT Token");
 				} catch (ExpiredJwtException e) {
@@ -83,7 +90,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 				System.out.println(e.getMessage());
 			} catch (DisabledException e) {
 				System.out.println(e.getMessage());
-			} catch(Exception e) {
+			} catch (Exception e) {
 				System.out.println(e.getMessage());
 			}
 		}

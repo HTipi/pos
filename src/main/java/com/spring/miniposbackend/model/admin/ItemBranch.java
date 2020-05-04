@@ -69,6 +69,11 @@ public class ItemBranch extends AuditModel{
 		return item;
 	}
 	
+	@JsonIgnore
+	public Branch getBranch() {
+		return branch;
+	}
+	
 	public String getCode() {
 		return item.getCode();
 	}

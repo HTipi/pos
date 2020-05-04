@@ -20,7 +20,8 @@ public class JwtTokenUtil implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
+//	public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
+//	public static final long JWT_TOKEN_VALIDITY = 0;
 
 	@Value("${jwt.secret}")
 	private String secret;
@@ -45,10 +46,10 @@ public class JwtTokenUtil implements Serializable {
 	}
 
 	//check if the token has expired
-	private Boolean isTokenExpired(String token) {
-		final Date expiration = getExpirationDateFromToken(token);
-		return expiration.before(new Date());
-	}
+//	private Boolean isTokenExpired(String token) {
+//		final Date expiration = getExpirationDateFromToken(token);
+//		return expiration.before(new Date());
+//	}
 
 	//generate token for user
 	public String generateToken(String username) {
@@ -64,13 +65,13 @@ public class JwtTokenUtil implements Serializable {
 	private String doGenerateToken(Map<String, Object> claims, String subject) {
 
 		return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-				.setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
+				//.setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
 				.signWith(SignatureAlgorithm.HS512, secret).compact();
 	}
 
 	//validate token
 	public Boolean validateToken(String token, UserDetails userDetails) {
 		final String usernameFromToken = getUsernameFromToken(token);
-		return (usernameFromToken.equals(userDetails.getUsername()) && !isTokenExpired(token));
+		return (usernameFromToken.equals(userDetails.getUsername()));
 	}
 }

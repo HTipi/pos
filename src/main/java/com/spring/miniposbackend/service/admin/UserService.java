@@ -20,4 +20,9 @@ public class UserService {
     			})
 				.orElse(null);
     }
+    
+    public User showByApiToken(String token) {
+    	return userRepository.findFirstByApiToken(token)
+    			.orElse(null);
+    }
 }

@@ -21,6 +21,7 @@ import com.spring.miniposbackend.modelview.ImageRequest;
 import com.spring.miniposbackend.modelview.ImageResponse;
 import com.spring.miniposbackend.service.admin.ItemBranchService;
 import com.spring.miniposbackend.service.admin.ItemService;
+import com.spring.miniposbackend.util.UserProfileUtil;
 
 @RestController
 @RequestMapping("item")
@@ -30,10 +31,12 @@ public class ItemBranchController {
 	private ItemBranchService itemBranchService;
 	@Autowired
 	private ItemService itemService;
+	@Autowired
+	private UserProfileUtil userProfile;
 	
 	@GetMapping("by-branch")
-	public List<ItemBranch> getByBranchId(@RequestParam Integer branchId){
-		return itemBranchService.showByBranchId(branchId,Optional.of(true));
+	public List<ItemBranch> getByBranchId(){
+		return itemBranchService.showByBranchId(userProfile.getProfile().getBranch().getId(),Optional.of(true));
 	}
 	@PostMapping("{itemId}/upload")
 	public Item uploadImage(@PathVariable Long itemId, @RequestParam("imageFile") MultipartFile file) {
@@ -47,7 +50,7 @@ public class ItemBranchController {
 	
 	@GetMapping("image-list")
 	public List<ImageResponse> getImages(@RequestParam Integer branchId){
-		return itemBranchService.getImages(branchId);
+		return itemBranchService.getImages(userProfile.getProfile().getBranch().getId());
 	}
 	
 	@PostMapping("image-update")

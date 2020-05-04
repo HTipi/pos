@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.spring.miniposbackend.model.sale.SaleTemporary;
 import com.spring.miniposbackend.service.sale.SaleTemporaryService;
+import com.spring.miniposbackend.util.UserProfileUtil;
 
 @RestController
 @RequestMapping("sale-temp")
@@ -24,6 +25,8 @@ public class SaleTemporaryController {
 
 	@Autowired
 	private SaleTemporaryService saleService;
+	@Autowired
+	private UserProfileUtil userProfile;
 	
 	@GetMapping("by-seat")
 	public List<SaleTemporary> getBySeatId(@RequestParam Integer seatId, @RequestParam Optional<Boolean> isPrinted,@RequestParam Optional<Boolean> cancel){
@@ -31,8 +34,8 @@ public class SaleTemporaryController {
 	}
 
 	@GetMapping("by-user")
-	public List<SaleTemporary> getByUserId(@RequestParam Integer userId, @RequestParam Optional<Boolean> isPrinted,@RequestParam Optional<Boolean> cancel){
-		return saleService.showByUserId(userId, isPrinted,cancel);
+	public List<SaleTemporary> getByUserId(@RequestParam Optional<Boolean> isPrinted,@RequestParam Optional<Boolean> cancel){
+		return saleService.showByUserId(userProfile.getProfile().getUser().getId(), isPrinted,cancel);
 	}
 	
 	@PostMapping

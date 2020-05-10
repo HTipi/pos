@@ -54,7 +54,7 @@ public class SaleTemporaryService {
             Integer seatId = requestItem.get("seatId");
             Long itemId = requestItem.get("itemId").longValue();
             Short quantity = requestItem.get("quantity").shortValue();
-            Integer userId = requestItem.get("userId");
+            Integer userId = userProfile.getProfile().getUser().getId();
             if (quantity < 1) {
                 throw new UnprocessableEntityException("Quantity must be greater than 0");
             }

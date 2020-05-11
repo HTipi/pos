@@ -41,6 +41,8 @@ public class Sale extends AuditModel{
 	@Column(name = "receipt_number", nullable = false,length = 32)
     private String receiptNumber;
 	
+	@Column(name = "seat_name", nullable = false,length = 32)
+    private String seatName;
 	
 	@Column(name = "value_date", nullable = false)
     private Date valueDate;

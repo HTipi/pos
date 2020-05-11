@@ -16,6 +16,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
+import com.spring.miniposbackend.model.AuditModel;
 import com.spring.miniposbackend.model.admin.Item;
 import com.spring.miniposbackend.model.admin.User;
 import org.hibernate.annotations.ColumnDefault;
@@ -31,7 +32,7 @@ import lombok.Setter;
 @Table(name = "sales_temp")
 @Setter
 @Getter
-public class SaleTemporary {
+public class SaleTemporary extends AuditModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

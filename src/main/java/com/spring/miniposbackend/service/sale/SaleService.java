@@ -95,6 +95,7 @@ public class SaleService {
         List<SaleDetail> listsales = new ArrayList<>();
         sale.setBranch(branch);
         sale.setUser(user);
+        sale.setSeatName(seat.getName());
         sale.setTotal(0.00);
         sale.setReceiptNumber("0");
         sale.setValueDate(new Date());
@@ -171,6 +172,7 @@ public class SaleService {
                 saleTransaction.setItemName(saleDetail.getItemName());
                 saleTransaction.setPrice(Double.parseDouble(saleDetail.getPrice().toString()));
                 saleTransaction.setQuantity(saleDetail.getQuantity());
+                saleTransaction.setSeatName(sale.getSeatName());
                 saleTransaction.setReceiptNumber(sale.getReceiptNumber());
                 saleTransaction.setTotal(saleDetail.getTotal());
                 saleTransaction.setReverse(sale.isReverse());

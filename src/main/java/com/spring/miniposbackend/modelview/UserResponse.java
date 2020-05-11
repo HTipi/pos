@@ -30,6 +30,9 @@ public class UserResponse {
 	public String getCorporateName() {
 		return corporate.getName();
 	}
+	public String getCorporateKh() {
+		return corporate.getNameKh();
+	}
 	
 	public String getBranchName() {
 		return branch.getName();

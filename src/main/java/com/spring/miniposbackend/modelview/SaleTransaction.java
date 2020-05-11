@@ -42,6 +42,8 @@ public class SaleTransaction{
     private String itemName;
     
     private Long itemId;
+    
+    private String seatName;
 	
 
 }

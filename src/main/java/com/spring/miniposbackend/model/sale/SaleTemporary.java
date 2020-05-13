@@ -72,6 +72,11 @@ public class SaleTemporary extends AuditModel {
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
     private User user;
+    
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "useredit_id", nullable = false)
+    @JsonIgnore
+    private User userEdit;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "item_branch_id", nullable = false)
@@ -99,6 +104,10 @@ public class SaleTemporary extends AuditModel {
 
     public Integer getUser_id() {
         return user.getId();
+    }
+    
+    public Integer getUseredit_id() {
+        return userEdit.getId();
     }
 
     public double getDiscountAmount() {

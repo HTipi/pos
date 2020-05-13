@@ -44,14 +44,14 @@ public class SaleTemporaryController {
 	}
 	
 	@DeleteMapping("item/{saleTempId}")
-	public SaleTemporary remove(@PathVariable Long saleTempId){
-		return saleService.removeItem(saleTempId);
+	public List<SaleTemporary> remove(@PathVariable Long saleTempId,@RequestParam(value = "seatId") Integer seatId){
+		return saleService.removeItem(saleTempId,seatId);
 	}
 	
 	
 	@PatchMapping("qty/{saleTempId}")
-	public SaleTemporary updateQuantity(@PathVariable Long saleTempId, @RequestParam(value = "quantity") Short quantity) {
-		return saleService.setQuantity(saleTempId, quantity);
+	public List<SaleTemporary> updateQuantity(@PathVariable Long saleTempId, @RequestParam(value = "quantity") Short quantity,@RequestParam(value = "seatId") Integer seatId) {
+		return saleService.setQuantity(saleTempId, quantity,seatId);
 	}
 	@PatchMapping("{seatId}")
 	public boolean printBySeat(@PathVariable Integer seatId) {

@@ -88,10 +88,12 @@ public class CustomUserDetail implements UserDetails {
 		return user;
 	}
 	
+	@JsonIgnore
 	public Branch getBranch() {
 		return branch;
 	}
 	
+	@JsonIgnore
 	public Corporate getCorporate() {
 		return corporate;
 	}

@@ -1,5 +1,7 @@
 package com.spring.miniposbackend.model.admin;
 
+import java.math.BigDecimal;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicUpdate;
@@ -21,20 +24,20 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "exchange")
+@Table(name = "branch_currencies",  uniqueConstraints = @UniqueConstraint(columnNames = {"branch_id","currency_id"}))
 @Setter @Getter
 @DynamicUpdate
-public class Exchange extends AuditModel{
+public class BranchCurrency extends AuditModel{
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
 	
-	@Column(name = "rate", nullable = false,length = 3)
-    private Double rate;
+	@Column(name = "rate", nullable = false, precision = 5, scale = 2)
+    private BigDecimal rate;
 	
 	
 	@Column(name = "enable", nullable = false)
@@ -50,4 +53,24 @@ public class Exchange extends AuditModel{
     @JoinColumn(name = "currency_id")
     @JsonIgnore
     private Currency currency;
+	
+	@Column(name = "home_currency", nullable = false)
+    @ColumnDefault("false")
+    private boolean isHome;
+	
+	public String getCode() {
+		return currency.getCode();
+	}
+	
+	public String getName() {
+		return currency.getName();
+	}
+	public String getNameKh() {
+		return currency.getNameKh();
+	}
+	
+	public String getSymbol() {
+		return currency.getSymbol();
+	}
+	
 }

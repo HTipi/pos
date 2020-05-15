@@ -16,7 +16,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "currency")
+@Table(name = "currencies")
 @Setter @Getter
 @DynamicUpdate
 public class Currency extends AuditModel{
@@ -34,12 +34,11 @@ public class Currency extends AuditModel{
 	@Column(name = "name", nullable = false,length = 32)
     private String name;
 	
+	@Column(name = "name_kh", nullable = false,length = 32)
+    private String nameKh;
+	
 	@Column(name = "symbol", nullable = false,length = 1)
     private String symbol;
-	
-	@Column(name = "home", nullable = false)
-    @ColumnDefault("false")
-    private boolean home;
 	
 	@Column(name = "enable", nullable = false)
     @ColumnDefault("false")

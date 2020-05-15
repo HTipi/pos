@@ -49,7 +49,16 @@ public class SaleTemporaryService {
                 }
             }
         }
-
+        Integer seatID =requestItems.get(0).get("seatId");
+        List<SaleTemporary> saletmp = saleRepository.findBySeatId(seatID);
+       
+        if(saletmp.size()>0) {
+        	if(!saletmp.get(0).getUserEdit().getId().equals(userProfile.getProfile().getUser().getId())) {
+            	saleRepository.updateUserEdit(userProfile.getProfile().getUser().getId(), seatID);
+            	return saletmp;
+            }
+        }
+        
         requestItems.forEach((requestItem) -> {
             Integer seatId = requestItem.get("seatId");
             Long itemId = requestItem.get("itemId").longValue();
@@ -79,10 +88,11 @@ public class SaleTemporaryService {
                     sale.setPrinted(false);
                     sale.setCancel(false);
                     sale.setUser(user);
+                    sale.setUserEdit(user);
                     return saleRepository.save(sale);
                 }).orElseThrow(() -> new ResourceNotFoundException("Record does not exist")))
                         .orElseThrow(() -> new ResourceNotFoundException("User does not exist"));
-
+                
             }).orElseThrow(() -> new ResourceNotFoundException("Seat does not exist"));
             list.add(saleTemp);
         });
@@ -90,8 +100,14 @@ public class SaleTemporaryService {
     }
 
     @Transactional
-    public SaleTemporary removeItem(Long saleTempId) {
-        return saleRepository.findById(saleTempId).map(sale -> {
+    public List<SaleTemporary> removeItem(Long saleTempId, Integer seatId) {
+    	List<SaleTemporary> list = new ArrayList<SaleTemporary>();
+    	List<SaleTemporary> saletmp = saleRepository.findBySeatId(seatId);
+    	if(!saletmp.get(0).getUserEdit().getId().equals(userProfile.getProfile().getUser().getId())) {
+        	saleRepository.updateUserEdit(userProfile.getProfile().getUser().getId(), seatId);
+        	return saletmp;
+        }
+        SaleTemporary saletemp =  saleRepository.findById(saleTempId).map(sale -> {
             if (sale.isPrinted()) {
                 throw new ConflictException("Record is already printed");
             }
@@ -103,11 +119,22 @@ public class SaleTemporaryService {
             saleRepository.deleteBySaleTempId(saleTempId);
             return sale;
         }).orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
+        list.add(saletemp);
+        saleRepository.updateUserEdit(userProfile.getProfile().getUser().getId(), seatId);
+        
+        return list;
+        
     }
 
     @Transactional
-    public SaleTemporary setQuantity(Long saleTempId, Short quantity) {
-        return saleRepository.findById(saleTempId).map(sale -> {
+    public List<SaleTemporary> setQuantity(Long saleTempId, Short quantity,Integer seatId) {
+    	List<SaleTemporary> list = new ArrayList<SaleTemporary>();
+    	List<SaleTemporary> saletmp = saleRepository.findBySeatId(seatId);
+        if(!saletmp.get(0).getUserEdit().getId().equals(userProfile.getProfile().getUser().getId())) {
+        	saleRepository.updateUserEdit(userProfile.getProfile().getUser().getId(), seatId);
+        	return saletmp;
+        }
+    	SaleTemporary saletemp = saleRepository.findById(saleTempId).map(sale -> {
             if (sale.isPrinted()) {
                 if (sale.getQuantity() > quantity)
                     throw new ConflictException("Record is already printed");
@@ -120,8 +147,12 @@ public class SaleTemporaryService {
             	throw new UnauthorizedException("Item is unauthorized");
             }
             sale.setQuantity(quantity);
+            sale.setUser(userProfile.getProfile().getUser());
+            sale.setUserEdit(userProfile.getProfile().getUser());
             return saleRepository.save(sale);
         }).orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
+    	list.add(saletemp);
+    	return list;
     }
 
     @Transactional

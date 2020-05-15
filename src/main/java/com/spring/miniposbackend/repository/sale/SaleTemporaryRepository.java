@@ -45,4 +45,7 @@ public interface SaleTemporaryRepository extends JpaRepository<SaleTemporary, Lo
     @Modifying
     @Query(value = "delete from Sales_temp where id=?1", nativeQuery = true)
     void deleteBySaleTempId(Long saleTmpId);
+    @Modifying
+    @Query(value = "update Sales_temp set useredit_id=?1 where seat_id=?2", nativeQuery = true)
+    void updateUserEdit(Integer userId,Integer seatId);
 }

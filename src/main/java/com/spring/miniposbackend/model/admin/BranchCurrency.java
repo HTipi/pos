@@ -36,7 +36,7 @@ public class BranchCurrency extends AuditModel{
     @Column(name = "id", nullable = false)
     private Integer id;
 	
-	@Column(name = "rate", nullable = false, precision = 10, scale = 2)
+	@Column(name = "rate", nullable = false, precision = 24, scale = 12)
     private BigDecimal rate;
 	
 	

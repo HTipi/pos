@@ -147,6 +147,7 @@ public class SaleTemporaryService {
             	throw new UnauthorizedException("Item is unauthorized");
             }
             sale.setQuantity(quantity);
+            sale.setValueDate(new Date());
             sale.setUser(userProfile.getProfile().getUser());
             sale.setUserEdit(userProfile.getProfile().getUser());
             return saleRepository.save(sale);

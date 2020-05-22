@@ -9,7 +9,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "setting")
+@Table(name = "settings")
 @Setter
 @Getter
 @DynamicUpdate
@@ -27,12 +27,9 @@ public class Setting extends AuditModel {
 
     @Column(name = "name", nullable = false,length = 128)
     private String name;
-
-    @Column(name = "description", nullable = false,length = 128)
-    private String description;
-
-    @Column(name = "value_type", nullable = false,length = 128)
-    private String valueType;
+    
+    @Column(name = "default_value", nullable = false,length = 128)
+    private String defaultValue;
 
     @Column(name = "sequence", nullable = false)
     private Integer sequence=1;

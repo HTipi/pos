@@ -17,7 +17,6 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
 import com.spring.miniposbackend.model.AuditModel;
-import com.spring.miniposbackend.model.admin.Item;
 import com.spring.miniposbackend.model.admin.User;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -34,7 +33,9 @@ import lombok.Setter;
 @Getter
 public class SaleTemporary extends AuditModel {
 
-    @Id
+	private static final long serialVersionUID = 1L;
+
+	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;

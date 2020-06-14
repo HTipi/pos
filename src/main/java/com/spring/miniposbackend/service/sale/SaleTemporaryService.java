@@ -58,12 +58,11 @@ public class SaleTemporaryService {
             	return saletmp;
             }
         }
-        
+        Integer userId = userProfile.getProfile().getUser().getId();
         requestItems.forEach((requestItem) -> {
             Integer seatId = requestItem.get("seatId");
             Long itemId = requestItem.get("itemId").longValue();
             Short quantity = requestItem.get("quantity").shortValue();
-            Integer userId = userProfile.getProfile().getUser().getId();
             if (quantity < 1) {
                 throw new UnprocessableEntityException("Quantity must be greater than 0");
             }

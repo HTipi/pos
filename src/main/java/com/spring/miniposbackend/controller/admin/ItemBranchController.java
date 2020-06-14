@@ -11,36 +11,25 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-
-import com.spring.miniposbackend.model.admin.Item;
 import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.modelview.ImageRequest;
 import com.spring.miniposbackend.modelview.ImageResponse;
 import com.spring.miniposbackend.service.admin.ItemBranchService;
-import com.spring.miniposbackend.service.admin.ItemService;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
 @RestController
-@RequestMapping("item")
+@RequestMapping("item-branch")
 public class ItemBranchController {
 	
 	@Autowired
 	private ItemBranchService itemBranchService;
-	@Autowired
-	private ItemService itemService;
 	@Autowired
 	private UserProfileUtil userProfile;
 	
 	@GetMapping("by-branch")
 	public List<ItemBranch> getByBranchId(){
 		return itemBranchService.showByBranchId(userProfile.getProfile().getBranch().getId(),Optional.of(true));
-	}
-	@PostMapping("{itemId}/upload")
-	public Item uploadImage(@PathVariable Long itemId, @RequestParam("imageFile") MultipartFile file) {
-		return itemService.uploadImage(itemId, file);
 	}
 	
 	@GetMapping("{itemBranchId}/get-image")
@@ -49,7 +38,7 @@ public class ItemBranchController {
 	}
 	
 	@GetMapping("image-list")
-	public List<ImageResponse> getImages(@RequestParam Integer branchId){
+	public List<ImageResponse> getImages(){
 		return itemBranchService.getImages(userProfile.getProfile().getBranch().getId());
 	}
 	

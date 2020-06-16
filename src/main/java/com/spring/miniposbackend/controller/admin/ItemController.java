@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -55,4 +56,13 @@ public class ItemController {
 		return itemService.getImages(requestImages);
 	}
 	
+	@PostMapping("{itemTypeId}")
+	public Item create(@PathVariable Integer itemTypeId,@RequestBody Item item) {
+		return itemService.create(itemTypeId, item);
+	}
+	
+	@PutMapping("{itemId}")
+	public Item update(@PathVariable Long itemId,@RequestBody Item item) {
+		return itemService.update(itemId, item);
+	}
 }

@@ -56,6 +56,6 @@ public class ExpenseType extends AuditModel {
     private Branch branch;
 
 	@Column(name = "enable", nullable = false)
-	@ColumnDefault("false")
+	@ColumnDefault("true")
 	private boolean enable;
 }

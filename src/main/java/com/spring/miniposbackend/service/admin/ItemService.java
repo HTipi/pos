@@ -148,5 +148,4 @@ public class ItemService {
 			return itemRepository.save(item);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
-
 }

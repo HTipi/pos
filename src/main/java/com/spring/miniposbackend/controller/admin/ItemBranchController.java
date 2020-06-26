@@ -7,10 +7,12 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.modelview.ImageRequest;
@@ -45,6 +47,23 @@ public class ItemBranchController {
 	@PostMapping("image-update")
 	public List<ImageResponse> getUpdatedImages(@Valid @RequestBody List<ImageRequest> requestImages){
 		return itemBranchService.getImages(requestImages);
+	}
+	/*
+	 * Admin Controller
+	 */
+	
+	@GetMapping("{branchId}/by-branch")
+	public List<ItemBranch> byBranch(@PathVariable Integer branchId){
+		return itemBranchService.showByBranchId(branchId,Optional.empty());
+	}
+	
+	@GetMapping("refresh")
+	public void refresh() {
+		itemBranchService.refresh();
+	}
+	@PatchMapping("{itemBranchId}/set-enable")
+	public ItemBranch setEnable(@PathVariable Long itemBranchId, @RequestParam Boolean enable) {
+		return itemBranchService.setEnable(itemBranchId, enable);
 	}
 
 }

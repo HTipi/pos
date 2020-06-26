@@ -22,8 +22,12 @@ import org.hibernate.annotations.DynamicUpdate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.AuditModel;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Entity
 @Table(name = "item_branches", uniqueConstraints = @UniqueConstraint(columnNames = {"item_id","branch_id"}))
+@Setter @Getter
 @DynamicUpdate
 public class ItemBranch extends AuditModel{
 

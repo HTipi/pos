@@ -4,16 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
+import com.spring.miniposbackend.model.admin.Branch;
+import com.spring.miniposbackend.model.admin.Item;
 import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.modelview.ImageRequest;
 import com.spring.miniposbackend.modelview.ImageResponse;
 import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
+import com.spring.miniposbackend.repository.admin.ItemRepository;
 import com.spring.miniposbackend.util.ImageUtil;
 
 @Service
@@ -24,13 +29,14 @@ public class ItemBranchService {
 	@Autowired
 	private BranchRepository branchRepository;
 	@Autowired
+	private ItemRepository itemRepository;
+	@Autowired
 	private ImageUtil imageUtil;
-	
 
 	@Value("${file.path.image.item}")
 	private String imagePath;
 
-	public List<ItemBranch> showByItemId(Integer itemId, Optional<Boolean> enable) {
+	public List<ItemBranch> showByItemId(Long itemId, Optional<Boolean> enable) {
 		if (enable.isPresent()) {
 			return itemBranchRepository.findByItemIdWithEnable(itemId, enable.get());
 		} else {
@@ -55,11 +61,11 @@ public class ItemBranchService {
 	}
 
 	public ImageResponse getImage(ItemBranch itemBranch) {
-		if(itemBranch.getImage().isEmpty()) {
+		if (itemBranch.getImage().isEmpty()) {
 			return new ImageResponse(itemBranch.getId(), null, itemBranch.getVersion());
 		}
 		try {
-			String fileLocation = String.format("%s/"+imagePath, System.getProperty("catalina.base"))+ "/"
+			String fileLocation = String.format("%s/" + imagePath, System.getProperty("catalina.base")) + "/"
 					+ itemBranch.getImage();
 			byte[] bArray = imageUtil.getImage(fileLocation);
 			return new ImageResponse(itemBranch.getId(), bArray, itemBranch.getVersion());
@@ -68,7 +74,7 @@ public class ItemBranchService {
 			return new ImageResponse(itemBranch.getId(), null, itemBranch.getVersion());
 		}
 	}
-	
+
 	public List<ImageResponse> getImages(Integer branchId) {
 		List<ItemBranch> itemBranches = itemBranchRepository.findByBranchIdWithEnable(branchId, true);
 		List<ImageResponse> images = new ArrayList<ImageResponse>();
@@ -78,7 +84,7 @@ public class ItemBranchService {
 		});
 		return images;
 	}
-	
+
 	public List<ImageResponse> getImages(List<ImageRequest> requestImages) {
 		List<ImageResponse> images = new ArrayList<ImageResponse>();
 		requestImages.forEach((requestImage) -> {
@@ -92,4 +98,32 @@ public class ItemBranchService {
 		return images;
 	}
 
+	@Transactional
+	public void refresh() {
+		List<Branch> branches = branchRepository.findAll();
+		branches.forEach((branch) -> {
+			List<Item> items = itemRepository.findByCorporateId(branch.getCorporate().getId());
+			items.forEach((item) -> {
+				Long itemId = item.getId();
+				Integer branchId = branch.getId();
+				Optional<ItemBranch> itemBranch  = itemBranchRepository.findFirstByBranchIdAndItemIdOrderByIdDesc(branchId, itemId);
+				if(!itemBranch.isPresent()) {
+					ItemBranch itemBr = new ItemBranch();
+					itemBr.setBranch(branch);
+					itemBr.setItem(item);
+					itemBr.setUseItemConfiguration(true);
+					itemBr.setEnable(false);
+					itemBr.setPrice(item.getPrice());
+					itemBr.setDiscount(itemBr.getDiscount());
+					itemBranchRepository.save(itemBr);
+				}
+			});
+		});
+	}
+	public ItemBranch setEnable(Long itemBranchId, Boolean enable) {
+		return itemBranchRepository.findById(itemBranchId).map(itemBranch -> {
+			itemBranch.setEnable(enable);
+			return itemBranchRepository.save(itemBranch);
+		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
+	}
 }

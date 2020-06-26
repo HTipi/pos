@@ -51,11 +51,11 @@ public class ExpenseType extends AuditModel {
     private User user;
 	
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "branch_id", unique = true, nullable = false)
+    @JoinColumn(name = "branch_id", nullable = false)
     @JsonIgnore
     private Branch branch;
 
 	@Column(name = "enable", nullable = false)
-	@ColumnDefault("false")
+	@ColumnDefault("true")
 	private boolean enable;
 }

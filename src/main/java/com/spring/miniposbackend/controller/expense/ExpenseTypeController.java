@@ -1,10 +1,11 @@
 package com.spring.miniposbackend.controller.expense;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,9 +29,18 @@ public class ExpenseTypeController {
 	}
 
 	@PostMapping
-	public ExpenseType create(@RequestBody Map<String, Integer> requestItem) {
-		return expenseTypeService.create(requestItem, userProfile.getProfile().getBranch().getId(),
+	public ExpenseType create(@RequestBody ExpenseType requestItem) {
+		return expenseTypeService.create(requestItem,
 				userProfile.getProfile().getUser().getId());
 	}
+	@PatchMapping("{expenseTypeId}")
+	public ExpenseType update(@PathVariable Integer expenseTypeId,@RequestBody ExpenseType expenseType) {
+		return expenseTypeService.update(expenseTypeId, expenseType,userProfile.getProfile().getUser().getId());
+	}
+	@PatchMapping("delete/{expenseTypeId}")
+	public ExpenseType delete(@PathVariable Integer expenseTypeId) {
+		return expenseTypeService.delete(expenseTypeId,userProfile.getProfile().getUser().getId());
+	}
+
 
 }

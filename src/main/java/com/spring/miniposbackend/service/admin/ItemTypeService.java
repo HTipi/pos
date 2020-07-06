@@ -12,12 +12,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
+import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.model.admin.ItemType;
 import com.spring.miniposbackend.modelview.ImageRequest;
 import com.spring.miniposbackend.modelview.ImageResponse;
 import com.spring.miniposbackend.repository.admin.CorporateRepository;
 import com.spring.miniposbackend.repository.admin.ItemTypeRepository;
 import com.spring.miniposbackend.util.ImageUtil;
+import com.spring.miniposbackend.util.UserProfileUtil;
 
 @Service
 public class ItemTypeService {
@@ -31,6 +33,9 @@ public class ItemTypeService {
 
 	@Value("${file.path.image.item-type}")
 	private String imagePath;
+
+	@Autowired
+	private UserProfileUtil userProfile;
 
 //	@Transactional(readOnly = true)
 //	public List<ItemType> shows(){
@@ -69,7 +74,7 @@ public class ItemTypeService {
 			}
 			try {
 				// read and write the file to the selected location-
-				String baseLocation = String.format("%s/"+imagePath, System.getProperty("catalina.base"));
+				String baseLocation = String.format("%s/" + imagePath, System.getProperty("catalina.base"));
 				String fileName = imageUtil.uploadImage(baseLocation, itemType.getId().toString(), file);
 				itemType.setImage(fileName);
 				itemType.setVersion((short) (itemType.getVersion() + 1));
@@ -78,7 +83,7 @@ public class ItemTypeService {
 				throw new ConflictException("Upable to upload File");
 
 			} catch (Exception e) {
-				throw new ConflictException("Exception :"+e.getMessage());
+				throw new ConflictException("Exception :" + e.getMessage());
 			}
 		}).orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
 	}
@@ -90,11 +95,11 @@ public class ItemTypeService {
 	}
 
 	public ImageResponse getImage(ItemType itemType) {
-		if(itemType.getImage().isEmpty()) {
+		if (itemType.getImage().isEmpty()) {
 			return new ImageResponse(itemType.getId().longValue(), null, itemType.getVersion());
 		}
 		try {
-			String fileLocation = String.format("%s/"+imagePath, System.getProperty("catalina.base"))+ "/"
+			String fileLocation = String.format("%s/" + imagePath, System.getProperty("catalina.base")) + "/"
 					+ itemType.getImage();
 			byte[] bArray = imageUtil.getImage(fileLocation);
 			return new ImageResponse(itemType.getId().longValue(), bArray, itemType.getVersion());
@@ -127,26 +132,39 @@ public class ItemTypeService {
 		return images;
 	}
 
-//	public ItemType create(ItemType itemType) {
-//		return itemTypeRepository.save(itemType);
-//	}
+	public ItemType create(Integer corporateId, ItemType requestItemType) {
+		return corporateRepository.findById(corporateId).map((corporate) -> {
+			if (userProfile.getProfile().getCorporate().getId() != corporate.getId()) {
+				throw new UnauthorizedException("Corporate is unauthorized");
+			}
+			ItemType itemType = new ItemType();
+			itemType.setCorporate(corporate);
+			itemType.setName(requestItemType.getName());
+			itemType.setNameKh(requestItemType.getNameKh());
+			itemType.setEnable(requestItemType.isEnable());
+			return itemTypeRepository.save(itemType);
+		}).orElseThrow(() -> new ResourceNotFoundException("Corporate does not exist"));
+	}
 
-//	public ItemType update(Integer itemTypeId,ItemType requestItemType) {
-//		return itemTypeRepository.findById(itemTypeId)
-//				.map(itemType -> {
-//					itemType.setName(requestItemType.getName());
-//					itemType.setNameKh(requestItemType.getNameKh());
-//					itemType.setImage(requestItemType.getImage());
-//					itemType.setEnable(requestItemType.isEnable());
-//					return itemTypeRepository.save(itemType);
-//				}).orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
+	public ItemType update(Integer itemTypeId, ItemType requestItemType) {
+		return itemTypeRepository.findById(itemTypeId).map(itemType -> {
+			if (userProfile.getProfile().getCorporate().getId() != itemType.getCorporate().getId()) {
+				throw new UnauthorizedException("Corporate is unauthorized");
+			}
+			itemType.setName(requestItemType.getName());
+			itemType.setNameKh(requestItemType.getNameKh());
+			itemType.setEnable(requestItemType.isEnable());
+			return itemTypeRepository.save(itemType);
+		}).orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
+	}
+
+//	public ItemType setEnable(Integer itemTypeId, boolean enable) {
+//		return itemTypeRepository.findById(itemTypeId).map(itemType -> {
+//			if (userProfile.getProfile().getCorporate().getId() != itemType.getCorporate().getId()) {
+//				throw new UnauthorizedException("Corporate is unauthorized");
+//			}
+//			itemType.setEnable(enable);
+//			return itemTypeRepository.save(itemType);
+//		}).orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
 //	}
-//	
-//	public ItemType setEnable(Integer itemTypeId,boolean enable) {
-//        return  itemTypeRepository.findById(itemTypeId)
-//				.map(itemType -> {
-//					itemType.setEnable(enable);
-//					return itemTypeRepository.save(itemType);
-//				}).orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
-//    }
 }

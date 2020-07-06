@@ -1,7 +1,5 @@
 package com.spring.miniposbackend.controller.expense;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -10,6 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.model.expense.ExpenseType;
 import com.spring.miniposbackend.service.expense.ExpenseTypeService;
 import com.spring.miniposbackend.util.UserProfileUtil;
@@ -24,23 +24,30 @@ public class ExpenseTypeController {
 	private UserProfileUtil userProfile;
 
 	@GetMapping("by-branch")
-	public List<ExpenseType> getByBranch() { // will get from user
-		return expenseTypeService.showByBranchId(userProfile.getProfile().getBranch().getId(), true);
+	public SuccessResponse getByBranch() { // will get from user
+
+		return new SuccessResponse("00", "fetch Expense Type",
+				expenseTypeService.showByBranchId(userProfile.getProfile().getBranch().getId(), true));
 	}
 
 	@PostMapping
-	public ExpenseType create(@RequestBody ExpenseType requestItem) {
-		return expenseTypeService.create(requestItem,
-				userProfile.getProfile().getUser().getId());
-	}
-	@PatchMapping("{expenseTypeId}")
-	public ExpenseType update(@PathVariable Integer expenseTypeId,@RequestBody ExpenseType expenseType) {
-		return expenseTypeService.update(expenseTypeId, expenseType,userProfile.getProfile().getUser().getId());
-	}
-	@PatchMapping("delete/{expenseTypeId}")
-	public ExpenseType delete(@PathVariable Integer expenseTypeId) {
-		return expenseTypeService.delete(expenseTypeId,userProfile.getProfile().getUser().getId());
+	public SuccessResponse create(@RequestBody ExpenseType requestItem) {
+		return new SuccessResponse("00", "Expense Type Created",
+				expenseTypeService.create(requestItem, userProfile.getProfile().getUser().getId()));
 	}
 
+	@PatchMapping("{expenseTypeId}")
+	public SuccessResponse update(@PathVariable Integer expenseTypeId, @RequestBody ExpenseType expenseType) {
+		return new SuccessResponse("00", "Expense Type Updated",
+				expenseTypeService.update(expenseTypeId, expenseType, userProfile.getProfile().getUser().getId()));
+
+	}
+
+	@PatchMapping("delete/{expenseTypeId}")
+	public SuccessResponse delete(@PathVariable Integer expenseTypeId) {
+		return new SuccessResponse("00", "Expense Type Disabled",
+				expenseTypeService.delete(expenseTypeId, userProfile.getProfile().getUser().getId()));
+
+	}
 
 }

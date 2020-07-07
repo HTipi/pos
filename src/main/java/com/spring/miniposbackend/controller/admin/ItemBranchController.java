@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.modelview.ImageRequest;
 import com.spring.miniposbackend.modelview.ImageResponse;
+import com.spring.miniposbackend.modelview.ItemBranchUpdate;
 import com.spring.miniposbackend.service.admin.ItemBranchService;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
@@ -64,6 +66,11 @@ public class ItemBranchController {
 	@PatchMapping("{itemBranchId}/set-enable")
 	public ItemBranch setEnable(@PathVariable Long itemBranchId, @RequestParam Boolean enable) {
 		return itemBranchService.setEnable(itemBranchId, enable);
+	}
+	
+	@PutMapping("{itemBranchId}")
+	public ItemBranch update(@PathVariable Long itemBranchId, @RequestBody ItemBranchUpdate itemBranch) {
+		return itemBranchService.update(itemBranchId, itemBranch);
 	}
 
 }

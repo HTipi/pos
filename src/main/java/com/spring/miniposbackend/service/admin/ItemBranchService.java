@@ -16,6 +16,7 @@ import com.spring.miniposbackend.model.admin.Item;
 import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.modelview.ImageRequest;
 import com.spring.miniposbackend.modelview.ImageResponse;
+import com.spring.miniposbackend.modelview.ItemBranchUpdate;
 import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
 import com.spring.miniposbackend.repository.admin.ItemRepository;
@@ -106,8 +107,9 @@ public class ItemBranchService {
 			items.forEach((item) -> {
 				Long itemId = item.getId();
 				Integer branchId = branch.getId();
-				Optional<ItemBranch> itemBranch  = itemBranchRepository.findFirstByBranchIdAndItemIdOrderByIdDesc(branchId, itemId);
-				if(!itemBranch.isPresent()) {
+				Optional<ItemBranch> itemBranch = itemBranchRepository
+						.findFirstByBranchIdAndItemIdOrderByIdDesc(branchId, itemId);
+				if (!itemBranch.isPresent()) {
 					ItemBranch itemBr = new ItemBranch();
 					itemBr.setBranch(branch);
 					itemBr.setItem(item);
@@ -120,6 +122,17 @@ public class ItemBranchService {
 			});
 		});
 	}
+
+	public ItemBranch update(Long itemBranchId, ItemBranchUpdate requestItem) {
+		return itemBranchRepository.findById(itemBranchId).map(itemBranch -> {
+			itemBranch.setUseItemConfiguration(requestItem.isUseItemConfiguration());
+			itemBranch.setPrice(requestItem.getPrice());
+			itemBranch.setDiscount(requestItem.getDiscount());
+			itemBranch.setEnable(requestItem.isEnable());
+			return itemBranchRepository.save(itemBranch);
+		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
+	}
+
 	public ItemBranch setEnable(Long itemBranchId, Boolean enable) {
 		return itemBranchRepository.findById(itemBranchId).map(itemBranch -> {
 			itemBranch.setEnable(enable);

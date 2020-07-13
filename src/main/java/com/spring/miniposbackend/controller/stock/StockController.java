@@ -37,7 +37,4 @@ public class StockController {
 	public Stock delete(@PathVariable Long stockId) {
 		return stockService.delete(stockId);
 	}
-	
-	
-
 }

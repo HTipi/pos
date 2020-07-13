@@ -38,7 +38,7 @@ public class StockEntry extends AuditModel{
 	
 	@Column(name = "stock_in", nullable = false)
     @ColumnDefault("true")
-    private Boolean stockIn;
+    private boolean stockIn;
 	
 	@Column(name = "value_date", nullable = false, updatable = false)
     private Date valueDate;
@@ -69,4 +69,12 @@ public class StockEntry extends AuditModel{
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
     private User user;
+	
+	public String getItemCode() {
+		return item.getCode();
+	}
+	
+	public String getItemName() {
+		return item.getName();
+	}
 }

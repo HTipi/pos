@@ -3,11 +3,15 @@ package com.spring.miniposbackend.service.stock;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.exception.UnauthorizedException;
+import com.spring.miniposbackend.exception.UnprocessableEntityException;
 import com.spring.miniposbackend.model.stock.StockEntry;
 import com.spring.miniposbackend.modelview.StockEntryRequest;
 import com.spring.miniposbackend.repository.admin.ItemRepository;
@@ -16,6 +20,7 @@ import com.spring.miniposbackend.repository.stock.StockEntryRepository;
 import com.spring.miniposbackend.repository.stock.StockRepository;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
+@Service
 public class StockEntryService {
 
 	@Autowired
@@ -25,11 +30,18 @@ public class StockEntryService {
 	@Autowired
 	private UserProfileUtil userProfile;
 	@Autowired
-	ItemRepository itemRepository;
+	private ItemRepository itemRepository;
 
 	@Autowired
 	private UserRepository userRepository;
 
+	public List<StockEntry> showByStockId(Long stockId) {
+		return stockRepository.findById(stockId).map((stock) -> {
+			return stockEntryRepository.findByStockId(stockId);
+		}).orElseThrow(() -> new ResourceNotFoundException("Stock does not exist"));
+	}
+
+	@Transactional
 	public List<StockEntry> create(Long stockId, List<StockEntryRequest> stockEntries) {
 		return stockRepository.findById(stockId).map((stock) -> {
 			if (stock.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
@@ -41,12 +53,17 @@ public class StockEntryService {
 			List<StockEntry> entries = new ArrayList<StockEntry>();
 			return userRepository.findById(userProfile.getProfile().getUser().getId()).map((user) -> {
 				stockEntries.forEach((stockEntryRequest) -> {
+					if (stockEntryRequest.getQuantity() < 1) {
+						throw new UnprocessableEntityException("Quantity must be greater than 0");
+					}
 					StockEntry stockEntry = itemRepository.findById(stockEntryRequest.getItemId()).map((item) -> {
 						if (item.getItemType().getCorporate().getId() != userProfile.getProfile().getCorporate()
 								.getId()) {
 							throw new UnauthorizedException("Item is unauthorized");
 						}
 						StockEntry stockEnt = new StockEntry();
+						stockEnt.setStockIn(stock.isStockIn());
+						stockEnt.setValueDate(stock.getValueDate());
 						stockEnt.setItem(item);
 						stockEnt.setPrice(stockEntryRequest.getPrice());
 						stockEnt.setQuantity(stockEntryRequest.getQuantity());

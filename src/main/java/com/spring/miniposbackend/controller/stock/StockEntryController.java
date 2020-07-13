@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -11,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.spring.miniposbackend.model.stock.Stock;
 import com.spring.miniposbackend.model.stock.StockEntry;
 import com.spring.miniposbackend.modelview.StockEntryRequest;
 import com.spring.miniposbackend.service.stock.StockEntryService;
@@ -36,6 +36,11 @@ public class StockEntryController {
 	@DeleteMapping("{stockEntryId}")
 	public StockEntry delete(@PathVariable Long stockEntryId) {
 		return stockEntryService.delete(stockEntryId);
+	}
+	
+	@GetMapping("get-by-stock-id/{stockId}")
+	List<StockEntry> getByStockId(@PathVariable Long stockId){
+		return stockEntryService.showByStockId(stockId);
 	}
 
 }

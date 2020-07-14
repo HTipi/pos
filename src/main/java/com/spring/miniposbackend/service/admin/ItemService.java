@@ -129,7 +129,8 @@ public class ItemService {
 			item.setNameKh(requestItem.getNameKh());
 			item.setPrice(requestItem.getPrice());
 			item.setDiscount(requestItem.getDiscount());
-			item.setEnable(requestItem.isEnable());
+			item.setItemType(itemType);
+			item.setEnable(true);
 			return itemRepository.save(item);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
 	}
@@ -144,7 +145,16 @@ public class ItemService {
 			item.setNameKh(requestItem.getNameKh());
 			item.setPrice(requestItem.getPrice());
 			item.setDiscount(requestItem.getDiscount());
-			item.setEnable(requestItem.isEnable());
+			//item.setEnable(requestItem.isEnable());
+			return itemRepository.save(item);
+		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
+	}
+	public Item disable(Long itemId) {
+		return itemRepository.findById(itemId).map((item) -> {
+			if (userProfile.getProfile().getCorporate().getId() != item.getItemType().getCorporate().getId()) {
+				throw new UnauthorizedException("Item is unauthorized");
+			}
+			item.setEnable(false);
 			return itemRepository.save(item);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}

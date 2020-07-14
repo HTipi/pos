@@ -58,6 +58,18 @@ public class Item extends AuditModel{
 	@ColumnDefault("0")
     private Short discount;
 	
+	@Column(name = "stock_in", nullable = false)
+	@ColumnDefault("0")
+    private Long stockIn;
+	
+	@Column(name = "stock_out", nullable = false)
+	@ColumnDefault("0")
+    private Long stockOut;
+	
+	@Column(name = "is_stock", nullable = false)
+    @ColumnDefault("false")
+    private boolean isStock;
+	
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "item_type_id", nullable = false)
     @JsonIgnore

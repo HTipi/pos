@@ -129,6 +129,7 @@ public class ItemService {
 			item.setNameKh(requestItem.getNameKh());
 			item.setPrice(requestItem.getPrice());
 			item.setDiscount(requestItem.getDiscount());
+			item.setStock(requestItem.isStock());
 			item.setItemType(itemType);
 			item.setEnable(true);
 			return itemRepository.save(item);
@@ -144,6 +145,7 @@ public class ItemService {
 			item.setName(requestItem.getName());
 			item.setNameKh(requestItem.getNameKh());
 			item.setPrice(requestItem.getPrice());
+			item.setStock(requestItem.isStock());
 			item.setDiscount(requestItem.getDiscount());
 			//item.setEnable(requestItem.isEnable());
 			return itemRepository.save(item);

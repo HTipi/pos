@@ -68,7 +68,7 @@ public class Item extends AuditModel{
 	
 	@Column(name = "is_stock", nullable = false)
     @ColumnDefault("false")
-    private boolean isStock;
+    private boolean stock;
 	
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "item_type_id", nullable = false)

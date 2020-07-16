@@ -77,4 +77,8 @@ public class StockEntry extends AuditModel{
 	public String getItemName() {
 		return item.getName();
 	}
+	
+	public Long getStockBalance() {
+		return item.getStockIn()-item.getStockOut();
+	}
 }

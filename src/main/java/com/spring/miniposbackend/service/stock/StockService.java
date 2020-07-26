@@ -1,11 +1,15 @@
 package com.spring.miniposbackend.service.stock;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.exception.UnauthorizedException;
+import com.spring.miniposbackend.model.admin.Item;
 import com.spring.miniposbackend.model.stock.Stock;
 import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.admin.UserRepository;
@@ -24,6 +28,18 @@ public class StockService {
 	@Autowired
 	private UserProfileUtil userProfile;
 
+	public List<Stock> showByBranchId(Integer branchId) {
+		return userRepository.findById( userProfile.getProfile().getUser().getId()).map((user)-> {
+			return branchRepository.findById(branchId).map((branch) -> {
+				if (branch.getId() != userProfile.getProfile().getBranch().getId()) {
+					throw new UnauthorizedException("Branch is unauthorized");
+				}
+				return stockRepository.findByBranchId(branchId);
+			}).orElseThrow(() -> new ResourceNotFoundException("Branch does not exist"));
+		}).orElseThrow(() -> new ResourceNotFoundException("User does not exist"));
+
+	}
+	
 	public Stock create(Integer branchId, Stock requestStock) {
 		return userRepository.findById( userProfile.getProfile().getUser().getId()).map((user)-> {
 			return branchRepository.findById(branchId).map((branch) -> {

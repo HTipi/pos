@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +18,7 @@ import com.spring.miniposbackend.model.admin.ItemType;
 import com.spring.miniposbackend.modelview.ImageRequest;
 import com.spring.miniposbackend.modelview.ImageResponse;
 import com.spring.miniposbackend.repository.admin.CorporateRepository;
+import com.spring.miniposbackend.repository.admin.ImageRepository;
 import com.spring.miniposbackend.repository.admin.ItemTypeRepository;
 import com.spring.miniposbackend.util.ImageUtil;
 import com.spring.miniposbackend.util.UserProfileUtil;
@@ -30,6 +32,8 @@ public class ItemTypeService {
 	private CorporateRepository corporateRepository;
 	@Autowired
 	private ImageUtil imageUtil;
+	@Autowired
+	private ImageRepository imageRepository;
 
 	@Value("${file.path.image.item-type}")
 	private String imagePath;
@@ -67,6 +71,20 @@ public class ItemTypeService {
 
 	}
 
+	public ItemType updateImage(Integer itemTypeId, UUID imageId) {
+		return imageRepository.findById(imageId)
+				.map((image) -> {
+					return itemTypeRepository.findById(itemTypeId)
+							.map((itemType) -> {
+								itemType.setImage(image.getName());
+								itemType.setVersion((short) (itemType.getVersion() + 1));
+								return itemTypeRepository.save(itemType);
+							})
+							.orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
+				})
+				.orElseThrow(() -> new ResourceNotFoundException("Image does not exist"));
+	}
+	
 	public ItemType uploadImage(Integer itemTypeId, MultipartFile file) {
 		return itemTypeRepository.findById(itemTypeId).map(itemType -> {
 			if (file.isEmpty()) {

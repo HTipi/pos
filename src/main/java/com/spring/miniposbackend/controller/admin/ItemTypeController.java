@@ -2,6 +2,7 @@ package com.spring.miniposbackend.controller.admin;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.validation.Valid;
 
@@ -58,6 +59,11 @@ public class ItemTypeController {
 		return new SuccessResponse("00", "Disable Item Type", itemTypeService.disable(itemTypeId));
 	}
 
+	@PatchMapping("{itemTypeId}/set-image/{imageId}")
+	public ItemType updateImage(@PathVariable Integer itemTypeId, @PathVariable UUID imageId) {
+		return itemTypeService.updateImage(itemTypeId, imageId);
+	}
+	
 	@PostMapping("{itemTypeId}/upload") /// Need to validate
 	public ItemType uploadImage(@PathVariable Integer itemTypeId, @RequestParam("imageFile") MultipartFile file) {
 		return itemTypeService.uploadImage(itemTypeId, file);

@@ -5,6 +5,9 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,11 +26,19 @@ public class ImageService {
 	private ImageRepository imageRepository;
 	
 	@Value("${file.path.image.item}")
-	private String imagePath;
+	private String itemPath;
+	@Value("${file.path.image.item-type}")
+	private String itemTypePath;
 	
-	public Image create(Image requestImage, MultipartFile file) {
+	public Image create(String type,MultipartFile file) {
 		if (file.isEmpty()) {
 			throw new ResourceNotFoundException("File content does not exist");
+		}
+		String imagePath ="";
+		if(type.compareToIgnoreCase("item")==0) {
+			imagePath=itemPath;
+		}else {
+			imagePath=itemTypePath;
 		}
 		try {
 			// read and write the file to the selected location-
@@ -37,6 +48,7 @@ public class ImageService {
 			Image image  =new Image();
 			image.setId(id);
 			image.setName(fileName);
+			image.setType(type);
 			return imageRepository.save(image);
 		} catch (IOException e) {
 			throw new ConflictException("Upable to upload File");
@@ -52,6 +64,12 @@ public class ImageService {
 		}
 		Image image = imageRepository.findById(imageId)
 				.orElseThrow(() -> new ResourceNotFoundException("Image does not exist"));
+		String imagePath ="";
+		if(image.getType().compareToIgnoreCase("item")==0) {
+			imagePath=itemPath;
+		}else {
+			imagePath=itemTypePath;
+		}
 		try {
 			// read and write the file to the selected location-
 			String baseLocation = String.format("%s/" + imagePath, System.getProperty("catalina.base"));
@@ -65,4 +83,13 @@ public class ImageService {
 			throw new ConflictException(e.getMessage());
 		}
 	}
+	
+	public Page<Image> getImages(String type, int page, int length){
+		Pageable pageable = PageRequest.of(page, length);
+		Page<Image> images = imageRepository.findByType(type, pageable);
+		return images;
+	}
+	
+	
+	
 }

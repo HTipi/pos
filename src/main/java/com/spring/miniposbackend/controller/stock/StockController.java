@@ -32,6 +32,7 @@ public class StockController {
 	}
 
 	
+	
 	@GetMapping
 	public SuccessResponse show() {
 		return new SuccessResponse("00", "fetch Stock",

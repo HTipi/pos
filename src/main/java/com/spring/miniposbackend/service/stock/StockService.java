@@ -40,6 +40,8 @@ public class StockService {
 
 	}
 	
+	
+	
 	public Stock create(Integer branchId, Stock requestStock) {
 		return userRepository.findById( userProfile.getProfile().getUser().getId()).map((user)-> {
 			return branchRepository.findById(branchId).map((branch) -> {

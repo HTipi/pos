@@ -24,8 +24,11 @@ public class Image extends AuditModel{
     @Column(name = "id", nullable = false)
     private UUID id;
 	
-	@Column(name = "name", nullable = false, length = 128)
+	@Column(name = "name", nullable = false, length = 64)
     private String name;
+	
+	@Column(name="type", nullable = false)
+	private String type;
 	
 //	@ManyToOne(cascade = CascadeType.ALL)
 //    @JoinColumn(name = "corporate_id")

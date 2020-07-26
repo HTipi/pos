@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +18,7 @@ import com.spring.miniposbackend.model.admin.Item;
 import com.spring.miniposbackend.modelview.ImageRequest;
 import com.spring.miniposbackend.modelview.ImageResponse;
 import com.spring.miniposbackend.repository.admin.CorporateRepository;
+import com.spring.miniposbackend.repository.admin.ImageRepository;
 import com.spring.miniposbackend.repository.admin.ItemRepository;
 import com.spring.miniposbackend.repository.admin.ItemTypeRepository;
 import com.spring.miniposbackend.util.ImageUtil;
@@ -35,6 +37,7 @@ public class ItemService {
 	private ImageUtil imageUtil;
 	@Autowired
 	private UserProfileUtil userProfile;
+	@Autowired ImageRepository imageRepository;
 
 	@Value("${file.path.image.item}")
 	private String imagePath;
@@ -51,6 +54,20 @@ public class ItemService {
 			}
 		}).orElseThrow(() -> new ResourceNotFoundException("Corporate does not exist"));
 
+	}
+	
+	public Item updateImage(Long itemId, UUID imageId) {
+		return imageRepository.findById(imageId)
+				.map((image) -> {
+					return itemRepository.findById(itemId)
+							.map((item) -> {
+								item.setImage(image.getName());
+								item.setVersion((short) (item.getVersion() + 1));
+								return itemRepository.save(item);
+							})
+							.orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
+				})
+				.orElseThrow(() -> new ResourceNotFoundException("Image does not exist"));
 	}
 
 	public Item uploadImage(Long itemId, MultipartFile file) {
@@ -130,6 +147,8 @@ public class ItemService {
 			item.setPrice(requestItem.getPrice());
 			item.setDiscount(requestItem.getDiscount());
 			item.setStock(requestItem.isStock());
+			item.setStockIn(0L);
+			item.setStockOut(0L);
 			item.setItemType(itemType);
 			item.setEnable(true);
 			return itemRepository.save(item);

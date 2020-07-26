@@ -2,6 +2,7 @@ package com.spring.miniposbackend.controller.admin;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.validation.Valid;
 
@@ -20,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.model.admin.Item;
 import com.spring.miniposbackend.modelview.ImageRequest;
-import com.spring.miniposbackend.modelview.ImageResponse;
 import com.spring.miniposbackend.service.admin.ItemService;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
@@ -36,6 +36,11 @@ public class ItemController {
 	@PostMapping("{itemId}/upload")
 	public Item uploadImage(@PathVariable Long itemId, @RequestParam("imageFile") MultipartFile file) {
 		return itemService.uploadImage(itemId, file);
+	}
+	
+	@PatchMapping("{itemId}/set-image/{imageId}")
+	public Item updateImage(@PathVariable Long itemId, @PathVariable UUID imageId) {
+		return itemService.updateImage(itemId, imageId);
 	}
 
 	@GetMapping("by-corporate")

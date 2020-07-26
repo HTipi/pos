@@ -31,6 +31,7 @@ public class StockController {
 		return new SuccessResponse("00", "create Stock",stockService.create(userProfile.getProfile().getBranch().getId(), stock));
 	}
 
+	
 	@GetMapping
 	public SuccessResponse show() {
 		return new SuccessResponse("00", "fetch Stock",

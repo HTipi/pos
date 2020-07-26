@@ -61,10 +61,4 @@ public class Stock extends AuditModel{
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
     private User user;
-	
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "stock_id", nullable = false)
-    @JsonIgnore
-    private List<StockEntry> stockEntries;
-	
 }

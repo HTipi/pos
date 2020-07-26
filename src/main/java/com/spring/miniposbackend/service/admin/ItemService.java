@@ -130,6 +130,8 @@ public class ItemService {
 			item.setPrice(requestItem.getPrice());
 			item.setDiscount(requestItem.getDiscount());
 			item.setStock(requestItem.isStock());
+			item.setStockIn(0L);
+			item.setStockOut(0L);
 			item.setItemType(itemType);
 			item.setEnable(true);
 			return itemRepository.save(item);

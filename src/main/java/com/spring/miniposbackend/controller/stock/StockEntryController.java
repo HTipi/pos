@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.model.stock.StockEntry;
 import com.spring.miniposbackend.modelview.StockEntryRequest;
 import com.spring.miniposbackend.service.stock.StockEntryService;
@@ -24,8 +25,8 @@ public class StockEntryController {
 	private StockEntryService stockEntryService;
 	
 	@PostMapping("{stockId}")
-	public List<StockEntry> create(@PathVariable Long stockId,@RequestBody List<StockEntryRequest> stockEntries){
-		return stockEntryService.create(stockId, stockEntries);
+	public SuccessResponse create(@PathVariable Long stockId,@RequestBody List<StockEntryRequest> stockEntries){
+		return new SuccessResponse("00", "delete Stock", stockEntryService.create(stockId, stockEntries));
 	}
 	
 	@PutMapping("{stockEntryId}")
@@ -39,8 +40,8 @@ public class StockEntryController {
 	}
 	
 	@GetMapping("get-by-stock-id/{stockId}")
-	List<StockEntry> getByStockId(@PathVariable Long stockId){
-		return stockEntryService.showByStockId(stockId);
+	SuccessResponse getByStockId(@PathVariable Long stockId){
+		return new SuccessResponse("00", "fetch StockEntry", stockEntryService.showByStockId(stockId));
 	}
-
+	
 }

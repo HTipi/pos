@@ -30,9 +30,6 @@ public class StockController {
 	public SuccessResponse create(@RequestBody Stock stock) {
 		return new SuccessResponse("00", "create Stock",stockService.create(userProfile.getProfile().getBranch().getId(), stock));
 	}
-
-	
-	
 	@GetMapping
 	public SuccessResponse show() {
 		return new SuccessResponse("00", "fetch Stock",
@@ -41,12 +38,12 @@ public class StockController {
 	}
 
 	@PatchMapping("{stockId}/description-update")
-	public Stock updateDescription(@PathVariable Long stockId, @RequestParam(name = "description") String description) {
-		return stockService.updateDescription(stockId, description);
+	public SuccessResponse updateDescription(@PathVariable Long stockId, @RequestParam(name = "description") String description) {
+		return new SuccessResponse("00", "delete Stock", stockService.updateDescription(stockId, description));
 	}
 
 	@DeleteMapping("{stockId}")
-	public Stock delete(@PathVariable Long stockId) {
-		return stockService.delete(stockId);
+	public SuccessResponse delete(@PathVariable Long stockId) {
+		return new SuccessResponse("00", "delete Stock",stockService.delete(stockId));
 	}
 }

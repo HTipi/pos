@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.exception.UnauthorizedException;
-import com.spring.miniposbackend.model.admin.Item;
 import com.spring.miniposbackend.model.stock.Stock;
 import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.admin.UserRepository;
@@ -28,25 +27,50 @@ public class StockService {
 	@Autowired
 	private UserProfileUtil userProfile;
 
-	public List<Stock> showByBranchId(Integer branchId) {
-		return userRepository.findById( userProfile.getProfile().getUser().getId()).map((user)-> {
+	public List<Stock> showByBranchId(Integer branchId, Optional<Boolean> stockIn, Optional<Boolean> posted) {
+		return userRepository.findById(userProfile.getProfile().getUser().getId()).map((user) -> {
 			return branchRepository.findById(branchId).map((branch) -> {
-				if (branch.getId() != userProfile.getProfile().getBranch().getId()) {
-					throw new UnauthorizedException("Branch is unauthorized");
+				if (stockIn.isPresent()) {
+					boolean isStockIn = stockIn.get();
+					if (isStockIn) {
+						if (branch.getId() != userProfile.getProfile().getBranch().getId()) {
+							throw new UnauthorizedException("Branch is unauthorized");
+						}
+					}else{
+						if (branch.getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
+							throw new UnauthorizedException("Corporate is unauthorized");
+						}
+					}
+					if (posted.isPresent()) {
+						boolean isPosted = posted.get();
+						return stockRepository.findByBranchId(branchId, isStockIn, isPosted);
+					} else {
+						return stockRepository.findByBranchId(branchId, stockIn.get().booleanValue());
+					}
+				} else {
+					if (branch.getId() != userProfile.getProfile().getBranch().getId()
+							&& stockIn.get().booleanValue()) {
+						throw new UnauthorizedException("Branch is unauthorized");
+					}
+					return stockRepository.findByBranchId(branchId);
 				}
-				return stockRepository.findByBranchId(branchId);
+
 			}).orElseThrow(() -> new ResourceNotFoundException("Branch does not exist"));
 		}).orElseThrow(() -> new ResourceNotFoundException("User does not exist"));
 
 	}
-	
-	
-	
+
 	public Stock create(Integer branchId, Stock requestStock) {
-		return userRepository.findById( userProfile.getProfile().getUser().getId()).map((user)-> {
+		return userRepository.findById(userProfile.getProfile().getUser().getId()).map((user) -> {
 			return branchRepository.findById(branchId).map((branch) -> {
-				if (branch.getId() != userProfile.getProfile().getBranch().getId()) {
-					throw new UnauthorizedException("Branch is unauthorized");
+				if (requestStock.isStockIn()) {
+					if (branch.getId() != userProfile.getProfile().getBranch().getId()) {
+						throw new UnauthorizedException("Branch is unauthorized");
+					}
+				}else{
+					if (branch.getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
+						throw new UnauthorizedException("Corporate is unauthorized");
+					}
 				}
 				Stock stock = new Stock();
 				stock.setValueDate(requestStock.getValueDate());
@@ -62,8 +86,14 @@ public class StockService {
 
 	public Stock updateDescription(Long stockId, String description) {
 		return stockRepository.findById(stockId).map((stock) -> {
-			if (stock.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
-				throw new UnauthorizedException("Branch is unauthorized");
+			if (stock.isStockIn()) {
+				if (stock.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
+					throw new UnauthorizedException("Branch is unauthorized");
+				}
+			}else{
+				if (stock.getBranch().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
+					throw new UnauthorizedException("Corporate is unauthorized");
+				}
 			}
 			if (stock.isPosted()) {
 				throw new ConflictException("Stock transaction is already posted");
@@ -75,13 +105,19 @@ public class StockService {
 
 	public Stock delete(Long stockId) {
 		return stockRepository.findById(stockId).map((stock) -> {
-			if (stock.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
-				throw new UnauthorizedException("Branch is unauthorized");
+			if (stock.isStockIn()) {
+				if (stock.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
+					throw new UnauthorizedException("Branch is unauthorized");
+				}
+			}else{
+				if (stock.getBranch().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
+					throw new UnauthorizedException("Corporate is unauthorized");
+				}
 			}
 			if (stock.isPosted()) {
 				throw new ConflictException("Stock transaction is already posted");
 			}
-				stockRepository.deleteById(stockId);
+			stockRepository.deleteById(stockId);
 			return stock;
 		}).orElseThrow(() -> new ResourceNotFoundException("Stock does not exist"));
 	}

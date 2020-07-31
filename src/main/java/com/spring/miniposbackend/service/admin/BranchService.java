@@ -2,11 +2,13 @@ package com.spring.miniposbackend.service.admin;
 
 import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
+import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.model.admin.Branch;
 import com.spring.miniposbackend.modelview.ImageResponse;
 import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.admin.CorporateRepository;
 import com.spring.miniposbackend.util.ImageUtil;
+import com.spring.miniposbackend.util.UserProfileUtil;
 
 import java.io.IOException;
 import java.util.List;
@@ -30,6 +32,9 @@ public class BranchService {
     private ImageUtil imageUtil;
     
     @Autowired
+	private UserProfileUtil userProfile;
+    
+    @Autowired
     private CorporateRepository corporateRepository;
 //    @Autowired
 //    private AddressRepository addressRepository;
@@ -41,6 +46,9 @@ public class BranchService {
 		return corporateRepository.findById(corporateId).map(corporate -> {
 			if (!corporate.isEnable()) {
 				throw new ConflictException("Corporate is disable");
+			}
+			if (corporate.getId() != userProfile.getProfile().getCorporate().getId()) {
+				throw new UnauthorizedException("Corporate is unauthorized");
 			}
 			if (enable.isPresent()) {
 				return branchRepository.findByCorporateId(corporateId, enable.get());

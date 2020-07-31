@@ -5,9 +5,12 @@ import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.model.admin.Branch;
 import com.spring.miniposbackend.modelview.ImageResponse;
 import com.spring.miniposbackend.repository.admin.BranchRepository;
+import com.spring.miniposbackend.repository.admin.CorporateRepository;
 import com.spring.miniposbackend.util.ImageUtil;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,13 +29,27 @@ public class BranchService {
     @Autowired
     private ImageUtil imageUtil;
     
-//    @Autowired
-//    private CorporateRepository corporateRepository;
+    @Autowired
+    private CorporateRepository corporateRepository;
 //    @Autowired
 //    private AddressRepository addressRepository;
     
 	@Value("${file.path.image.branch}")
 	private String imagePath;
+	
+	public List<Branch> showByCorpoateId(Integer corporateId, Optional<Boolean> enable) {
+		return corporateRepository.findById(corporateId).map(corporate -> {
+			if (!corporate.isEnable()) {
+				throw new ConflictException("Corporate is disable");
+			}
+			if (enable.isPresent()) {
+				return branchRepository.findByCorporateId(corporateId, enable.get());
+			} else {
+				return branchRepository.findByCorporateId(corporateId);
+			}
+		}).orElseThrow(() -> new ResourceNotFoundException("Corporate does not exist"));
+
+	}
     
     public Branch uploadImage(Integer branchId, MultipartFile file) {
 		return branchRepository.findById(branchId).map(branch -> {

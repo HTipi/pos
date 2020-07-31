@@ -44,8 +44,14 @@ public class StockEntryService {
 	@Transactional
 	public List<StockEntry> create(Long stockId, List<StockEntryRequest> stockEntries) {
 		return stockRepository.findById(stockId).map((stock) -> {
-			if (stock.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
-				throw new UnauthorizedException("Branch is unauthorized");
+			if (stock.isStockIn()) {
+				if (stock.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
+					throw new UnauthorizedException("Branch is unauthorized");
+				}
+			}else{
+				if (stock.getBranch().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
+					throw new UnauthorizedException("Corporate is unauthorized");
+				}
 			}
 			if (stock.isPosted()) {
 				throw new ConflictException("Stock transaction is already posted");
@@ -83,8 +89,14 @@ public class StockEntryService {
 
 	public StockEntry update(Long stockEntryId, StockEntryRequest stockEntryRequest) {
 		return stockEntryRepository.findById(stockEntryId).map((stockEntry) -> {
-			if (stockEntry.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
-				throw new UnauthorizedException("Branch is unauthorized");
+			if (stockEntry.isStockIn()) {
+				if (stockEntry.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
+					throw new UnauthorizedException("Branch is unauthorized");
+				}
+			}else{
+				if (stockEntry.getBranch().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
+					throw new UnauthorizedException("Corporate is unauthorized");
+				}
 			}
 			if (stockEntry.getStock().isPosted()) {
 				throw new ConflictException("Stock transaction is already posted");
@@ -103,8 +115,14 @@ public class StockEntryService {
 
 	public StockEntry delete(Long stockEntryId) {
 		return stockEntryRepository.findById(stockEntryId).map((stockEntry) -> {
-			if (stockEntry.getStock().getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
-				throw new UnauthorizedException("Branch is unauthorized");
+			if (stockEntry.isStockIn()) {
+				if (stockEntry.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
+					throw new UnauthorizedException("Branch is unauthorized");
+				}
+			}else{
+				if (stockEntry.getBranch().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
+					throw new UnauthorizedException("Corporate is unauthorized");
+				}
 			}
 			if (stockEntry.getStock().isPosted()) {
 				throw new ConflictException("Stock transaction is already posted");

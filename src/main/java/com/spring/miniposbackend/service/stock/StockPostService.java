@@ -39,8 +39,14 @@ public class StockPostService {
 	@Transactional
 	public List<StockPost> create(Long stockId) {
 		return stockRepository.findById(stockId).map((stock) -> {
-			if (stock.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
-				throw new UnauthorizedException("Branch is unauthorized");
+			if (stock.isStockIn()) {
+				if (stock.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
+					throw new UnauthorizedException("Branch is unauthorized");
+				}
+			}else{
+				if (stock.getBranch().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
+					throw new UnauthorizedException("Corporate is unauthorized");
+				}
 			}
 			if (stock.isPosted()) {
 				throw new ConflictException("Stock transaction is already posted");

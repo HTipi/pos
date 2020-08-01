@@ -19,4 +19,13 @@ public interface StockRepository extends JpaRepository<Stock, Long>{
 	@Query(value = "select s from Stock s where s.branch.id = ?1 and s.stockIn = ?2 and s.posted = ?3")
 	List<Stock> findByBranchId(Integer branchId, boolean stockIn, boolean posted);
 	
+	@Query(value = "select s from Stock s where s.branch.corporate.id = ?1")
+	List<Stock> findByCorporateId(Integer corporateId);
+
+	@Query(value = "select s from Stock s where s.branch.corporate.id = ?1 and s.stockIn = ?2")
+	List<Stock> findByCorporateId(Integer corporateId, boolean stockIn);
+	
+	@Query(value = "select s from Stock s where s.branch.corporate.id = ?1 and s.stockIn = ?2 and s.posted = ?3")
+	List<Stock> findByCorporateId(Integer corporateId, boolean stockIn, boolean posted);
+	
 }

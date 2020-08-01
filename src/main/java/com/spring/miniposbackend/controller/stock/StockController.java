@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.model.stock.Stock;
 import com.spring.miniposbackend.service.stock.StockService;
+import com.spring.miniposbackend.util.UserProfileUtil;
 
 @RestController
 @RequestMapping("stock")
@@ -23,10 +24,17 @@ public class StockController {
 
 	@Autowired
 	private StockService stockService;
-
-	@GetMapping("branch/{branchId}/stock-in/{stockIn}")
-	public SuccessResponse show(@PathVariable Integer branchId, @PathVariable Boolean stockIn) {
-		return new SuccessResponse("00", "fetch Stock", stockService.showByBranchId(branchId, Optional.of(stockIn), Optional.of(false)));
+	@Autowired
+	private UserProfileUtil userProfile;
+	
+	@GetMapping("stock-in")
+	public SuccessResponse getStockIn() {
+		return new SuccessResponse("00", "fetch Stock", stockService.showStockInByBranchId(userProfile.getProfile().getBranch().getId(), Optional.of(false)));
+	}
+	
+	@GetMapping("stock-out")
+	public SuccessResponse getStockOut() {
+		return new SuccessResponse("00", "fetch Stock", stockService.showStockOutByCorporateId(userProfile.getProfile().getCorporate().getId(), Optional.of(false)));
 	}
 
 	@PostMapping("branch/{branchId}")

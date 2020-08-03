@@ -73,6 +73,8 @@ public class StockPostService {
 						}else {
 							item.setStockIn(item.getStockOut()+stockEntry.getQuantity());
 						}
+						stock.setPosted(true);
+						stockRepository.save(stock);
 						itemRepository.save(item);
 						return stockPostRepository.save(stockPostTem);
 					}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));

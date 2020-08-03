@@ -2,6 +2,7 @@ package com.spring.miniposbackend.service.stock;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -35,9 +36,12 @@ public class StockEntryService {
 	@Autowired
 	private UserRepository userRepository;
 
-	public List<StockEntry> showByStockId(Long stockId) {
+	public List<StockEntry> showByStockId(Long stockId, Optional<Boolean> posted) {
 		return stockRepository.findById(stockId).map((stock) -> {
-			return stockEntryRepository.findByStockId(stockId);
+			if (posted.isPresent()) {
+				return stockEntryRepository.findByStockIdWithPosted(stockId, posted.get());
+			} else
+				return stockEntryRepository.findByStockIdWithPosted(stockId, false);
 		}).orElseThrow(() -> new ResourceNotFoundException("Stock does not exist"));
 	}
 
@@ -48,7 +52,7 @@ public class StockEntryService {
 				if (stock.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
 					throw new UnauthorizedException("Branch is unauthorized");
 				}
-			}else{
+			} else {
 				if (stock.getBranch().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
 					throw new UnauthorizedException("Corporate is unauthorized");
 				}
@@ -93,7 +97,7 @@ public class StockEntryService {
 				if (stockEntry.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
 					throw new UnauthorizedException("Branch is unauthorized");
 				}
-			}else{
+			} else {
 				if (stockEntry.getBranch().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
 					throw new UnauthorizedException("Corporate is unauthorized");
 				}
@@ -119,7 +123,7 @@ public class StockEntryService {
 				if (stockEntry.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
 					throw new UnauthorizedException("Branch is unauthorized");
 				}
-			}else{
+			} else {
 				if (stockEntry.getBranch().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
 					throw new UnauthorizedException("Corporate is unauthorized");
 				}

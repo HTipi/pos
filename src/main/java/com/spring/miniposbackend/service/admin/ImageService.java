@@ -42,7 +42,8 @@ public class ImageService {
 		}
 		try {
 			// read and write the file to the selected location-
-			String baseLocation = String.format("%s/" + imagePath, System.getProperty("catalina.base"));
+			//String baseLocation = String.format("%s/" + imagePath, System.getProperty("catalina.base"));
+			String baseLocation = imagePath;
 			UUID id = UUID.randomUUID();
 			String fileName = imageUtil.uploadImage(baseLocation, id.toString(), file);
 			Image image  =new Image();
@@ -72,7 +73,8 @@ public class ImageService {
 		}
 		try {
 			// read and write the file to the selected location-
-			String baseLocation = String.format("%s/" + imagePath, System.getProperty("catalina.base"));
+			//String baseLocation = String.format("%s/" + imagePath, System.getProperty("catalina.base"));
+			String baseLocation = imagePath;
 			String fileName = imageUtil.uploadImage(baseLocation, image.getName().substring(0, image.getName().lastIndexOf(".")-1), file);
 			image.setName(fileName);
 			return imageRepository.save(image);

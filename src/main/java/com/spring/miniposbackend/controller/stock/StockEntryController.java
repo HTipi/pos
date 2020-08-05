@@ -37,8 +37,8 @@ public class StockEntryController {
 	}
 	
 	@DeleteMapping("{stockEntryId}")
-	public StockEntry delete(@PathVariable Long stockEntryId) {
-		return stockEntryService.delete(stockEntryId);
+	public SuccessResponse delete(@PathVariable Long stockEntryId) {
+		return new SuccessResponse("00", "fetch StockEntry",stockEntryService.delete(stockEntryId));
 	}
 	
 	@GetMapping("get-by-stock-id/{stockId}")

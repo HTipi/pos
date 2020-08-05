@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.model.admin.Image;
 import com.spring.miniposbackend.service.admin.ImageService;
 
@@ -24,8 +25,8 @@ public class ImageController {
 	private ImageService imageService;
 	
 	@GetMapping
-	public Page<Image> getImageList(@RequestParam("type") String type, @RequestParam("page") int page, @RequestParam("length") int length) {
-		return imageService.getImages(type, page, length);
+	public SuccessResponse getImageList(@RequestParam("type") String type, @RequestParam("page") int page, @RequestParam("length") int length) {
+		return new SuccessResponse("00", "fetch Images", imageService.getImages(type, page, length));
 	}
 
 	@PostMapping

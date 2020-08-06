@@ -87,7 +87,19 @@ public class ImageService {
 	}
 	
 	private byte[] getImage(String type, String imageName) {
-		return null;
+		String imagePath ="";
+		if(type.compareToIgnoreCase("item")==0) {
+			imagePath=itemPath;
+		}else {
+			imagePath=itemTypePath;
+		}
+		try {
+			String fileLocation = imagePath + "/"+ imageName;
+			return imageUtil.getImage(fileLocation);
+
+		} catch (Exception e) {
+			return null;
+		}
 	}
 	
 	public Page<Image> getImages(String type, int page, int length){
@@ -95,7 +107,7 @@ public class ImageService {
 		Page<Image> images = imageRepository.findByType(type, pageable);
 		
 		images.getContent().forEach((content) -> {
-			content.setBase64(null);
+			content.setBase64(getImage(type,content.getName()));
 		});;
 		
 		return images;

@@ -71,16 +71,16 @@ public class StockPostService {
 						if(stock.isStockIn()) {
 							item.setStockIn(item.getStockIn()+stockEntry.getQuantity());
 						}else {
-							item.setStockIn(item.getStockOut()+stockEntry.getQuantity());
+							item.setStockOut(item.getStockOut()+stockEntry.getQuantity());
 						}
-						stock.setPosted(true);
-						stockRepository.save(stock);
 						itemRepository.save(item);
 						return stockPostRepository.save(stockPostTem);
 					}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 					
 					stockPosts.add(stockPost);
 				});
+				stock.setPosted(true);
+				stockRepository.save(stock);
 				return stockPosts;
 			}).orElseThrow(() -> new ResourceNotFoundException("User does not exist"));
 		}).orElseThrow(() -> new ResourceNotFoundException("Stock does not exist"));

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.model.stock.StockPost;
 import com.spring.miniposbackend.service.stock.StockPostService;
 
@@ -19,7 +20,7 @@ public class StockPostController {
 	private StockPostService stockPostService;
 	
 	@PostMapping("{stockId}")
-	public List<StockPost> create(@PathVariable Long stockId){
-		return stockPostService.create(stockId);
+	public SuccessResponse create(@PathVariable Long stockId){
+		return new SuccessResponse("00", "fetch Stock", stockPostService.create(stockId));
 	}
 }

@@ -77,7 +77,8 @@ public class ItemService {
 			}
 			try {
 				// read and write the file to the selected location-
-				String baseLocation = String.format("%s/" + imagePath, System.getProperty("catalina.base"));
+				//String baseLocation = String.format("%s/" + imagePath, System.getProperty("catalina.base"));
+				String baseLocation = imagePath;
 				String fileName = imageUtil.uploadImage(baseLocation, item.getId().toString(), file);
 				item.setImage(fileName);
 				item.setVersion((short) (item.getVersion() + 1));
@@ -96,8 +97,9 @@ public class ItemService {
 			return new ImageResponse(item.getId(), null, item.getVersion());
 		}
 		try {
-			String fileLocation = String.format("%s/" + imagePath, System.getProperty("catalina.base")) + "/"
-					+ item.getImage();
+//			String fileLocation = String.format("%s/" + imagePath, System.getProperty("catalina.base")) + "/"
+//					+ item.getImage();
+			String fileLocation = imagePath + "/"+ item.getImage();
 			byte[] bArray = imageUtil.getImage(fileLocation);
 			return new ImageResponse(item.getId(), bArray, item.getVersion());
 

@@ -84,9 +84,18 @@ public class ImageService {
 		}
 	}
 	
+	private byte[] getImage(String type, String imageName) {
+		return null;
+	}
+	
 	public Page<Image> getImages(String type, int page, int length){
 		Pageable pageable = PageRequest.of(page, length);
 		Page<Image> images = imageRepository.findByType(type, pageable);
+		
+		images.getContent().forEach((content) -> {
+			content.setBase64(null);
+		});;
+		
 		return images;
 	}
 	

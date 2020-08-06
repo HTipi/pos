@@ -7,6 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.spring.miniposbackend.model.AuditModel;
 
@@ -29,6 +30,9 @@ public class Image extends AuditModel{
 	
 	@Column(name="type", nullable = false)
 	private String type;
+	
+	@Transient
+	private byte[] base64;
 	
 //	@ManyToOne(cascade = CascadeType.ALL)
 //    @JoinColumn(name = "corporate_id")

@@ -60,8 +60,8 @@ public class ItemTypeController {
 	}
 
 	@PatchMapping("{itemTypeId}/set-image/{imageId}")
-	public ItemType updateImage(@PathVariable Integer itemTypeId, @PathVariable UUID imageId) {
-		return itemTypeService.updateImage(itemTypeId, imageId);
+	public SuccessResponse updateImage(@PathVariable Integer itemTypeId, @PathVariable UUID imageId) {
+		return new SuccessResponse("00", "update Image Item Type", itemTypeService.updateImage(itemTypeId, imageId));
 	}
 	
 	@PostMapping("{itemTypeId}/upload") /// Need to validate

@@ -45,7 +45,7 @@ public class Branch extends AuditModel{
     @JsonIgnore
     private Address address;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "corporate_id",nullable = false)
     @JsonIgnore
     private Corporate corporate;

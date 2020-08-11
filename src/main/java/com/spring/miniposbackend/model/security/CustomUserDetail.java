@@ -11,8 +11,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.admin.Branch;
 import com.spring.miniposbackend.model.admin.Corporate;
-import com.spring.miniposbackend.model.admin.Role;
 import com.spring.miniposbackend.model.admin.User;
+import com.spring.miniposbackend.model.admin.UserRole;
 
 public class CustomUserDetail implements UserDetails {
 	String ROLE_PREFIX = "ROLE_";
@@ -23,22 +23,24 @@ public class CustomUserDetail implements UserDetails {
 	private static final long serialVersionUID = 1L;
 	
 	private User user;
-	
-	private Role role;
+	private List<UserRole> userRoles;
 	private Branch branch;
 	private Corporate corporate;
+	
 
-	public CustomUserDetail(User user) {
+	public CustomUserDetail(User user, Branch branch, Corporate corporate, List<UserRole> userRoles) {
 		this.user = user;
-		role = user.getRole();
-		branch = user.getBranch();
-		corporate = branch.getCorporate();
+		this.userRoles = userRoles;
+		this.branch = branch;
+		this.corporate = corporate;
 	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		final List<SimpleGrantedAuthority> authorities = new LinkedList<>();
-		authorities.add(new SimpleGrantedAuthority(ROLE_PREFIX + role.getName()));
+		userRoles.forEach((userRole) -> {
+			authorities.add(new SimpleGrantedAuthority(ROLE_PREFIX + userRole.getRole().getName()));
+		});
 		return authorities;
 	}
 

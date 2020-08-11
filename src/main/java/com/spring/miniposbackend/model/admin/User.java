@@ -46,15 +46,10 @@ public class User extends AuditModel{
     @Column(name = "date_of_birth", nullable = false)
     private Date dateOfBirth;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "branch_id",nullable = false)
     @JsonIgnore
     private Branch branch;
-    
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "role_id",nullable = false)
-    @JsonIgnore
-    private Role role;
 
     @Column(name = "lock", nullable = false)
     @ColumnDefault("false")

@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.spring.miniposbackend.model.admin.ItemType;
 import com.spring.miniposbackend.model.admin.Seat;
+import com.spring.miniposbackend.model.security.CustomUserDetail;
 import com.spring.miniposbackend.service.admin.ItemTypeService;
 import com.spring.miniposbackend.service.admin.SeatService;
+import com.spring.miniposbackend.util.UserProfileUtil;
 
 @RestController
 @RequestMapping("init")
@@ -23,6 +25,13 @@ public class InitController {
 	private ItemTypeService itemTypeService;
 	@Autowired
 	private SeatService seatService;
+	@Autowired
+	private UserProfileUtil userProfile;
+	
+	@GetMapping("/me")
+	public CustomUserDetail getMe() {
+		return userProfile.getProfile();
+	}
 	
 	@GetMapping
 	public Map<String, Object> init(){

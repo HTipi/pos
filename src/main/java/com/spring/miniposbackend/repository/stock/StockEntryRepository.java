@@ -6,8 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.spring.miniposbackend.model.stock.StockEntry;
-import com.spring.miniposbackend.model.stock.StockOutTemporary;
-
 public interface StockEntryRepository extends JpaRepository<StockEntry, Long>{
 
 	List<StockEntry> findByStockId(Long stockId);

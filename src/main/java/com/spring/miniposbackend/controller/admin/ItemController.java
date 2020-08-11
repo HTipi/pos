@@ -39,8 +39,8 @@ public class ItemController {
 	}
 	
 	@PatchMapping("{itemId}/set-image/{imageId}")
-	public Item updateImage(@PathVariable Long itemId, @PathVariable UUID imageId) {
-		return itemService.updateImage(itemId, imageId);
+	public SuccessResponse updateImage(@PathVariable Long itemId, @PathVariable UUID imageId) {
+		return new SuccessResponse("00", "update Image Item", itemService.updateImage(itemId, imageId));
 	}
 
 	@GetMapping("by-corporate")

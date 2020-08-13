@@ -1,42 +1,38 @@
-//package com.spring.miniposbackend.controller.admin;
-//
-//
-//import com.spring.miniposbackend.model.admin.UserRole;
-//import com.spring.miniposbackend.service.admin.UserRoleService;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.web.bind.annotation.*;
-//
-//import java.util.List;
-//
-//@RestController
-//@RequestMapping("userRole")
-//public class UserRoleController {
-//
-//    @Autowired
-//    private UserRoleService userRoleService;
-//
-//    @GetMapping
-//    public List<UserRole> shows() {
-//        return this.userRoleService.shows();
-//    }
-//
-//    @GetMapping("active")
-//    public List<UserRole> showAllActive() {
-//        return this.userRoleService.showAllActive();
-//    }
-//
-//    @PostMapping
-//    public UserRole create(@RequestParam Integer userId, @RequestParam Integer roleId, @RequestBody UserRole userRole) {
-//        return this.userRoleService.create(userId, roleId, userRole);
-//    }
-//
-//    @PutMapping
-//    public UserRole update(@RequestParam Long userRoleId, @RequestParam Integer userId, @RequestParam Integer roleId, @RequestBody UserRole userRole) {
-//        return this.userRoleService.update(userRoleId, userId, roleId, userRole);
-//    }
-//
-//    @PatchMapping("{userRoleId}")
-//    public UserRole updateStatus(@PathVariable Long userRoleId, @RequestBody Boolean status) {
-//        return this.userRoleService.updateStatus(userRoleId, status);
-//    }
-//}
+package com.spring.miniposbackend.controller.admin;
+
+import com.spring.miniposbackend.model.admin.UserRole;
+import com.spring.miniposbackend.service.admin.UserRoleService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Optional;
+
+@RestController
+@RequestMapping("user-role")
+public class UserRoleController {
+
+	@Autowired
+	private UserRoleService userRoleService;
+
+	@GetMapping("user/{userId}")
+	public List<UserRole> getRoles(@PathVariable Integer userId) {
+		return userRoleService.showByUserId(userId, Optional.of(true));
+	}
+
+	@DeleteMapping("user/{userId}/role/{roleId}")
+	public UserRole delete(@PathVariable Integer userId, @PathVariable Integer roleId) {
+		return userRoleService.delete(userId, roleId);
+	}
+
+	@PostMapping("user/{userId}/role/{roleId}")
+	public UserRole create(@PathVariable Integer userId, @PathVariable Integer roleId) {
+		return userRoleService.create(userId, roleId);
+	}
+}

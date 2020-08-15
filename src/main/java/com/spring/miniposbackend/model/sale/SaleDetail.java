@@ -20,7 +20,6 @@ import org.hibernate.annotations.DynamicUpdate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.AuditModel;
 import com.spring.miniposbackend.model.admin.Branch;
-import com.spring.miniposbackend.model.admin.Item;
 import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.model.admin.User;
 

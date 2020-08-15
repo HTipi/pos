@@ -13,9 +13,9 @@ import com.spring.miniposbackend.model.admin.ItemBranch;
 public interface ItemBranchRepository extends  JpaRepository<ItemBranch, Long>{
 	List<ItemBranch> findByBranchId(Integer branchId);
 	@Query(value = "select ib from ItemBranch ib where ib.branch.id = ?1 and ib.enable= ?2 and ib.item.enable=true")
-	List<ItemBranch> findByBranchIdWithEnable(Integer branchId, boolean enable);
+	List<ItemBranch> findByBranchId(Integer branchId, boolean enable);
 	List<ItemBranch> findByItemId(Long itemId);
 	@Query(value = "select ib from ItemBranch ib where ib.item.id = ?1 and ib.enable= ?2")
-	List<ItemBranch> findByItemIdWithEnable(Long itemId, boolean enable);
+	List<ItemBranch> findByItemId(Long itemId, boolean enable);
 	Optional<ItemBranch> findFirstByBranchIdAndItemIdOrderByIdDesc(Integer branchId, Long itemId);
 }

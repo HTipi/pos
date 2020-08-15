@@ -15,6 +15,6 @@ public class BranchSettingService {
     private BranchSettingRepository settingBranchRepository;
 
     public List<BranchSetting> showByBranchId(Integer branchId,boolean enable) {
-        return settingBranchRepository.findByBranchIdWithEnable(branchId,enable);
+        return settingBranchRepository.findByBranchId(branchId,enable);
     }
 }

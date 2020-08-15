@@ -12,7 +12,6 @@ import com.spring.miniposbackend.model.admin.Branch;
 @Repository
 public interface BranchRepository extends JpaRepository<Branch,Integer> {
 
-	@Query(value = "select b from Branch b where b.corporate.id = ?1")
 	List<Branch> findByCorporateId(Integer corporateId);
 	@Query(value = "select b from Branch b where b.corporate.id = ?1 and b.enable = ?2")
 	List<Branch> findByCorporateId(Integer corporateId, boolean enable);

@@ -30,7 +30,8 @@ import lombok.Setter;
 @Setter
 @Getter
 @DynamicUpdate
-public class Expense {
+public class Expense extends AuditModel {
+	private static final long serialVersionUID = 1L;
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -48,9 +49,9 @@ public class Expense {
 	@Column(name = "value_date", nullable = false)
     private Date valueDate;
 	
-	@Column(name = "created_at", nullable = false)
-    private Date createdAt;
-
+	@Column(name = "expense_remark", nullable = false)
+    private String remark;
+	
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "branch_id", nullable = false)
     @JsonIgnore
@@ -67,6 +68,10 @@ public class Expense {
 	
 	@Column(name = "reverse_date", nullable = true)
     private Date reverseDate;
+	
+	public String getExpenseTypeName() {
+		return expenseType.getName();
+	}
 
 
 }

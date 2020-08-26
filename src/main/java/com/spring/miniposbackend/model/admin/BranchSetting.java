@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.AuditModel;
 import lombok.Getter;
 import lombok.Setter;
+
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
@@ -22,12 +24,12 @@ public class BranchSetting extends AuditModel {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "setting_id", nullable = false)
     @JsonIgnore
     Setting setting;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "branch_id", nullable = false)
     @JsonIgnore
     Branch branch;
@@ -35,6 +37,9 @@ public class BranchSetting extends AuditModel {
     @Column(name = "value", nullable = false,length = 32)
     private String settingValue;
     
+	@Column(name = "enable", nullable = false)
+    @ColumnDefault("false")
+    private boolean enable;
 
     public String getSettingCode() {
         return setting.getCode();
@@ -44,6 +49,9 @@ public class BranchSetting extends AuditModel {
     }
     public Integer getSequenceNumber() {
         return setting.getSequence();
+    }
+    public String getDefaultValue() {
+    	return setting.getDefaultValue();
     }
 
 }

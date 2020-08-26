@@ -83,4 +83,9 @@ public class ItemTypeController {
 	public List<ImageResponse> getUpdatedImages(@Valid @RequestBody List<ImageRequest> requestImages) {
 		return itemTypeService.getImages(requestImages);
 	}
+	
+	@PostMapping("image-list")
+	public SuccessResponse getImagesList(@RequestBody List<ImageRequest> requestImages) {
+		return new SuccessResponse("00", "fetch Image List ItemType", itemTypeService.getImagesFromList(requestImages));
+	}
 }

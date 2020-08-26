@@ -7,24 +7,24 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class ResourceNotFoundException extends RuntimeException{
 
 	private static final long serialVersionUID = 1L;
-	private Short errorCode;
+	private String errorCode;
 	
 	public ResourceNotFoundException(String message) {
         super(message);
-        this.errorCode = 404;
+        this.errorCode = "404";
     }
 	
-	public ResourceNotFoundException(String message, Short errorCode) {
+	public ResourceNotFoundException(String message, String errorCode) {
         super(message);
         this.errorCode = errorCode;
     }
 
     public ResourceNotFoundException(String message, Throwable cause) {
         super(message, cause);
-        this.errorCode = 404;
+        this.errorCode = "404";
     }
     
-    public Short getErrorCode() {
+    public String getErrorCode() {
         return errorCode;
     }
 }

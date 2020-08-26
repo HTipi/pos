@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("setting")
+@RequestMapping("branch-setting")
 public class BranchSettingController {
 	
 	@Autowired
@@ -24,5 +24,4 @@ public class BranchSettingController {
 	public List<BranchSetting> getByBranchId(){
 		return branchSettingService.showByBranchId(userProfile.getProfile().getBranch().getId(),true);
 	}
-
 }

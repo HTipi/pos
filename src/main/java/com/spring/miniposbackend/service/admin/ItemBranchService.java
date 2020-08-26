@@ -62,12 +62,11 @@ public class ItemBranchService {
 	}
 
 	public ImageResponse getImage(ItemBranch itemBranch) {
-		if (itemBranch.getImage().isEmpty()) {
+		if (itemBranch.getImage() == null) {
 			return new ImageResponse(itemBranch.getId(), null, itemBranch.getVersion());
 		}
 		try {
-			String fileLocation = String.format("%s/" + imagePath, System.getProperty("catalina.base")) + "/"
-					+ itemBranch.getImage();
+			String fileLocation = imagePath + "/"+ itemBranch.getImage();
 			byte[] bArray = imageUtil.getImage(fileLocation);
 			return new ImageResponse(itemBranch.getId(), bArray, itemBranch.getVersion());
 
@@ -95,6 +94,17 @@ public class ItemBranchService {
 				ImageResponse image = getImage(itemBranch);
 				images.add(image);
 			}
+		});
+		return images;
+	}
+	
+	public List<ImageResponse> getImagesFromList(List<ImageRequest> requestImages) {
+		List<ImageResponse> images = new ArrayList<ImageResponse>();
+		requestImages.forEach((requestImage) -> {
+			ItemBranch itemBranch = itemBranchRepository.findById(requestImage.getId())
+					.orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
+				ImageResponse image = getImage(itemBranch);
+				images.add(image);
 		});
 		return images;
 	}

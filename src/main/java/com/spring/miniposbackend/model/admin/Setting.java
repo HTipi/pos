@@ -33,6 +33,7 @@ public class Setting extends AuditModel {
 
     @Column(name = "sequence", nullable = false)
     private Integer sequence=1;
+    
 
     @Column(name = "enable", nullable = false)
     @ColumnDefault("false")

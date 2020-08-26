@@ -25,6 +25,11 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
 		ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getErrorCode(),ex.getMessage());
 		return new ResponseEntity<ExceptionResponse>(exceptionResponse, HttpStatus.BAD_REQUEST);
 	}
+	@ExceptionHandler(UnauthorizedException.class)
+	public final ResponseEntity<ExceptionResponse> handleException(UnauthorizedException ex, WebRequest request){
+		ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getErrorCode(),ex.getMessage());
+		return new ResponseEntity<ExceptionResponse>(exceptionResponse, HttpStatus.UNAUTHORIZED);
+	}
 	
 	
 }

@@ -7,19 +7,23 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class BadRequestException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 
-	private Short errorCode;
+	private String errorCode;
 
 	public BadRequestException(String message) {
 		super(message);
-		this.errorCode = 400;
+		this.errorCode = "400";
 	}
+	public BadRequestException(String message, String errorCode) {
+        super(message);
+        this.errorCode = errorCode;
+    }
 
 	public BadRequestException(String message, Throwable cause) {
 		super(message, cause);
-		this.errorCode = 400;
+		this.errorCode = "400";
 	}
 
-	public Short getErrorCode() {
+	public String getErrorCode() {
 		return errorCode;
 	}
 }

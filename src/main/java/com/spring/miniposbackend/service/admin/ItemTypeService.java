@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.exception.UnauthorizedException;
+import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.model.admin.ItemType;
 import com.spring.miniposbackend.modelview.ImageRequest;
 import com.spring.miniposbackend.modelview.ImageResponse;
@@ -72,19 +73,15 @@ public class ItemTypeService {
 	}
 
 	public ItemType updateImage(Integer itemTypeId, UUID imageId) {
-		return imageRepository.findById(imageId)
-				.map((image) -> {
-					return itemTypeRepository.findById(itemTypeId)
-							.map((itemType) -> {
-								itemType.setImage(image.getName());
-								itemType.setVersion((short) (itemType.getVersion() + 1));
-								return itemTypeRepository.save(itemType);
-							})
-							.orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
-				})
-				.orElseThrow(() -> new ResourceNotFoundException("Image does not exist"));
+		return imageRepository.findById(imageId).map((image) -> {
+			return itemTypeRepository.findById(itemTypeId).map((itemType) -> {
+				itemType.setImage(image.getName());
+				itemType.setVersion((short) (itemType.getVersion() + 1));
+				return itemTypeRepository.save(itemType);
+			}).orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
+		}).orElseThrow(() -> new ResourceNotFoundException("Image does not exist"));
 	}
-	
+
 	public ItemType uploadImage(Integer itemTypeId, MultipartFile file) {
 		return itemTypeRepository.findById(itemTypeId).map(itemType -> {
 			if (file.isEmpty()) {
@@ -114,13 +111,13 @@ public class ItemTypeService {
 	}
 
 	public ImageResponse getImage(ItemType itemType) {
-		if (itemType.getImage().isEmpty()) {
+		if (itemType.getImage() == null) {
 			return new ImageResponse(itemType.getId().longValue(), null, itemType.getVersion());
 		}
 		try {
 //			String fileLocation = String.format("%s/" + imagePath, System.getProperty("catalina.base")) + "/"
 //					+ itemType.getImage();
-			String fileLocation = imagePath + "/"+ itemType.getImage();
+			String fileLocation = imagePath + "/" + itemType.getImage();
 			byte[] bArray = imageUtil.getImage(fileLocation);
 			return new ImageResponse(itemType.getId().longValue(), bArray, itemType.getVersion());
 
@@ -152,6 +149,16 @@ public class ItemTypeService {
 		return images;
 	}
 
+	public List<ImageResponse> getImagesFromList(List<ImageRequest> requestImages) {
+		List<ImageResponse> images = new ArrayList<ImageResponse>();
+		requestImages.forEach((requestImage) -> {
+			ItemType itemType = itemTypeRepository.findById(requestImage.getId().intValue())
+					.orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
+			ImageResponse image = getImage(itemType);
+			images.add(image);
+		});
+		return images;
+	}
 	public ItemType create(Integer corporateId, ItemType requestItemType) {
 		return corporateRepository.findById(corporateId).map((corporate) -> {
 			if (userProfile.getProfile().getCorporate().getId() != corporate.getId()) {
@@ -177,7 +184,7 @@ public class ItemTypeService {
 			return itemTypeRepository.save(itemType);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
 	}
-	
+
 	public ItemType disable(Integer itemTypeId) {
 		return itemTypeRepository.findById(itemTypeId).map(itemType -> {
 			if (userProfile.getProfile().getCorporate().getId() != itemType.getCorporate().getId()) {

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.model.sale.SaleTemporary;
 import com.spring.miniposbackend.service.sale.SaleTemporaryService;
 import com.spring.miniposbackend.util.UserProfileUtil;
@@ -29,13 +30,13 @@ public class SaleTemporaryController {
 	private UserProfileUtil userProfile;
 	
 	@GetMapping("by-seat")
-	public List<SaleTemporary> getBySeatId(@RequestParam Integer seatId, @RequestParam Optional<Boolean> isPrinted,@RequestParam Optional<Boolean> cancel){
-		return saleService.showBySeatId(seatId, isPrinted,cancel);
+	public SuccessResponse getBySeatId(@RequestParam Integer seatId, @RequestParam Optional<Boolean> isPrinted,@RequestParam Optional<Boolean> cancel){
+		return new SuccessResponse("00", "fetch Sale Tmp by Seat", saleService.showBySeatId(seatId, isPrinted,cancel));
 	}
 
 	@GetMapping("by-user")
-	public List<SaleTemporary> getByUserId(@RequestParam Optional<Boolean> isPrinted,@RequestParam Optional<Boolean> cancel){
-		return saleService.showByUserId(userProfile.getProfile().getUser().getId(), isPrinted,cancel);
+	public SuccessResponse getByUserId(@RequestParam Optional<Boolean> isPrinted,@RequestParam Optional<Boolean> cancel){
+		return new SuccessResponse("00", "fetch Sale Tmp by User",saleService.showByUserId(userProfile.getProfile().getUser().getId(), isPrinted,cancel));
 	}
 	
 	@PostMapping

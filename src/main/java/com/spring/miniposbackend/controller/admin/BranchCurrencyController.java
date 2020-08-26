@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.model.admin.BranchCurrency;
 import com.spring.miniposbackend.service.admin.BranchCurrencyService;
 import com.spring.miniposbackend.util.UserProfileUtil;
@@ -20,8 +21,8 @@ public class BranchCurrencyController {
 	private UserProfileUtil userProfile;
 	
 	@GetMapping("by-branch")
-	public List<BranchCurrency> getByBranch(){ // will get from user
-		return branchCurrencyServie.showByBranchId(userProfile.getProfile().getBranch().getId(), true, true);
+	public SuccessResponse getByBranch(){ // will get from user
+		return new SuccessResponse("00", "fetch Currency", branchCurrencyServie.showByBranchId(userProfile.getProfile().getBranch().getId(), true, true));
 	} 
 
 }

@@ -24,12 +24,12 @@ public class SaleDashboardController {
 	private SaleDashboardService branchDashboardService;
 	@Autowired
 	UserProfileUtil userProfile;
-	
+
 	private Date today;
 	private Date startWeek;
 	private Date startMonth;
-	
-	private void setDate() {
+
+	private void getDate() {
 		Calendar cal = Calendar.getInstance();
 		cal.set(Calendar.HOUR_OF_DAY, 0);
 		cal.clear(Calendar.MINUTE);
@@ -46,16 +46,22 @@ public class SaleDashboardController {
 
 	@GetMapping("/branch/summary")
 	public SuccessResponse branchSummaryDetail() {
-		setDate();
-		return new SuccessResponse("00", "fetch report", branchDashboardService
-				.summaryDetail(userProfile.getProfile().getCorporate().getId(), startMonth, startWeek, today));
+		getDate();
+		return new SuccessResponse("00", "fetch report", branchDashboardService.branchSummaryByCorpateId(
+				userProfile.getProfile().getCorporate().getId(), startMonth, startWeek, today));
 	}
-	
+
 	@GetMapping("/item/summary")
-	public SuccessResponse itemSummaryDetail() {
-		setDate();
-		return new SuccessResponse("00", "fetch report", branchDashboardService
-				.summaryDetail(userProfile.getProfile().getCorporate().getId(), startMonth, startWeek, today));
+	public SuccessResponse itemSummaryDetail(@RequestParam Optional<Integer> branchId) {
+		getDate();
+		if (branchId.isPresent()) {
+			return new SuccessResponse("00", "fetch report",
+					branchDashboardService.itemSummaryByBranchId(branchId.get(), startMonth, startWeek, today));
+		} else {
+			return new SuccessResponse("00", "fetch report", branchDashboardService.itemSummaryByCorporateId(
+					userProfile.getProfile().getCorporate().getId(), startMonth, startWeek, today));
+		}
+
 	}
 
 	@GetMapping("/detail")

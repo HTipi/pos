@@ -3,7 +3,6 @@ package com.spring.miniposbackend.modelview;
 
 import lombok.Getter;
 import lombok.Setter;
-import java.math.BigDecimal;
 import java.util.Date;
 
 @Setter @Getter

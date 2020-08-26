@@ -3,23 +3,32 @@ package com.spring.miniposbackend.modelview.dashboard;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter @Setter
+@Getter
+@Setter
 public class ItemSummaryDetail {
-	private Integer branchId;
+	private Long itemId;
+	private String itemName;
+	private String itemNameKh;
 	private Double monthlySale;
 	private Double weeklySale;
 	private Double dailySale;
-	
+
 	public ItemSummaryDetail() {
-		branchId=null;
-		monthlySale=null;
-		weeklySale=null;
-		dailySale=null;
+		itemId = null;
+		itemName = null;
+		itemNameKh = null;
+		monthlySale = null;
+		weeklySale = null;
+		dailySale = null;
 	}
-	public ItemSummaryDetail(Integer branchId, Double monthlySale, Double weeklySale, Double dailySale) {
-		this.branchId=branchId;
-		this.monthlySale=monthlySale;
-		this.weeklySale=weeklySale;
-		this.dailySale=dailySale;
+
+	public ItemSummaryDetail(Long itemId, String itemName, String itemNamekh, Double monthlySale, Double weeklySale,
+			Double dailySale) {
+		this.itemId = itemId;
+		this.itemName = itemName;
+		this.itemNameKh = itemNamekh;
+		this.monthlySale = monthlySale;
+		this.weeklySale = weeklySale;
+		this.dailySale = dailySale;
 	}
 }

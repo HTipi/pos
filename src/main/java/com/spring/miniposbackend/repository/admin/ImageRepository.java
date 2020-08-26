@@ -13,6 +13,6 @@ import com.spring.miniposbackend.model.admin.Image;
 @Repository
 public interface ImageRepository extends JpaRepository<Image,UUID>{
 
-	@Query("select image from Image image where image.type = ?1")
+	@Query("select i from Image i where i.type = ?1")
 	Page<Image> findByType(String type, Pageable pageable);
 }

@@ -99,4 +99,9 @@ public class CustomUserDetail implements UserDetails {
 	public Corporate getCorporate() {
 		return corporate;
 	}
+	
+	@JsonIgnore
+	public List<UserRole> getUserRole() {
+		return userRoles;
+	}
 }

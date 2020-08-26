@@ -28,9 +28,6 @@ public class BranchSettingService {
 	@Autowired
 	private UserProfileUtil userProfile;
 
-	public List<BranchSetting> showByBranchId(Integer branchId, boolean enable) {
-		return settingBranchRepository.findByBranchIdWithEnable(branchId, enable);
-	}
 	@Transactional
 	public BranchSetting delete(Integer branchSettingId, Integer branchId, Integer settingId) {
 		return branchRepository.findById(branchId).map((branch) -> {
@@ -47,4 +44,7 @@ public class BranchSettingService {
 		}).orElseThrow(() -> new ResourceNotFoundException("branch does not exist", "01"));
 	}
 
+    public List<BranchSetting> showByBranchId(Integer branchId,boolean enable) {
+        return settingBranchRepository.findByBranchId(branchId,enable);
+    }
 }

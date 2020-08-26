@@ -24,7 +24,7 @@ public class RoleService {
     }
 
     public List<Role> showAllActive() {
-        return this.roleRepository.findAllActive();
+        return this.roleRepository.findAll(true);
     }
 
     public Role create(Role role) {

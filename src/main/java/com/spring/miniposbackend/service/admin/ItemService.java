@@ -48,7 +48,7 @@ public class ItemService {
 				throw new ConflictException("Corporate is disable");
 			}
 			if (enable.isPresent()) {
-				return itemRepository.findByCorporateIdWithEnable(corporateId, enable.get());
+				return itemRepository.findByCorporateId(corporateId, enable.get());
 			} else {
 				return itemRepository.findByCorporateId(corporateId);
 			}
@@ -115,7 +115,7 @@ public class ItemService {
 	}
 
 	public List<ImageResponse> getImages(Integer corporateId) {
-		List<Item> items = itemRepository.findByCorporateIdWithEnable(corporateId, true);
+		List<Item> items = itemRepository.findByCorporateId(corporateId, true);
 		List<ImageResponse> images = new ArrayList<ImageResponse>();
 		items.forEach((item) -> {
 			ImageResponse image = getImage(item);

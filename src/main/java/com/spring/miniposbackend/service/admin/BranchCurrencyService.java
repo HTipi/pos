@@ -15,7 +15,7 @@ public class BranchCurrencyService {
 	private BranchCurrencyRepository branchCurrencyRepository;
 	
 	public List<BranchCurrency> showByBranchId(Integer branchId, boolean currencyEnable, boolean enable){
-		return branchCurrencyRepository.findByBranchIdWithEnable(branchId, currencyEnable, enable);
+		return branchCurrencyRepository.findByBranchId(branchId, currencyEnable, enable);
 	}
 
 }

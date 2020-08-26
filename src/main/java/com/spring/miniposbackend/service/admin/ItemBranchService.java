@@ -39,7 +39,7 @@ public class ItemBranchService {
 
 	public List<ItemBranch> showByItemId(Long itemId, Optional<Boolean> enable) {
 		if (enable.isPresent()) {
-			return itemBranchRepository.findByItemIdWithEnable(itemId, enable.get());
+			return itemBranchRepository.findByItemId(itemId, enable.get());
 		} else {
 			return itemBranchRepository.findByItemId(itemId);
 		}
@@ -48,7 +48,7 @@ public class ItemBranchService {
 	public List<ItemBranch> showByBranchId(Integer branchId, Optional<Boolean> enable) {
 		return branchRepository.findById(branchId).map(branch -> {
 			if (enable.isPresent()) {
-				return itemBranchRepository.findByBranchIdWithEnable(branchId, enable.get());
+				return itemBranchRepository.findByBranchId(branchId, enable.get());
 			} else {
 				return itemBranchRepository.findByBranchId(branchId);
 			}
@@ -76,7 +76,7 @@ public class ItemBranchService {
 	}
 
 	public List<ImageResponse> getImages(Integer branchId) {
-		List<ItemBranch> itemBranches = itemBranchRepository.findByBranchIdWithEnable(branchId, true);
+		List<ItemBranch> itemBranches = itemBranchRepository.findByBranchId(branchId, true);
 		List<ImageResponse> images = new ArrayList<ImageResponse>();
 		itemBranches.forEach((itemBranch) -> {
 			ImageResponse image = getImage(itemBranch);

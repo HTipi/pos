@@ -114,6 +114,14 @@ public class ItemBranch extends AuditModel{
 		return item.getItemType().getId();
 	}
 	
+	public String getItemTypeName() {
+		return item.getItemType().getName();
+	}
+	
+	public String getItemTypeNameKh() {
+		return item.getItemType().getNameKh();
+	}
+	
 	public Short getVersion() {
 		return item.getVersion();
 	}

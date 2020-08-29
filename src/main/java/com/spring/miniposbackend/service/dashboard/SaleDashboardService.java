@@ -31,7 +31,8 @@ public class SaleDashboardService {
 	@Autowired
 	private BranchRepository branchRepository;
 
-	public List<BranchSummaryDetail> branchSummaryByCorpateId(Integer corporateId, Date startDate, Date startWeek, Date endDate) {
+	public List<BranchSummaryDetail> branchSummaryByCorpateId(Integer corporateId, Date startDate, Date startWeek,
+			Date endDate) {
 		if (userProfile.getProfile().getCorporate().getId() != corporateId) {
 			throw new UnauthorizedException("Corporate is unauthorized");
 		}
@@ -41,25 +42,27 @@ public class SaleDashboardService {
 		mapSqlParameterSource.addValue("startWeek", startWeek);
 		mapSqlParameterSource.addValue("corporateId", corporateId);
 
-		return jdbc.query("select sale.branch_id, " 
-				+ "max(branch.name) as branch_name, "
+		return jdbc.query("select sale.branch_id, " + "max(branch.name) as branch_name, "
 				+ "max(branch.name_kh) as branch_name_kh,"
 				+ "sum(case when date_trunc('day',sale.value_date) between :startDate and :endDate then sale.quantity else 0  end) as monthly_sale, "
 				+ "sum(case when date_trunc('day',sale.value_date) between :startWeek and :endDate then sale.quantity else 0 end) as weekly_sale, "
-				+ "sum(case when date_trunc('day',sale.value_date) between :endDate and :endDate then sale.quantity else 0 end) as daily_sale "
-				+ "from sale_details sale " 
-				+ "inner join branches branch on sale.branch_id = branch.id "
+				+ "sum(case when date_trunc('day',sale.value_date) between :endDate and :endDate then sale.quantity else 0 end) as daily_sale ,"
+				+ "sum(case when date_trunc('day',sale.value_date) between :startDate and :endDate then sale.total else 0  end) as monthly_sale_amount, "
+				+ "sum(case when date_trunc('day',sale.value_date) between :startWeek and :endDate then sale.total else 0 end) as weekly_sale_amount, "
+				+ "sum(case when date_trunc('day',sale.value_date) between :endDate and :endDate then sale.total else 0 end) as daily_sale_amount "
+				+ "from sale_details sale " + "inner join branches branch on sale.branch_id = branch.id "
 				+ "inner join corporates corporate on branch.corporate_id = corporate.id "
 				+ "where sale.reverse = false "
 				+ "and date_trunc('day',sale.value_date) between :startDate and :endDate "
-				+ "and corporate.id = :corporateId " 
-				+ "group by sale.branch_id", mapSqlParameterSource,
+				+ "and corporate.id = :corporateId " + "group by sale.branch_id", mapSqlParameterSource,
 				(rs, rowNum) -> new BranchSummaryDetail(rs.getInt("branch_id"), rs.getString("branch_name"),
-						rs.getString("branch_name_kh"), rs.getDouble("monthly_sale"), rs.getDouble("weekly_sale"),
-						rs.getDouble("daily_sale")));
+						rs.getString("branch_name_kh"), rs.getInt("monthly_sale"), rs.getInt("weekly_sale"),
+						rs.getInt("daily_sale"), rs.getDouble("monthly_sale_amount"),
+						rs.getDouble("weekly_sale_amount"), rs.getDouble("daily_sale_amount")));
 	}
-	
-	public List<ItemSummaryDetail> itemSummaryByBranchId(Integer branchId, Date startDate, Date startWeek, Date endDate) {
+
+	public List<ItemSummaryDetail> itemSummaryByBranchId(Integer branchId, Date startDate, Date startWeek,
+			Date endDate) {
 
 		if (userProfile.getProfile().getBranch().getId() != branchId && !userProfile.getProfile().getAuthorities()
 				.stream().anyMatch(a -> a.getAuthority().equals("ROLE_OWNER"))) {
@@ -75,27 +78,28 @@ public class SaleDashboardService {
 			mapSqlParameterSource.addValue("startWeek", startWeek);
 			mapSqlParameterSource.addValue("branchId", branchId);
 
-			return jdbc.query("select item.id as item_id, " 
-					+ "max(item.name) as item_name, "
+			return jdbc.query("select item.id as item_id, " + "max(item.name) as item_name, "
 					+ "max(item.name_kh) as item_name_kh,"
 					+ "sum(case when date_trunc('day',sale.value_date) between :startDate and :endDate then sale.quantity else 0  end) as monthly_sale, "
 					+ "sum(case when date_trunc('day',sale.value_date) between :startWeek and :endDate then sale.quantity else 0 end) as weekly_sale, "
-					+ "sum(case when date_trunc('day',sale.value_date) between :endDate and :endDate then sale.quantity else 0 end) as daily_sale "
-					+ "from sale_details sale " 
-					+ "inner join item_branches ib on sale.item_branch_id=ib.id "
-					+ "inner join items item on ib.item_id=item.id "
-					+ "where sale.reverse = false "
+					+ "sum(case when date_trunc('day',sale.value_date) between :endDate and :endDate then sale.quantity else 0 end) as daily_sale, "
+					+ "sum(case when date_trunc('day',sale.value_date) between :startDate and :endDate then sale.total else 0  end) as monthly_sale_amount, "
+					+ "sum(case when date_trunc('day',sale.value_date) between :startWeek and :endDate then sale.total else 0 end) as weekly_sale_amount, "
+					+ "sum(case when date_trunc('day',sale.value_date) between :endDate and :endDate then sale.total else 0 end) as daily_sale_amount "
+					+ "from sale_details sale " + "inner join item_branches ib on sale.item_branch_id=ib.id "
+					+ "inner join items item on ib.item_id=item.id " + "where sale.reverse = false "
 					+ "and date_trunc('day',sale.value_date) between :startDate and :endDate "
-					+ "and sale.branch_id = :branchId " 
-					+ "group by item.id", mapSqlParameterSource,
+					+ "and sale.branch_id = :branchId " + "group by item.id", mapSqlParameterSource,
 					(rs, rowNum) -> new ItemSummaryDetail(rs.getLong("item_id"), rs.getString("item_name"),
-							rs.getString("item_name_kh"), rs.getDouble("monthly_sale"), rs.getDouble("weekly_sale"),
-							rs.getDouble("daily_sale")));
+							rs.getString("item_name_kh"), rs.getInt("monthly_sale"), rs.getInt("weekly_sale"),
+							rs.getInt("daily_sale"), rs.getDouble("monthly_sale_amount"),
+							rs.getDouble("weekly_sale_amount"), rs.getDouble("daily_sale_amount")));
 		}).orElseThrow(() -> new ResourceNotFoundException("User does not exist"));
-		
+
 	}
-	
-	public List<ItemSummaryDetail> itemSummaryByCorporateId(Integer corporateId, Date startDate, Date startWeek, Date endDate) {
+
+	public List<ItemSummaryDetail> itemSummaryByCorporateId(Integer corporateId, Date startDate, Date startWeek,
+			Date endDate) {
 		if (userProfile.getProfile().getCorporate().getId() != corporateId) {
 			throw new UnauthorizedException("Corporate is unauthorized");
 		}
@@ -105,24 +109,25 @@ public class SaleDashboardService {
 		mapSqlParameterSource.addValue("startWeek", startWeek);
 		mapSqlParameterSource.addValue("corporateId", corporateId);
 
-		return jdbc.query("select item.id as item_id, " 
-				+ "max(item.name) as item_name, "
+		return jdbc.query("select item.id as item_id, " + "max(item.name) as item_name, "
 				+ "max(item.name_kh) as item_name_kh,"
 				+ "sum(case when date_trunc('day',sale.value_date) between :startDate and :endDate then sale.quantity else 0  end) as monthly_sale, "
 				+ "sum(case when date_trunc('day',sale.value_date) between :startWeek and :endDate then sale.quantity else 0 end) as weekly_sale, "
-				+ "sum(case when date_trunc('day',sale.value_date) between :endDate and :endDate then sale.quantity else 0 end) as daily_sale "
-				+ "from sale_details sale " 
-				+ "inner join item_branches ib on sale.item_branch_id=ib.id "
+				+ "sum(case when date_trunc('day',sale.value_date) between :endDate and :endDate then sale.quantity else 0 end) as daily_sale, "
+				+ "sum(case when date_trunc('day',sale.value_date) between :startDate and :endDate then sale.total else 0  end) as monthly_sale_amount, "
+				+ "sum(case when date_trunc('day',sale.value_date) between :startWeek and :endDate then sale.total else 0 end) as weekly_sale_amount, "
+				+ "sum(case when date_trunc('day',sale.value_date) between :endDate and :endDate then sale.total else 0 end) as daily_sale_amount "
+				+ "from sale_details sale " + "inner join item_branches ib on sale.item_branch_id=ib.id "
 				+ "inner join items item on ib.item_id=item.id "
 				+ "inner join branches branch on sale.branch_id = branch.id "
 				+ "inner join corporates corporate on branch.corporate_id = corporate.id "
 				+ "where sale.reverse = false "
 				+ "and date_trunc('day',sale.value_date) between :startDate and :endDate "
-				+ "and corporate.id = :corporateId " 
-				+ "group by item.id", mapSqlParameterSource,
+				+ "and corporate.id = :corporateId " + "group by item.id", mapSqlParameterSource,
 				(rs, rowNum) -> new ItemSummaryDetail(rs.getLong("item_id"), rs.getString("item_name"),
-						rs.getString("item_name_kh"), rs.getDouble("monthly_sale"), rs.getDouble("weekly_sale"),
-						rs.getDouble("daily_sale")));
+						rs.getString("item_name_kh"), rs.getInt("monthly_sale"), rs.getInt("weekly_sale"),
+						rs.getInt("daily_sale"), rs.getDouble("monthly_sale_amount"),
+						rs.getDouble("weekly_sale_amount"), rs.getDouble("daily_sale_amount")));
 	}
 
 	public Page<SaleDetail> saleDetailByCorporateId(Integer corporateId, Date from, Date to, Pageable pageable) {

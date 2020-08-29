@@ -1,15 +1,19 @@
 package com.spring.miniposbackend.model;
 
 
-import lombok.Getter;
+import org.springframework.stereotype.Component;
 
-@Getter
+import lombok.Getter;
+import lombok.Setter;
+
+@Component
+@Getter @Setter
 public class SuccessResponse  {
 
 	private String code;
 	private String message;
 	private Object data;
-	
+		
 	public SuccessResponse(String code, String message,Object data) {
 		this.code = code;
 		this.message = message;

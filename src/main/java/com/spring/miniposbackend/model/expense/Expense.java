@@ -3,7 +3,6 @@ package com.spring.miniposbackend.model.expense;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -41,7 +40,7 @@ public class Expense extends AuditModel {
 	@Column(name = "expense_amt", nullable = false, precision = 10, scale = 2)
 	private BigDecimal expenseAmt;
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "expense_type_id", nullable = false)
 	@JsonIgnore
 	private ExpenseType expenseType;
@@ -52,12 +51,12 @@ public class Expense extends AuditModel {
 	@Column(name = "expense_remark", nullable = false)
     private String remark;
 	
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "branch_id", nullable = false)
     @JsonIgnore
     private Branch branch;
 	
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
     private User user;

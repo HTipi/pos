@@ -16,6 +16,7 @@ import org.hibernate.annotations.ColumnDefault;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.AuditModel;
 import com.spring.miniposbackend.model.admin.Branch;
+import com.spring.miniposbackend.model.admin.StockType;
 import com.spring.miniposbackend.model.admin.User;
 
 import lombok.Getter;
@@ -44,9 +45,10 @@ public class Stock extends AuditModel{
     @ColumnDefault("false")
     private boolean posted;
 	
-	@Column(name = "stock_in", nullable = false)
-    @ColumnDefault("true")
-    private boolean stockIn;
+	@ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "stock_type_code", nullable = false)
+    @JsonIgnore
+    private StockType stockType;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "branch_id", nullable = false)

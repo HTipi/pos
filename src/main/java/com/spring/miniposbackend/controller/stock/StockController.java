@@ -26,20 +26,29 @@ public class StockController {
 	private StockService stockService;
 	@Autowired
 	private UserProfileUtil userProfile;
-	
+
 	@GetMapping("stock-in")
 	public SuccessResponse getStockIn() {
-		return new SuccessResponse("00", "fetch Stock", stockService.showStockInByBranchId(userProfile.getProfile().getBranch().getId(), Optional.of(false)));
-	}
-	
-	@GetMapping("stock-out")
-	public SuccessResponse getStockOut() {
-		return new SuccessResponse("00", "fetch Stock", stockService.showStockOutByCorporateId(userProfile.getProfile().getCorporate().getId(), Optional.of(false)));
+		return new SuccessResponse("00", "fetch Stock",
+				stockService.showStockInByBranchId(userProfile.getProfile().getBranch().getId(), Optional.of(false)));
 	}
 
-	@PostMapping("branch/{branchId}")
-	public SuccessResponse create(@PathVariable Integer branchId, @RequestBody Stock stock) {
-		return new SuccessResponse("00", "create Stock", stockService.create(branchId, stock));
+	@GetMapping("stock-out")
+	public SuccessResponse getStockOut() {
+		return new SuccessResponse("00", "fetch Stock", stockService
+				.showStockOutByCorporateId(userProfile.getProfile().getCorporate().getId(), Optional.of(false)));
+	}
+
+	@GetMapping("stock-dispose")
+	public SuccessResponse getStockDispose() {
+		return new SuccessResponse("00", "fetch Stock", stockService
+				.showStockDisposeByCorporateId(userProfile.getProfile().getCorporate().getId(), Optional.of(false)));
+	}
+
+	@PostMapping("branch/{branchId}/stock-type/{stockType}")
+	public SuccessResponse create(@PathVariable Integer branchId, @PathVariable String stockType,
+			@RequestBody Stock stock) {
+		return new SuccessResponse("00", "create Stock", stockService.create(branchId, stockType, stock));
 	}
 
 	@PatchMapping("{stockId}/description-update")

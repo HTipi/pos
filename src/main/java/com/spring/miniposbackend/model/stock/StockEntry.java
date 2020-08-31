@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.AuditModel;
 import com.spring.miniposbackend.model.admin.Branch;
 import com.spring.miniposbackend.model.admin.Item;
+import com.spring.miniposbackend.model.admin.StockType;
 import com.spring.miniposbackend.model.admin.User;
 
 import lombok.Getter;
@@ -36,9 +37,10 @@ public class StockEntry extends AuditModel{
     @Column(name = "id", nullable = false)
     private Long id;
 	
-	@Column(name = "stock_in", nullable = false)
-    @ColumnDefault("true")
-    private boolean stockIn;
+	@ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "stock_type_code", nullable = false)
+    @JsonIgnore
+    private StockType stockType;
 	
 	@Column(name = "value_date", nullable = false, updatable = false)
     private Date valueDate;

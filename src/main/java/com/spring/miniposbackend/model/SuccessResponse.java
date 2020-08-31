@@ -1,7 +1,5 @@
 package com.spring.miniposbackend.model;
 
-
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,5 +15,4 @@ public class SuccessResponse  {
 		this.message = message;
 		this.data = data;
 	}
-	
 }

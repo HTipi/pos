@@ -1,20 +1,26 @@
-//package com.spring.miniposbackend.controller.admin;
-//
-//import com.spring.miniposbackend.model.admin.User;
-//import com.spring.miniposbackend.repository.admin.UserRepository;
-//import com.spring.miniposbackend.service.admin.UserService;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.web.bind.annotation.*;
-//
-//import java.util.List;
-//
-//@RestController
-//@RequestMapping("user")
-//public class UserController {
-//
-//    @Autowired
-//    private UserService userService;
-//
+package com.spring.miniposbackend.controller.admin;
+
+import com.spring.miniposbackend.modelview.UserResponse;
+import com.spring.miniposbackend.service.admin.UserService;
+import com.spring.miniposbackend.util.UserProfileUtil;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("user")
+public class UserController {
+
+    @Autowired
+    private UserService userService;
+    @Autowired 
+    private UserProfileUtil userProfile;
+    
+    @GetMapping("me")
+    public UserResponse getProfile() {
+    	return new UserResponse(userService.showByUsername(userProfile.getProfile().getUsername()), null);
+    }
+
 //    @GetMapping
 //    public List<User> shows() {
 //        return this.userService.shows();
@@ -39,5 +45,5 @@
 //    public User updateStatus(@PathVariable Integer userId, @RequestBody Boolean status) {
 //        return this.userService.updateStatus(userId, status);
 //    }
-//
-//}
+
+}

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.exception.UnauthorizedException;
+import com.spring.miniposbackend.model.admin.StockType;
 import com.spring.miniposbackend.model.stock.StockEntry;
 import com.spring.miniposbackend.model.stock.StockPost;
 import com.spring.miniposbackend.repository.admin.ItemRepository;
@@ -39,7 +40,8 @@ public class StockPostService {
 	@Transactional
 	public List<StockPost> create(Long stockId) {
 		return stockRepository.findById(stockId).map((stock) -> {
-			if (stock.isStockIn()) {
+			StockType stockType = stock.getStockType();
+			if (stockType.getCode().compareTo("STOCK-IN") == 0) {
 				if (stock.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
 					throw new UnauthorizedException("Branch is unauthorized");
 				}
@@ -60,7 +62,7 @@ public class StockPostService {
 							throw new ConflictException("Item is not allowed");
 						}
 						StockPost stockPostTem  = new StockPost();
-						stockPostTem.setStockIn(stock.isStockIn());
+						stockPostTem.setStockType(stockType);
 						stockPostTem.setValueDate(stock.getValueDate());
 						stockPostTem.setItem(stockEntry.getItem());
 						stockPostTem.setPrice(stockEntry.getPrice());
@@ -68,7 +70,7 @@ public class StockPostService {
 						stockPostTem.setBranch(stock.getBranch());
 						stockPostTem.setUser(user);
 						stockPostTem.setStock(stock);
-						if(stock.isStockIn()) {
+						if(stockType.getCode().compareTo("STOCK-IN") == 0) {
 							item.setStockIn(item.getStockIn()+stockEntry.getQuantity());
 						}else {
 							item.setStockOut(item.getStockOut()+stockEntry.getQuantity());

@@ -32,12 +32,14 @@ public class User extends AuditModel{
     private String username;
 
     @Column(name = "password", nullable = false)
+    @JsonIgnore
     private String password;
 
     @Transient
     private String confirmPassword;
     
     @Column(name="api_token", nullable = true)
+    @JsonIgnore
     private String apiToken;
 
     @Column(name = "telephone", nullable = false, length = 32)

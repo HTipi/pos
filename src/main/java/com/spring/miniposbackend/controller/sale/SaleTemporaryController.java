@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.spring.miniposbackend.exception.InternalErrorException;
 import com.spring.miniposbackend.model.SuccessResponse;
-import com.spring.miniposbackend.model.sale.SaleTemporary;
 import com.spring.miniposbackend.service.sale.SaleTemporaryService;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
@@ -36,31 +36,32 @@ public class SaleTemporaryController {
 
 	@GetMapping("by-user")
 	public SuccessResponse getByUserId(@RequestParam Optional<Boolean> isPrinted,@RequestParam Optional<Boolean> cancel){
+		
 		return new SuccessResponse("00", "fetch Sale Tmp by User",saleService.showByUserId(userProfile.getProfile().getUser().getId(), isPrinted,cancel));
 	}
 	
 	@PostMapping
-	public List<SaleTemporary> create(@RequestBody List<Map<String, Integer>> requestItem) {
-		return saleService.addItem(requestItem);
+	public SuccessResponse create(@RequestBody List<Map<String, Integer>> requestItem) {
+		return new SuccessResponse("00", "add SaleTmp", saleService.addItem(requestItem));
 	}
 	
 	@DeleteMapping("item/{saleTempId}")
-	public List<SaleTemporary> remove(@PathVariable Long saleTempId,@RequestParam(value = "seatId") Integer seatId){
-		return saleService.removeItem(saleTempId,seatId);
+	public SuccessResponse remove(@PathVariable Long saleTempId,@RequestParam(value = "seatId") Integer seatId){
+		return new SuccessResponse("00", "remove SaleTmp", saleService.removeItem(saleTempId,seatId));
 	}
 	
 	
 	@PatchMapping("qty/{saleTempId}")
-	public List<SaleTemporary> updateQuantity(@PathVariable Long saleTempId, @RequestParam(value = "quantity") Short quantity,@RequestParam(value = "seatId") Integer seatId) {
-		return saleService.setQuantity(saleTempId, quantity,seatId);
+	public SuccessResponse updateQuantity(@PathVariable Long saleTempId, @RequestParam(value = "quantity") Short quantity,@RequestParam(value = "seatId") Integer seatId) {
+		return new SuccessResponse("00", "update QTY", saleService.setQuantity(saleTempId, quantity,seatId));
 	}
 	@PatchMapping("{seatId}")
-	public boolean printBySeat(@PathVariable Integer seatId) {
+	public SuccessResponse printBySeat(@PathVariable Integer seatId) {
 		try {
-			return saleService.printBySeat(seatId);
+			return new SuccessResponse("00", "do Print",saleService.printBySeat(seatId));
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
+			throw new InternalErrorException("prin SaleTmp Failed","04");
 		}
 		
 	}

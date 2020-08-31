@@ -62,7 +62,6 @@ public class SaleService {
     public List<Sale> showSaleByUser(Integer userId, @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> date) {
     	
     	if (date.isPresent()) {
-    		System.out.println(date);
     		return saleRepository.findByIdWithValueDate(userId, date.get());
     	}
         return saleRepository.findByUserId(userId);

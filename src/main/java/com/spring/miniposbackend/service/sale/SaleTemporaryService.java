@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.spring.miniposbackend.exception.ConflictException;
+import com.spring.miniposbackend.exception.InternalErrorException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.exception.UnprocessableEntityException;
@@ -165,7 +166,7 @@ public class SaleTemporaryService {
             });
             return true;
         } catch (Exception ex) {
-            throw new Exception(ex.getMessage());
+            throw new InternalErrorException("prin SaleTmp Failed","04");
         }
     }
 

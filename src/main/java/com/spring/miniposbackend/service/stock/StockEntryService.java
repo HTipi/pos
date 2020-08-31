@@ -13,6 +13,7 @@ import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.exception.UnprocessableEntityException;
+import com.spring.miniposbackend.model.admin.StockType;
 import com.spring.miniposbackend.model.stock.StockEntry;
 import com.spring.miniposbackend.modelview.StockEntryRequest;
 import com.spring.miniposbackend.repository.admin.ItemRepository;
@@ -46,9 +47,10 @@ public class StockEntryService {
 	}
 
 	@Transactional
-	public List<StockEntry> create(Long stockId, List<StockEntryRequest> stockEntries) {
+	public List<StockEntry> create(Long stockId,List<StockEntryRequest> stockEntries) {
 		return stockRepository.findById(stockId).map((stock) -> {
-			if (stock.isStockIn()) {
+			StockType stockType = stock.getStockType();
+			if (stockType.getCode().compareTo("STOCK-IN") == 0) {
 				if (stock.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
 					throw new UnauthorizedException("Branch is unauthorized");
 				}
@@ -72,7 +74,7 @@ public class StockEntryService {
 							throw new UnauthorizedException("Item is unauthorized");
 						}
 						StockEntry stockEnt = new StockEntry();
-						stockEnt.setStockIn(stock.isStockIn());
+						stockEnt.setStockType(stockType);
 						stockEnt.setValueDate(stock.getValueDate());
 						stockEnt.setItem(item);
 						stockEnt.setPrice(stockEntryRequest.getPrice());
@@ -93,7 +95,7 @@ public class StockEntryService {
 
 	public StockEntry update(Long stockEntryId, StockEntryRequest stockEntryRequest) {
 		return stockEntryRepository.findById(stockEntryId).map((stockEntry) -> {
-			if (stockEntry.isStockIn()) {
+			if (stockEntry.getStockType().getCode().compareTo("STOCK-IN") == 0) {
 				if (stockEntry.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
 					throw new UnauthorizedException("Branch is unauthorized");
 				}
@@ -119,7 +121,7 @@ public class StockEntryService {
 
 	public StockEntry delete(Long stockEntryId) {
 		return stockEntryRepository.findById(stockEntryId).map((stockEntry) -> {
-			if (stockEntry.isStockIn()) {
+			if (stockEntry.getStockType().getCode().compareTo("STOCK-IN") == 0) {
 				if (stockEntry.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
 					throw new UnauthorizedException("Branch is unauthorized");
 				}

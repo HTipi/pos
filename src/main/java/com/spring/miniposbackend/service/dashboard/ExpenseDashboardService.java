@@ -4,12 +4,16 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import com.spring.miniposbackend.exception.UnauthorizedException;
+import com.spring.miniposbackend.model.expense.Expense;
 import com.spring.miniposbackend.modelview.dashboard.ExpenseSummaryDetail;
+import com.spring.miniposbackend.repository.expense.ExpenseRepository;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
 @Service
@@ -19,6 +23,8 @@ public class ExpenseDashboardService {
 	private NamedParameterJdbcTemplate jdbc;
 	@Autowired
 	private UserProfileUtil userProfile;
+	@Autowired
+	private ExpenseRepository expenseRepository;
 
 	public List<ExpenseSummaryDetail> expenseSummaryByBranchId(Integer branchId, Date startDate, Date endDate) {
 		if (userProfile.getProfile().getBranch().getId() != branchId) {
@@ -37,5 +43,12 @@ public class ExpenseDashboardService {
 						+ "and exps.branch = :branchId " + "group by exps.branch_id",
 				mapSqlParameterSource, (rs, rowNum) -> new ExpenseSummaryDetail(rs.getInt("branch_id"),
 						rs.getString("branch_name"), rs.getString("branch_name_kh"), rs.getDouble("expense_amount")));
+	}
+
+	public Page<Expense> expenseDetailByBranchId(Integer branchId, Date from, Date to, Pageable pageable) {
+		if (userProfile.getProfile().getBranch().getId() != branchId) {
+			throw new UnauthorizedException("Branch is unauthorized");
+		}
+		return expenseRepository.findByBranchId(branchId, from, to, pageable);
 	}
 }

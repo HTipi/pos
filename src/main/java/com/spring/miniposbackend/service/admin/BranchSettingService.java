@@ -3,11 +3,9 @@ package com.spring.miniposbackend.service.admin;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.model.admin.BranchSetting;
-import com.spring.miniposbackend.model.admin.Seat;
 import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.admin.BranchSettingRepository;
 import com.spring.miniposbackend.repository.admin.SettingRepository;
-import com.spring.miniposbackend.repository.admin.UserRepository;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BranchSettingService {
@@ -44,7 +43,18 @@ public class BranchSettingService {
 		}).orElseThrow(() -> new ResourceNotFoundException("branch does not exist", "01"));
 	}
 
-    public List<BranchSetting> showByBranchId(Integer branchId,boolean enable) {
-        return settingBranchRepository.findByBranchId(branchId,enable);
-    }
+	public List<BranchSetting> showByBranchId(Integer branchId, Optional<Boolean> enable) {
+		if (enable.isPresent()) {
+			return settingBranchRepository.findByBranchId(branchId, enable.get());
+		} else {
+			return settingBranchRepository.findByBranchId(branchId);
+		}
+	}
+
+	public BranchSetting updateEnable(Integer branchId, Integer settingId, boolean enable) {
+		return settingBranchRepository.findFirstByBranchIdAndSettingId(branchId, settingId).map((branchSetting) -> {
+			branchSetting.setEnable(enable);
+			return settingBranchRepository.save(branchSetting);
+		}).orElseThrow(() -> new ResourceNotFoundException("Record does not exist", "01"));
+	}
 }

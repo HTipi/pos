@@ -36,12 +36,18 @@ public class SaleDashboardController {
 		cal.clear(Calendar.SECOND);
 		cal.clear(Calendar.MILLISECOND);
 		cal.setFirstDayOfWeek(Calendar.MONDAY);
-		//cal.set(Calendar.DAY_OF_MONTH, 15);
+		// cal.set(Calendar.DAY_OF_MONTH, 15);
 		today = cal.getTime();
-		cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-		startWeek = cal.getTime();
-		cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
-		startMonth = cal.getTime();
+		if (cal.get(Calendar.DAY_OF_MONTH) <= 7) {
+			cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
+			startWeek = cal.getTime();
+			startMonth = cal.getTime();
+		} else {
+			cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+			startWeek = cal.getTime();
+			cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
+			startMonth = cal.getTime();
+		}
 	}
 
 	@GetMapping("/branch/summary")

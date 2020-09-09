@@ -26,8 +26,8 @@ public class ExpenseDashboardController {
 	private ExpenseDashboardService expenseDashboardService;
 
 	private Date today;
-//	private Date startWeek;
-//	private Date startMonth;
+	private Date startWeek;
+	private Date startMonth;
 
 	private void getDate() {
 		Calendar cal = Calendar.getInstance();
@@ -36,22 +36,39 @@ public class ExpenseDashboardController {
 		cal.clear(Calendar.SECOND);
 		cal.clear(Calendar.MILLISECOND);
 		cal.setFirstDayOfWeek(Calendar.MONDAY);
+		// cal.set(Calendar.DAY_OF_MONTH, 15);
 		today = cal.getTime();
+		if (cal.get(Calendar.DAY_OF_MONTH) <= 7) {
+			cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
+			startWeek = cal.getTime();
+			startMonth = cal.getTime();
+		} else {
+			cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+			startWeek = cal.getTime();
+			cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
+			startMonth = cal.getTime();
+		}
 	}
 
 	@GetMapping("/branch/summary")
 	public SuccessResponse branchSummaryDetail() {
 		getDate();
 		return new SuccessResponse("00", "fetch report", expenseDashboardService
-				.expenseSummaryByBranchId(userProfile.getProfile().getBranch().getId(), today, today));
+				.expenseSummaryByBranchId(userProfile.getProfile().getBranch().getId(), startMonth, startWeek, today));
+	}
+	@GetMapping("/expense-type/summary")
+	public SuccessResponse expenseTypeSummaryDetail(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
+			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to) {
+		return new SuccessResponse("00", "fetch report", expenseDashboardService
+				.expenseTypeSummaryByBranchId(userProfile.getProfile().getBranch().getId(), from, to));
 	}
 
 	@GetMapping("/detail")
 	public SuccessResponse expenseDetail(@RequestParam Integer page, @RequestParam Integer length,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
-			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to, @RequestParam Integer branchId) {
+			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to) {
 		Pageable pageable = PageRequest.of(page, length);
 		return new SuccessResponse("00", "fetch report",
-				expenseDashboardService.expenseDetailByBranchId(branchId, from, to, pageable));
+				expenseDashboardService.expenseDetailByBranchId(userProfile.getProfile().getBranch().getId(), from, to, pageable));
 	}
 }

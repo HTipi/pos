@@ -1,5 +1,6 @@
 package com.spring.miniposbackend.controller.admin;
 
+import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.modelview.UserResponse;
 import com.spring.miniposbackend.service.admin.UserService;
 import com.spring.miniposbackend.util.UserProfileUtil;
@@ -17,8 +18,8 @@ public class UserController {
     private UserProfileUtil userProfile;
     
     @GetMapping("me")
-    public UserResponse getProfile() {
-    	return new UserResponse(userService.showByUsername(userProfile.getProfile().getUsername()), null);
+    public SuccessResponse getProfile() {
+    	return new SuccessResponse("00", "fetch ME",new UserResponse(userService.showByUsername(userProfile.getProfile().getUsername()), null));
     }
 
 //    @GetMapping

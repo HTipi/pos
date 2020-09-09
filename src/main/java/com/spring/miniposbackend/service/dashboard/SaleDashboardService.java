@@ -14,7 +14,9 @@ import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.model.sale.SaleDetail;
 import com.spring.miniposbackend.modelview.dashboard.BranchSummaryDetail;
+import com.spring.miniposbackend.modelview.dashboard.ExpenseTypeSummaryDetail;
 import com.spring.miniposbackend.modelview.dashboard.ItemSummaryDetail;
+import com.spring.miniposbackend.modelview.dashboard.ItemTypeSummaryDetail;
 import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.sale.SaleDetailRepository;
 import com.spring.miniposbackend.util.UserProfileUtil;
@@ -96,6 +98,34 @@ public class SaleDashboardService {
 							rs.getDouble("weekly_sale_amount"), rs.getDouble("daily_sale_amount")));
 		}).orElseThrow(() -> new ResourceNotFoundException("User does not exist"));
 
+	}
+	public List<ItemTypeSummaryDetail> itemTypeSummaryByBranchId(Integer branchId, Date startDate,
+			Date endDate) {
+		if (userProfile.getProfile().getBranch().getId() != branchId) {
+			throw new UnauthorizedException("You are unauthorized");
+		}
+		MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource();
+		mapSqlParameterSource.addValue("startDate", startDate);
+		mapSqlParameterSource.addValue("endDate", endDate);
+		mapSqlParameterSource.addValue("branchId", branchId);
+		return jdbc.query(
+				"select * from itemTypeSummaryByBranchId(:branchId,:startDate,:endDate)",
+				mapSqlParameterSource, (rs, rowNum) -> new ItemTypeSummaryDetail(rs.getInt("itemTypeId"),
+						rs.getString("itemTypeName"), rs.getString("itemTypeKh"), rs.getDouble("saleAmt"),rs.getInt("saleItem")));
+	}
+	public List<ItemTypeSummaryDetail> itemTypeSummaryByCopId(Integer corporateId, Date startDate,
+			Date endDate) {
+		if (userProfile.getProfile().getCorporate().getId() != corporateId) {
+			throw new UnauthorizedException("Corporate is unauthorized");
+		}
+		MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource();
+		mapSqlParameterSource.addValue("startDate", startDate);
+		mapSqlParameterSource.addValue("endDate", endDate);
+		mapSqlParameterSource.addValue("corporateId", corporateId);
+		return jdbc.query(
+				"select * from itemTypeSummaryByCopId(:corporateId,:startDate,:endDate)",
+				mapSqlParameterSource, (rs, rowNum) -> new ItemTypeSummaryDetail(rs.getInt("itemTypeId"),
+						rs.getString("itemTypeName"), rs.getString("itemTypeKh"), rs.getDouble("saleAmt"),rs.getInt("saleItem")));
 	}
 
 	public List<ItemSummaryDetail> itemSummaryByCorporateId(Integer corporateId, Date startDate, Date startWeek,

@@ -69,6 +69,18 @@ public class SaleDashboardController {
 		}
 
 	}
+	@GetMapping("/item-type/summary")
+	public SuccessResponse itemTypeSummaryDetail(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
+			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,@RequestParam Optional<Integer> branchId) {
+		if (branchId.isPresent()) {
+			return new SuccessResponse("00", "fetch report",
+					branchDashboardService.itemTypeSummaryByBranchId(branchId.get(), from, to));
+		} else {
+			return new SuccessResponse("00", "fetch report", branchDashboardService.itemTypeSummaryByCopId(
+					userProfile.getProfile().getCorporate().getId(), from,to));
+		}
+
+	}
 
 	@GetMapping("/detail")
 	public SuccessResponse saleDetail(@RequestParam Integer page, @RequestParam Integer length,

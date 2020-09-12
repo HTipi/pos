@@ -58,8 +58,11 @@ public class SaleDashboardController {
 	}
 
 	@GetMapping("/item/summary")
-	public SuccessResponse itemSummaryDetail(@RequestParam Optional<Integer> branchId) {
-		getDate();
+	public SuccessResponse itemSummaryDetail(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> from,
+			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> to,
+			@RequestParam Optional<Integer> branchId) {
+		if (!from.isPresent())
+			getDate();
 		if (branchId.isPresent()) {
 			return new SuccessResponse("00", "fetch report",
 					branchDashboardService.itemSummaryByBranchId(branchId.get(), startMonth, startWeek, today));
@@ -69,15 +72,41 @@ public class SaleDashboardController {
 		}
 
 	}
-	@GetMapping("/item-type/summary")
-	public SuccessResponse itemTypeSummaryDetail(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
-			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,@RequestParam Optional<Integer> branchId) {
+	@GetMapping("/item-chart/summary")
+	public SuccessResponse itemSummaryChart(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
+			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,
+			@RequestParam Optional<Integer> branchId) {
 		if (branchId.isPresent()) {
 			return new SuccessResponse("00", "fetch report",
-					branchDashboardService.itemTypeSummaryByBranchId(branchId.get(), from, to));
+					branchDashboardService.itemChartByBranchId(branchId.get(), from,to));
 		} else {
-			return new SuccessResponse("00", "fetch report", branchDashboardService.itemTypeSummaryByCopId(
+			return new SuccessResponse("00", "fetch report", branchDashboardService.itemChartByCopId(
 					userProfile.getProfile().getCorporate().getId(), from,to));
+		}
+
+	}
+
+	@GetMapping("/item-type/summary")
+	public SuccessResponse itemTypeSummaryDetail(@RequestParam Optional<Integer> branchId) {
+		getDate();
+		if (branchId.isPresent()) {
+			return new SuccessResponse("00", "fetch report",
+					branchDashboardService.itemTypeSummaryByBranchId(branchId.get(), startMonth, startWeek, today));
+		} else {
+			return new SuccessResponse("00", "fetch report",
+					branchDashboardService.itemTypeSummaryByCopId(userProfile.getProfile().getCorporate().getId(), startMonth, startWeek, today));
+		}
+
+	}
+	@GetMapping("/item-type-chart/summary")
+	public SuccessResponse itemTypeSummaryChart(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
+			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to, @RequestParam Optional<Integer> branchId) {
+		if (branchId.isPresent()) {
+			return new SuccessResponse("00", "fetch report",
+					branchDashboardService.itemTypeChartByBranchId(branchId.get(), from, to));
+		} else {
+			return new SuccessResponse("00", "fetch report", branchDashboardService
+					.itemTypeChartByCopId(userProfile.getProfile().getCorporate().getId(), from, to));
 		}
 
 	}

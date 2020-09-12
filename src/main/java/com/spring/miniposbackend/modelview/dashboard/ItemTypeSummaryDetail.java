@@ -6,26 +6,40 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ItemTypeSummaryDetail {
-
-	private Integer itemTypeId;
+	private Long itemTypeId;
 	private String itemTypeName;
-	private String itemTypeKh;
-	private Double saleAmt;
-	private Integer saleItem;
+	private String itemTypeNameKh;
+	private Integer monthlySale;
+	private Integer weeklySale;
+	private Integer dailySale;
+
+	private Double monthlySaleAmount;
+	private Double weeklySaleAmount;
+	private Double dailySaleAmount;
 
 	public ItemTypeSummaryDetail() {
-		this.itemTypeId=null;
-		this.itemTypeName=null;
-		this.itemTypeKh=null;
-		this.saleAmt=null;
-		this.saleItem=null;
+		itemTypeId = null;
+		itemTypeName = null;
+		itemTypeNameKh = null;
+		monthlySale = null;
+		weeklySale = null;
+		dailySale = null;
+		monthlySaleAmount = null;
+		weeklySaleAmount = null;
+		dailySaleAmount = null;
 	}
-	
-	public ItemTypeSummaryDetail(Integer itemTypeId, String itemTypeName, String itemTypeKh,Double saleAmt,Integer saleItem) {
+
+	public ItemTypeSummaryDetail(Long itemTypeId, String itemTypeName, String itemTypeNameKh, Integer monthlySale,
+			Integer weeklySale, Integer dailySale, Double monthlySaleAmount, Double weeklySaleAmount,
+			Double dailySaleAmout) {
 		this.itemTypeId = itemTypeId;
 		this.itemTypeName = itemTypeName;
-		this.itemTypeKh = itemTypeKh;
-		this.saleAmt = saleAmt;
-		this.saleItem = saleItem;
+		this.itemTypeNameKh = itemTypeNameKh;
+		this.monthlySale = monthlySale;
+		this.weeklySale = weeklySale;
+		this.dailySale = dailySale;
+		this.monthlySaleAmount = monthlySaleAmount;
+		this.weeklySaleAmount = weeklySaleAmount;
+		this.dailySaleAmount = dailySaleAmout;
 	}
 }

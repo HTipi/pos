@@ -16,9 +16,9 @@ public interface SaleDetailRepository extends JpaRepository<SaleDetail, Long> {
 
 	List<SaleDetail> findByUserId(Integer userId);
 
-	@Query("select s from SaleDetail s where s.branch.corporate.id= ?1 and date_trunc('day',s.valueDate) between ?2 and ?3 and s.reverse=false")
+	@Query("select s from SaleDetail s where s.branch.corporate.id= ?1 and date_trunc('day',s.valueDate) between ?2 and ?3")
 	Page<SaleDetail> findByCorporateId(Integer corporateId, Date from, Date to, Pageable pageable);
 	
-	@Query("select s from SaleDetail s where s.branch.id= ?1 and date_trunc('day',s.valueDate) between ?2 and ?3 and s.reverse=false")
+	@Query("select s from SaleDetail s where s.branch.id= ?1 and date_trunc('day',s.valueDate) between ?2 and ?3")
 	Page<SaleDetail> findByBranchId(Integer branchId, Date from, Date to, Pageable pageable);
 }

@@ -38,7 +38,7 @@ public class SaleDashboardController {
 		cal.setFirstDayOfWeek(Calendar.MONDAY);
 		// cal.set(Calendar.DAY_OF_MONTH, 15);
 		today = cal.getTime();
-		if (cal.get(Calendar.DAY_OF_MONTH) <= 7) {
+		if (cal.get(Calendar.DAY_OF_MONTH) < 7) {
 			cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
 			startWeek = cal.getTime();
 			startMonth = cal.getTime();

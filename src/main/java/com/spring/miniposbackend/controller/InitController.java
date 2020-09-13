@@ -29,8 +29,14 @@ public class InitController {
 	private UserProfileUtil userProfile;
 	
 	@GetMapping("/me")
-	public CustomUserDetail getMe() {
-		return userProfile.getProfile();
+	public void getMe() throws InterruptedException {
+		CustomUserDetail user = userProfile.getProfile();
+		int i;
+		for(i=0;i<10;i++) {
+			System.out.println(user.getUsername());
+			Thread.sleep(5 * 1000);
+		}
+		
 	}
 	
 	@GetMapping

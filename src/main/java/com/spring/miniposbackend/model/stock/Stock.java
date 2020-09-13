@@ -59,4 +59,8 @@ public class Stock extends AuditModel{
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
     private User user;
+	
+	public String getStockCode() {
+		return stockType.getCode();
+	}
 }

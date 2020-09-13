@@ -25,8 +25,8 @@ public class BranchSettingController {
 	private UserProfileUtil userProfile;
 
 	@GetMapping("by-branch")
-	public List<BranchSetting> getByBranchId() {
-		return branchSettingService.showByBranchId(userProfile.getProfile().getBranch().getId(), Optional.empty());
+	public SuccessResponse getByBranchId() {
+		return new SuccessResponse("00", "fetch Setting", branchSettingService.showByBranchId(userProfile.getProfile().getBranch().getId(), Optional.empty()));
 	}
 
 	@PatchMapping

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -51,12 +52,14 @@ public class ExpenseDashboardController {
 	}
 
 	@GetMapping("/branch/summary")
+	@PreAuthorize("hasAnyRole('USER','OWNER')")
 	public SuccessResponse branchSummaryDetail() {
 		getDate();
 		return new SuccessResponse("00", "fetch report", expenseDashboardService
 				.expenseSummaryByBranchId(userProfile.getProfile().getBranch().getId(), startMonth, startWeek, today));
 	}
 	@GetMapping("/expense-type/summary")
+	@PreAuthorize("hasAnyRole('USER','OWNER')")
 	public SuccessResponse expenseTypeSummaryDetail(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to) {
 		return new SuccessResponse("00", "fetch report", expenseDashboardService
@@ -64,6 +67,7 @@ public class ExpenseDashboardController {
 	}
 
 	@GetMapping("/detail")
+	@PreAuthorize("hasAnyRole('USER','OWNER')")
 	public SuccessResponse expenseDetail(@RequestParam Integer page, @RequestParam Integer length,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to) {

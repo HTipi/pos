@@ -28,14 +28,20 @@ public class InitController {
 	@Autowired
 	private UserProfileUtil userProfile;
 	
-	@GetMapping("/me")
-	public void getMe() throws InterruptedException {
+	@GetMapping("/test")
+	public void getTest() throws InterruptedException {
 		CustomUserDetail user = userProfile.getProfile();
 		int i;
 		for(i=0;i<10;i++) {
 			System.out.println(user.getUsername());
 			Thread.sleep(5 * 1000);
 		}
+		
+	}
+	
+	@GetMapping("/me")
+	public  CustomUserDetail getMe() throws InterruptedException {
+		return userProfile.getProfile();
 		
 	}
 	

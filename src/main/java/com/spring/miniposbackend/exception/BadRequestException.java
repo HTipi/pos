@@ -11,7 +11,7 @@ public class BadRequestException extends RuntimeException {
 
 	public BadRequestException(String message) {
 		super(message);
-		this.errorCode = "400";
+		this.errorCode = "06";
 	}
 	public BadRequestException(String message, String errorCode) {
         super(message);
@@ -20,7 +20,7 @@ public class BadRequestException extends RuntimeException {
 
 	public BadRequestException(String message, Throwable cause) {
 		super(message, cause);
-		this.errorCode = "400";
+		this.errorCode = "06";
 	}
 
 	public String getErrorCode() {

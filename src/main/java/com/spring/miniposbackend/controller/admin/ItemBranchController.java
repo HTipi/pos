@@ -6,6 +6,7 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,21 +35,25 @@ public class ItemBranchController {
 	private UserProfileUtil userProfile;
 	
 	@GetMapping("by-branch")
+	@PreAuthorize("hasAnyRole('USER')")
 	public SuccessResponse getByBranchId(){
 		return new SuccessResponse("00", "fetch item branch", itemBranchService.showByBranchId(userProfile.getProfile().getBranch().getId(),Optional.of(true)));
 	}
 	
 	@GetMapping("{itemBranchId}/get-image")
+	@PreAuthorize("hasAnyRole('USER')")
 	public ImageResponse getImage(@PathVariable Long itemBranchId) {
 		return itemBranchService.getImage(itemBranchId);
 	}
 	
 	@GetMapping("image-list")
+	@PreAuthorize("hasAnyRole('USER')")
 	public List<ImageResponse> getImages(){
 		return itemBranchService.getImages(userProfile.getProfile().getBranch().getId());
 	}
 	
 	@PostMapping("image-update")
+	@PreAuthorize("hasAnyRole('USER')")
 	public List<ImageResponse> getUpdatedImages(@Valid @RequestBody List<ImageRequest> requestImages){
 		return itemBranchService.getImages(requestImages);
 	}
@@ -61,20 +66,25 @@ public class ItemBranchController {
 	 */
 	
 	@GetMapping("{branchId}/by-branch")
+	@PreAuthorize("hasAnyRole('OWNER')")
 	public List<ItemBranch> byBranch(@PathVariable Integer branchId){
 		return itemBranchService.showByBranchId(branchId,Optional.empty());
 	}
 	
 	@GetMapping("refresh")
+	@PreAuthorize("hasAnyRole('OWNER')")
 	public void refresh() {
 		itemBranchService.refresh();
 	}
+	
 	@PatchMapping("{itemBranchId}/set-enable")
+	@PreAuthorize("hasAnyRole('OWNER')")
 	public ItemBranch setEnable(@PathVariable Long itemBranchId, @RequestParam Boolean enable) {
 		return itemBranchService.setEnable(itemBranchId, enable);
 	}
 	
 	@PutMapping("{itemBranchId}")
+	@PreAuthorize("hasAnyRole('OWNER')")
 	public ItemBranch update(@PathVariable Long itemBranchId, @RequestBody ItemBranchUpdate itemBranch) {
 		return itemBranchService.update(itemBranchId, itemBranch);
 	}

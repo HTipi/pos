@@ -11,7 +11,7 @@ public class ResourceNotFoundException extends RuntimeException{
 	
 	public ResourceNotFoundException(String message) {
         super(message);
-        this.errorCode = "404";
+        this.errorCode = "01";
     }
 	
 	public ResourceNotFoundException(String message, String errorCode) {
@@ -21,7 +21,7 @@ public class ResourceNotFoundException extends RuntimeException{
 
     public ResourceNotFoundException(String message, Throwable cause) {
         super(message, cause);
-        this.errorCode = "404";
+        this.errorCode = "01";
     }
     
     public String getErrorCode() {

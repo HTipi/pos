@@ -31,5 +31,23 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
 		return new ResponseEntity<ExceptionResponse>(exceptionResponse, HttpStatus.UNAUTHORIZED);
 	}
 	
+	@ExceptionHandler(ConflictException.class)
+	public final ResponseEntity<ExceptionResponse> handleException(ConflictException ex, WebRequest request){
+		ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getErrorCode(),ex.getMessage());
+		return new ResponseEntity<ExceptionResponse>(exceptionResponse, HttpStatus.UNAUTHORIZED);
+	}
+	
+	@ExceptionHandler(UnprocessableEntityException.class)
+	public final ResponseEntity<ExceptionResponse> handleException(UnprocessableEntityException ex, WebRequest request){
+		ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getErrorCode(),ex.getMessage());
+		return new ResponseEntity<ExceptionResponse>(exceptionResponse, HttpStatus.UNAUTHORIZED);
+	}
+	
+	@ExceptionHandler(InternalErrorException.class)
+	public final ResponseEntity<ExceptionResponse> handleException(InternalErrorException ex, WebRequest request){
+		ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), ex.getErrorCode(),ex.getMessage());
+		return new ResponseEntity<ExceptionResponse>(exceptionResponse, HttpStatus.UNAUTHORIZED);
+	}
+	
 	
 }

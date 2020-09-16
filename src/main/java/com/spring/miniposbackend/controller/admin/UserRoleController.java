@@ -4,6 +4,7 @@ import com.spring.miniposbackend.model.admin.UserRole;
 import com.spring.miniposbackend.service.admin.UserRoleService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,16 +23,19 @@ public class UserRoleController {
 	private UserRoleService userRoleService;
 
 	@GetMapping("user/{userId}")
+	@PreAuthorize("hasAnyRole('OWNER')")
 	public List<UserRole> getRoles(@PathVariable Integer userId) {
 		return userRoleService.showByUserId(userId, Optional.of(true));
 	}
 
 	@DeleteMapping("user/{userId}/role/{roleId}")
+	@PreAuthorize("hasAnyRole('OWNER')")
 	public UserRole delete(@PathVariable Integer userId, @PathVariable Integer roleId) {
 		return userRoleService.delete(userId, roleId);
 	}
 
 	@PostMapping("user/{userId}/role/{roleId}")
+	@PreAuthorize("hasAnyRole('OWNER')")
 	public UserRole create(@PathVariable Integer userId, @PathVariable Integer roleId) {
 		return userRoleService.create(userId, roleId);
 	}

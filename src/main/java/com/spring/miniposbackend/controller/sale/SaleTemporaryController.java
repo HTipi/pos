@@ -31,38 +31,38 @@ public class SaleTemporaryController {
 	private UserProfileUtil userProfile;
 	
 	@GetMapping("by-seat")
-	@PreAuthorize("hasAnyRole('USER')")
+	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse getBySeatId(@RequestParam Integer seatId, @RequestParam Optional<Boolean> isPrinted,@RequestParam Optional<Boolean> cancel){
 		return new SuccessResponse("00", "fetch Sale Tmp by Seat", saleService.showBySeatId(seatId, isPrinted,cancel));
 	}
 
 	@GetMapping("by-user")
-	@PreAuthorize("hasAnyRole('USER')")
+	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse getByUserId(@RequestParam Optional<Boolean> isPrinted,@RequestParam Optional<Boolean> cancel){
 		
 		return new SuccessResponse("00", "fetch Sale Tmp by User",saleService.showByUserId(userProfile.getProfile().getUser().getId(), isPrinted,cancel));
 	}
 	
 	@PostMapping
-	@PreAuthorize("hasAnyRole('USER')")
+	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse create(@RequestBody List<Map<String, Integer>> requestItem) {
 		return new SuccessResponse("00", "add SaleTmp", saleService.addItem(requestItem));
 	}
 	
 	@DeleteMapping("item/{saleTempId}")
-	@PreAuthorize("hasAnyRole('USER')")
+	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse remove(@PathVariable Long saleTempId,@RequestParam(value = "seatId") Integer seatId){
 		return new SuccessResponse("00", "remove SaleTmp", saleService.removeItem(saleTempId,seatId));
 	}
 	
 	
 	@PatchMapping("qty/{saleTempId}")
-	@PreAuthorize("hasAnyRole('USER')")
+	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse updateQuantity(@PathVariable Long saleTempId, @RequestParam(value = "quantity") Short quantity,@RequestParam(value = "seatId") Integer seatId) {
 		return new SuccessResponse("00", "update QTY", saleService.setQuantity(saleTempId, quantity,seatId));
 	}
 	@PatchMapping("{seatId}")
-	@PreAuthorize("hasAnyRole('USER')")
+	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse printBySeat(@PathVariable Integer seatId) {
 		try {
 			return new SuccessResponse("00", "do Print",saleService.printBySeat(seatId));

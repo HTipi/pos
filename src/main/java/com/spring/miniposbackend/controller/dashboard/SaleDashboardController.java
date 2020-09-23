@@ -60,7 +60,7 @@ public class SaleDashboardController {
 	}
 
 	@GetMapping("/item/summary")
-	@PreAuthorize("hasAnyRole('OWNER','USER')")
+	@PreAuthorize("hasAnyRole('OWNER','SALE')")
 	public SuccessResponse itemSummaryDetail(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> from,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> to,
 			@RequestParam Optional<Integer> branchId) {
@@ -76,7 +76,7 @@ public class SaleDashboardController {
 
 	}
 	@GetMapping("/item-chart/summary")
-	@PreAuthorize("hasAnyRole('OWNER','USER')")
+	@PreAuthorize("hasAnyRole('OWNER','SALE')")
 	public SuccessResponse itemSummaryChart(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,
 			@RequestParam Optional<Integer> branchId) {

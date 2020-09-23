@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.modelview.ImageRequest;
-import com.spring.miniposbackend.modelview.ImageResponse;
 import com.spring.miniposbackend.modelview.ItemBranchUpdate;
 import com.spring.miniposbackend.service.admin.ItemBranchService;
 import com.spring.miniposbackend.util.UserProfileUtil;
@@ -35,27 +34,27 @@ public class ItemBranchController {
 	private UserProfileUtil userProfile;
 	
 	@GetMapping("by-branch")
-	@PreAuthorize("hasAnyRole('USER')")
+	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse getByBranchId(){
 		return new SuccessResponse("00", "fetch item branch", itemBranchService.showByBranchId(userProfile.getProfile().getBranch().getId(),Optional.of(true)));
 	}
 	
 	@GetMapping("{itemBranchId}/get-image")
-	@PreAuthorize("hasAnyRole('USER')")
-	public ImageResponse getImage(@PathVariable Long itemBranchId) {
-		return itemBranchService.getImage(itemBranchId);
+	@PreAuthorize("hasAnyRole('SALE')")
+	public SuccessResponse getImage(@PathVariable Long itemBranchId) {
+		return new SuccessResponse("00", "fetch image", itemBranchService.getImage(itemBranchId));
 	}
 	
 	@GetMapping("image-list")
-	@PreAuthorize("hasAnyRole('USER')")
-	public List<ImageResponse> getImages(){
-		return itemBranchService.getImages(userProfile.getProfile().getBranch().getId());
+	@PreAuthorize("hasAnyRole('SALE')")
+	public SuccessResponse getImages(){
+		return new SuccessResponse("00", "fetch images", itemBranchService.getImages(userProfile.getProfile().getBranch().getId()));
 	}
 	
 	@PostMapping("image-update")
-	@PreAuthorize("hasAnyRole('USER')")
-	public List<ImageResponse> getUpdatedImages(@Valid @RequestBody List<ImageRequest> requestImages){
-		return itemBranchService.getImages(requestImages);
+	@PreAuthorize("hasAnyRole('SALE')")
+	public SuccessResponse getUpdatedImages(@Valid @RequestBody List<ImageRequest> requestImages){
+		return new SuccessResponse("00", "Image updated", itemBranchService.getImages(requestImages));
 	}
 	@PostMapping("image-list")
 	public SuccessResponse getImagesList( @RequestBody List<ImageRequest> requestImages){

@@ -62,7 +62,7 @@ public class ItemController {
 
 	@GetMapping("image-list")
 	@PreAuthorize("hasAnyRole('OWNER')")
-	public SuccessResponse getImages(@RequestParam Integer corporateId) {
+	public SuccessResponse getImages() {
 		return new SuccessResponse("00", "fetch Item Image List",
 				itemService.getImages(userProfile.getProfile().getCorporate().getId()));
 	}

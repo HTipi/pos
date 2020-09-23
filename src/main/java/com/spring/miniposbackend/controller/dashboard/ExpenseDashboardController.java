@@ -67,7 +67,7 @@ public class ExpenseDashboardController {
 	}
 
 	@GetMapping("/detail")
-	@PreAuthorize("hasAnyRole('USER','OWNER')")
+	@PreAuthorize("hasAnyRole('SALE','OWNER')")
 	public SuccessResponse expenseDetail(@RequestParam Integer page, @RequestParam Integer length,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to) {

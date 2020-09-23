@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
+import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.model.admin.Branch;
 import com.spring.miniposbackend.model.admin.Item;
 import com.spring.miniposbackend.model.admin.ItemBranch;
@@ -21,6 +22,7 @@ import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
 import com.spring.miniposbackend.repository.admin.ItemRepository;
 import com.spring.miniposbackend.util.ImageUtil;
+import com.spring.miniposbackend.util.UserProfileUtil;
 
 @Service
 public class ItemBranchService {
@@ -33,6 +35,8 @@ public class ItemBranchService {
 	private ItemRepository itemRepository;
 	@Autowired
 	private ImageUtil imageUtil;
+	@Autowired
+	private UserProfileUtil userProfile;
 
 	@Value("${file.path.image.item}")
 	private String imagePath;
@@ -47,6 +51,9 @@ public class ItemBranchService {
 
 	public List<ItemBranch> showByBranchId(Integer branchId, Optional<Boolean> enable) {
 		return branchRepository.findById(branchId).map(branch -> {
+			if (branch.getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
+				throw new UnauthorizedException("Corporate is unauthorized");
+			}
 			if (enable.isPresent()) {
 				return itemBranchRepository.findByBranchId(branchId, enable.get());
 			} else {
@@ -57,6 +64,9 @@ public class ItemBranchService {
 
 	public ImageResponse getImage(Long itemBranchId) {
 		return itemBranchRepository.findById(itemBranchId).map(itemBranch -> {
+			if (itemBranch.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
+				throw new UnauthorizedException("Branch is unauthorized");
+			}
 			return getImage(itemBranch);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
@@ -66,7 +76,7 @@ public class ItemBranchService {
 			return new ImageResponse(itemBranch.getId(), null, itemBranch.getVersion());
 		}
 		try {
-			String fileLocation = imagePath + "/"+ itemBranch.getImage();
+			String fileLocation = imagePath + "/" + itemBranch.getImage();
 			byte[] bArray = imageUtil.getImage(fileLocation);
 			return new ImageResponse(itemBranch.getId(), bArray, itemBranch.getVersion());
 
@@ -91,20 +101,26 @@ public class ItemBranchService {
 			ItemBranch itemBranch = itemBranchRepository.findById(requestImage.getId())
 					.orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 			if (itemBranch.getVersion() > requestImage.getVersion()) {
+				if (itemBranch.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
+					throw new UnauthorizedException("Branch is authorized");
+				}
 				ImageResponse image = getImage(itemBranch);
 				images.add(image);
 			}
 		});
 		return images;
 	}
-	
+
 	public List<ImageResponse> getImagesFromList(List<ImageRequest> requestImages) {
 		List<ImageResponse> images = new ArrayList<ImageResponse>();
 		requestImages.forEach((requestImage) -> {
 			ItemBranch itemBranch = itemBranchRepository.findById(requestImage.getId())
 					.orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
-				ImageResponse image = getImage(itemBranch);
-				images.add(image);
+			if (itemBranch.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
+				throw new UnauthorizedException("Branch is authorized");
+			}
+			ImageResponse image = getImage(itemBranch);
+			images.add(image);
 		});
 		return images;
 	}
@@ -135,6 +151,9 @@ public class ItemBranchService {
 
 	public ItemBranch update(Long itemBranchId, ItemBranchUpdate requestItem) {
 		return itemBranchRepository.findById(itemBranchId).map(itemBranch -> {
+			if (itemBranch.getBranch().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
+				throw new UnauthorizedException("Corporate is unauthorized");
+			}
 			itemBranch.setUseItemConfiguration(requestItem.isUseItemConfiguration());
 			itemBranch.setPrice(requestItem.getPrice());
 			itemBranch.setDiscount(requestItem.getDiscount());
@@ -145,6 +164,9 @@ public class ItemBranchService {
 
 	public ItemBranch setEnable(Long itemBranchId, Boolean enable) {
 		return itemBranchRepository.findById(itemBranchId).map(itemBranch -> {
+			if (itemBranch.getBranch().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
+				throw new UnauthorizedException("Corporate is unauthorized");
+			}
 			itemBranch.setEnable(enable);
 			return itemBranchRepository.save(itemBranch);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));

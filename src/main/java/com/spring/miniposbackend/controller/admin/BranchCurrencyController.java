@@ -20,7 +20,7 @@ public class BranchCurrencyController {
 	private UserProfileUtil userProfile;
 	
 	@GetMapping("by-branch")
-	@PreAuthorize("hasAnyRole('OWNER','USER')")
+	@PreAuthorize("hasAnyRole('OWNER','SALE')")
 	public SuccessResponse getByBranch(){ // will get from user
 		return new SuccessResponse("00", "fetch Currency", branchCurrencyServie.showByBranchId(userProfile.getProfile().getBranch().getId(), true, true));
 	} 

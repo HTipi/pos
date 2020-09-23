@@ -24,7 +24,7 @@ public class BranchSettingController {
 	private UserProfileUtil userProfile;
 
 	@GetMapping("by-branch")
-	@PreAuthorize("hasAnyRole('OWNER','USER')")
+	@PreAuthorize("hasAnyRole('OWNER','SALE')")
 	public SuccessResponse getByBranchId() {
 		return new SuccessResponse("00", "fetch Setting", branchSettingService.showByBranchId(userProfile.getProfile().getBranch().getId(), Optional.empty()));
 	}

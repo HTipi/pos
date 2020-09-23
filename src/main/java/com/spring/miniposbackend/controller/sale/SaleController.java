@@ -23,31 +23,31 @@ public class SaleController {
 	private UserProfileUtil userProfile;
 
 	@GetMapping("by-user")
-	@PreAuthorize("hasAnyRole('USER')")
+	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse getByUserId(@RequestParam Optional<Long> saleId) {
 		return new SuccessResponse("00", "fetch Sale by User", saleService.showSaleTranByUser(userProfile.getProfile().getUser().getId(), saleId));
 	}
 
 	@GetMapping("summary/by-user")
-	@PreAuthorize("hasAnyRole('USER')")
+	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse getSaleByUserId(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> date) {
 		return new SuccessResponse("00", "fetch Sale Sum By User", saleService.showSaleByUser(userProfile.getProfile().getUser().getId(),date));
 	}
 
 	@GetMapping("by-branch")
-	@PreAuthorize("hasAnyRole('USER')")
+	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse getByBranchId(@RequestParam Integer branchId) {
 		return new SuccessResponse("00", "fetch Sale by Branch", saleService.showSaleByBranch(branchId));
 	}
 
 	@PostMapping
-	@PreAuthorize("hasAnyRole('USER')")
+	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse create(@RequestParam Integer seatId) {
 		return new SuccessResponse("00", "make Payment", saleService.create(seatId, userProfile.getProfile().getBranch().getId(), userProfile.getProfile().getUser().getId()));
 	}
 
 	@PatchMapping("reverse/{saleId}")
-	@PreAuthorize("hasAnyRole('USER')")
+	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse reverseSale(@PathVariable Long saleId) {
 		return new SuccessResponse("00", "reverse Sale", saleService.reverseSale(saleId));
 	}

@@ -53,6 +53,9 @@ public class BranchSettingService {
 
 	public BranchSetting updateEnable(Integer branchId, Integer settingId, boolean enable) {
 		return settingBranchRepository.findFirstByBranchIdAndSettingId(branchId, settingId).map((branchSetting) -> {
+			if (branchSetting.getBranch().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
+				throw new UnauthorizedException("Branch is unauthorized");
+			}
 			branchSetting.setEnable(enable);
 			return settingBranchRepository.save(branchSetting);
 		}).orElseThrow(() -> new ResourceNotFoundException("Record does not exist", "01"));

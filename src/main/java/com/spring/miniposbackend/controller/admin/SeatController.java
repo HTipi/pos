@@ -26,7 +26,7 @@ public class SeatController {
 	private UserProfileUtil userProfile;
 
 	@GetMapping("by-branch")
-	@PreAuthorize("hasAnyRole('USER','OWNER')")
+	@PreAuthorize("hasAnyRole('SALE','OWNER')")
 	public SuccessResponse getAll() {
 		return new SuccessResponse("00", "fetch Seat", seatService.showByBranchId(userProfile.getProfile().getBranch().getId()));
 	}

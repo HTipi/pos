@@ -41,7 +41,7 @@ public class ItemTypeController {
 	private UserProfileUtil userProfile;
 
 	@GetMapping("by-corporate")
-	@PreAuthorize("hasAnyRole('OWNER','USER')")
+	@PreAuthorize("hasAnyRole('OWNER','SALE')")
 	public SuccessResponse getByCorporate() { // will get from user
 
 		return new SuccessResponse("00", "fetch Item Type",
@@ -77,13 +77,13 @@ public class ItemTypeController {
 	}
 
 	@GetMapping("{itemTypeId}/get-image")
-	@PreAuthorize("hasAnyRole('OWNER','USER')")
+	@PreAuthorize("hasAnyRole('OWNER','SALE')")
 	public ImageResponse getImage(@PathVariable Integer itemTypeId) {
 		return itemTypeService.getImage(itemTypeId);
 	}
 
 	@GetMapping("image-list")
-	@PreAuthorize("hasAnyRole('OWNER','USER')")
+	@PreAuthorize("hasAnyRole('OWNER','SALE')")
 	public List<ImageResponse> getImages(@RequestParam Integer corporateId) {
 		return itemTypeService.getImages(userProfile.getProfile().getCorporate().getId());
 	}

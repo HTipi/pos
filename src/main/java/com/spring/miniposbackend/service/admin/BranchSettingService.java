@@ -60,4 +60,13 @@ public class BranchSettingService {
 			return settingBranchRepository.save(branchSetting);
 		}).orElseThrow(() -> new ResourceNotFoundException("Record does not exist", "01"));
 	}
+	public BranchSetting updateSettingValue(Integer branchId, Integer settingId, boolean enable) {
+		return settingBranchRepository.findFirstByBranchIdAndSettingId(branchId, settingId).map((branchSetting) -> {
+			String val = "true";
+			if(!enable)
+				val = "false";
+			branchSetting.setSettingValue(val);
+			return settingBranchRepository.save(branchSetting);
+		}).orElseThrow(() -> new ResourceNotFoundException("Record does not exist", "01"));
+	}
 }

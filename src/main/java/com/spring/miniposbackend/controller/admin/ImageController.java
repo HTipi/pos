@@ -3,6 +3,7 @@ package com.spring.miniposbackend.controller.admin;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,16 +25,19 @@ public class ImageController {
 	private ImageService imageService;
 	
 	@GetMapping
+	@PreAuthorize("hasAnyRole('OWNER')")
 	public SuccessResponse getImageList(@RequestParam("type") String type, @RequestParam("page") int page, @RequestParam("length") int length) {
 		return new SuccessResponse("00", "fetch Images", imageService.getImages(type, page, length));
 	}
 
 	@PostMapping
+	@PreAuthorize("hasAnyRole('OWNER')")
 	public Image create(@RequestParam("type") String type, @RequestParam("imageFile") MultipartFile file) {
 		return imageService.create(type, file);
 	}
 	
 	@PutMapping("{imageId}")
+	@PreAuthorize("hasAnyRole('OWNER')")
 	public Image update(@PathVariable UUID imageId,@RequestParam("imageFile") MultipartFile file) {
 		return imageService.update(imageId, file);
 	}

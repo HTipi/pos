@@ -14,7 +14,6 @@ import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.model.sale.SaleDetail;
 import com.spring.miniposbackend.modelview.dashboard.BranchSummaryDetail;
-import com.spring.miniposbackend.modelview.dashboard.ExpenseTypeSummaryDetail;
 import com.spring.miniposbackend.modelview.dashboard.ItemSummaryChart;
 import com.spring.miniposbackend.modelview.dashboard.ItemSummaryDetail;
 import com.spring.miniposbackend.modelview.dashboard.ItemTypeSummaryChart;

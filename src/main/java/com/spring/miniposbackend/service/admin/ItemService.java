@@ -37,7 +37,8 @@ public class ItemService {
 	private ImageUtil imageUtil;
 	@Autowired
 	private UserProfileUtil userProfile;
-	@Autowired ImageRepository imageRepository;
+	@Autowired
+	ImageRepository imageRepository;
 
 	@Value("${file.path.image.item}")
 	private String imagePath;
@@ -55,19 +56,18 @@ public class ItemService {
 		}).orElseThrow(() -> new ResourceNotFoundException("Corporate does not exist"));
 
 	}
-	
+
 	public Item updateImage(Long itemId, UUID imageId) {
-		return imageRepository.findById(imageId)
-				.map((image) -> {
-					return itemRepository.findById(itemId)
-							.map((item) -> {
-								item.setImage(image.getName());
-								item.setVersion((short) (item.getVersion() + 1));
-								return itemRepository.save(item);
-							})
-							.orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
-				})
-				.orElseThrow(() -> new ResourceNotFoundException("Image does not exist"));
+		return imageRepository.findById(imageId).map((image) -> {
+			return itemRepository.findById(itemId).map((item) -> {
+				if (item.getItemType().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
+					throw new UnauthorizedException("Corporate is unauthorized");
+				}
+				item.setImage(image.getName());
+				item.setVersion((short) (item.getVersion() + 1));
+				return itemRepository.save(item);
+			}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
+		}).orElseThrow(() -> new ResourceNotFoundException("Image does not exist"));
 	}
 
 	public Item uploadImage(Long itemId, MultipartFile file) {
@@ -75,9 +75,13 @@ public class ItemService {
 			if (file.isEmpty()) {
 				throw new ResourceNotFoundException("File content does not exist");
 			}
+			if (item.getItemType().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
+				throw new UnauthorizedException("Corporate is unauthorized");
+			}
 			try {
 				// read and write the file to the selected location-
-				//String baseLocation = String.format("%s/" + imagePath, System.getProperty("catalina.base"));
+				// String baseLocation = String.format("%s/" + imagePath,
+				// System.getProperty("catalina.base"));
 				String baseLocation = imagePath;
 				String fileName = imageUtil.uploadImage(baseLocation, item.getId().toString(), file);
 				item.setImage(fileName);
@@ -99,7 +103,7 @@ public class ItemService {
 		try {
 //			String fileLocation = String.format("%s/" + imagePath, System.getProperty("catalina.base")) + "/"
 //					+ item.getImage();
-			String fileLocation = imagePath + "/"+ item.getImage();
+			String fileLocation = imagePath + "/" + item.getImage();
 			byte[] bArray = imageUtil.getImage(fileLocation);
 			return new ImageResponse(item.getId(), bArray, item.getVersion());
 
@@ -110,6 +114,9 @@ public class ItemService {
 
 	public ImageResponse getImage(Long itemId) {
 		return itemRepository.findById(itemId).map(item -> {
+			if (item.getItemType().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
+				throw new UnauthorizedException("Corporate is unauthorized");
+			}
 			return getImage(item);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
@@ -130,6 +137,9 @@ public class ItemService {
 			Item item = itemRepository.findById(requestImage.getId())
 					.orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 			if (item.getVersion() > requestImage.getVersion()) {
+				if (item.getItemType().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
+					throw new UnauthorizedException("Corporate is unauthorized");
+				}
 				ImageResponse image = getImage(item);
 				images.add(image);
 			}
@@ -168,10 +178,11 @@ public class ItemService {
 			item.setPrice(requestItem.getPrice());
 			item.setStock(requestItem.isStock());
 			item.setDiscount(requestItem.getDiscount());
-			//item.setEnable(requestItem.isEnable());
+			// item.setEnable(requestItem.isEnable());
 			return itemRepository.save(item);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
+
 	public Item disable(Long itemId) {
 		return itemRepository.findById(itemId).map((item) -> {
 			if (userProfile.getProfile().getCorporate().getId() != item.getItemType().getCorporate().getId()) {

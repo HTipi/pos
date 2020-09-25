@@ -6,6 +6,7 @@ import com.spring.miniposbackend.service.admin.UserService;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,6 +19,7 @@ public class UserController {
     private UserProfileUtil userProfile;
     
     @GetMapping("me")
+    @PreAuthorize("hasAnyRole('OWNER','SALE')")
     public SuccessResponse getProfile() {
     	return new SuccessResponse("00", "fetch ME",new UserResponse(userService.showByUsername(userProfile.getProfile().getUsername()), null));
     }

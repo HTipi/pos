@@ -1,6 +1,7 @@
 package com.spring.miniposbackend.controller.expense;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +26,7 @@ public class ExpenseTypeController {
 	private UserProfileUtil userProfile;
 
 	@GetMapping("by-branch")
+	@PreAuthorize("hasAnyRole('OWNER','SALE')")
 	public SuccessResponse getByBranch() { // will get from user
 
 		return new SuccessResponse("00", "fetch Expense Type",
@@ -32,12 +34,14 @@ public class ExpenseTypeController {
 	}
 
 	@PostMapping
+	@PreAuthorize("hasAnyRole('OWNER')")
 	public SuccessResponse create(@RequestBody ExpenseType requestItem) {
 		return new SuccessResponse("00", "Expense Type Created",
 				expenseTypeService.create(requestItem, userProfile.getProfile().getUser().getId()));
 	}
 
 	@PutMapping("{expenseTypeId}")
+	@PreAuthorize("hasAnyRole('OWNER')")
 	public SuccessResponse update(@PathVariable Integer expenseTypeId, @RequestBody ExpenseType expenseType) {
 		return new SuccessResponse("00", "Expense Type Updated",
 				expenseTypeService.update(expenseTypeId, expenseType, userProfile.getProfile().getUser().getId()));
@@ -45,6 +49,7 @@ public class ExpenseTypeController {
 	}
 
 	@PatchMapping("delete/{expenseTypeId}")
+	@PreAuthorize("hasAnyRole('OWNER')")
 	public SuccessResponse delete(@PathVariable Integer expenseTypeId) {
 		return new SuccessResponse("00", "Expense Type Disabled",
 				expenseTypeService.delete(expenseTypeId, userProfile.getProfile().getUser().getId()));

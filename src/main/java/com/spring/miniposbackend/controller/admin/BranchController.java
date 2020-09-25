@@ -10,6 +10,7 @@ import com.spring.miniposbackend.util.UserProfileUtil;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,16 +33,19 @@ public class BranchController {
 	private UserProfileUtil userProfile;
 
 	@PostMapping("{branchId}/upload")
+	@PreAuthorize("hasAnyRole('OWNER')")
 	public Branch uploadImage(@PathVariable Integer branchId, @RequestParam("imageFile") MultipartFile file) {
 		return branchService.uploadImage(branchId, file);
 	}
 	
 	@GetMapping("{branchId}/get-image")
+	@PreAuthorize("hasAnyRole('OWNER')")
 	public ImageResponse getImage(@PathVariable Integer branchId) {
 		return branchService.getImage(branchId);
 	}
 	
 	@GetMapping("by-corporate")
+	@PreAuthorize("hasAnyRole('OWNER')")
 	public SuccessResponse getByCorporateId() {
 		return new SuccessResponse("00", "Branch Retrieve", branchService.showByCorpoateId(userProfile.getProfile().getCorporate().getId(), Optional.of(true)));
 	}

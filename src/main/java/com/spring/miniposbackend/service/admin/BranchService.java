@@ -64,6 +64,9 @@ public class BranchService {
 			if (file.isEmpty()) {
 				throw new ResourceNotFoundException("File content does not exist");
 			}
+			if(branch.getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
+				throw new UnauthorizedException("Corporate is unauthorized");
+			}
 			try {
 				// read and write the file to the selected location-
 				String baseLocation = String.format("%s/"+imagePath, System.getProperty("catalina.base"));
@@ -81,6 +84,9 @@ public class BranchService {
     
     public ImageResponse getImage(Integer branchId) {
 		return branchRepository.findById(branchId).map(branch -> {
+			if(branch.getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
+				throw new UnauthorizedException("Corporate is unauthorized");
+			}
 			return getImage(branch);
 		}).orElseThrow(() -> new ResourceNotFoundException("Branch does not exist"));
 	}

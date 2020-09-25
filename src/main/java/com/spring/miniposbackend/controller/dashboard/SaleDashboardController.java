@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -51,6 +52,7 @@ public class SaleDashboardController {
 	}
 
 	@GetMapping("/branch/summary")
+	@PreAuthorize("hasAnyRole('OWNER')")
 	public SuccessResponse branchSummaryDetail() {
 		getDate();
 		return new SuccessResponse("00", "fetch report", branchDashboardService.branchSummaryByCorpateId(
@@ -58,6 +60,7 @@ public class SaleDashboardController {
 	}
 
 	@GetMapping("/item/summary")
+	@PreAuthorize("hasAnyRole('OWNER','SALE')")
 	public SuccessResponse itemSummaryDetail(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> from,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> to,
 			@RequestParam Optional<Integer> branchId) {
@@ -73,6 +76,7 @@ public class SaleDashboardController {
 
 	}
 	@GetMapping("/item-chart/summary")
+	@PreAuthorize("hasAnyRole('OWNER','SALE')")
 	public SuccessResponse itemSummaryChart(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,
 			@RequestParam Optional<Integer> branchId) {

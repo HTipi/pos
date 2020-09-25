@@ -2,6 +2,8 @@ package com.spring.miniposbackend.controller.admin;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,6 +17,8 @@ public class SettingController {
 	@Autowired
 	private SettingService settingService;
 	
+	@GetMapping
+	@PreAuthorize("hasAnyRole('OWNER')")
 	public SuccessResponse getAll(){
 		return new SuccessResponse("00", "fetch setting by branch", settingService.showByAll());
 	}

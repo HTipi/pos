@@ -11,6 +11,7 @@ public class UnauthorizedException extends RuntimeException{
 
 	public UnauthorizedException(String message) {
 		super(message);
+		this.errorCode="02";
 	}
 	public UnauthorizedException(String message, String errorCode) {
         super(message);
@@ -18,6 +19,7 @@ public class UnauthorizedException extends RuntimeException{
     }
 	public UnauthorizedException(String message, Throwable cause) {
 		super(message, cause);
+		this.errorCode="02";
 	
 	}
 	public String getErrorCode() {

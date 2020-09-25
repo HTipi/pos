@@ -1,11 +1,11 @@
 package com.spring.miniposbackend.controller.expense;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +30,7 @@ public class ExpenseController {
 	private UserProfileUtil userProfile;
 
 	@GetMapping("by-branch-monthly")
+	@PreAuthorize("hasAnyRole('SALE','OWNER')")
 	public SuccessResponse getByBranchM(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date valueDate,
 			@RequestParam Optional<Boolean> isReversed) {
 		return new SuccessResponse("00", "fetch Expense", expenseService
@@ -37,6 +38,7 @@ public class ExpenseController {
 	}
 
 	@GetMapping("by-branch-date")
+	@PreAuthorize("hasAnyRole('SALE','OWNER')")
 	public SuccessResponse getByBranch(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
 			@RequestParam Optional<Boolean> isReversed) { // will get from user
@@ -45,12 +47,14 @@ public class ExpenseController {
 	}
 
 	@PostMapping
+	@PreAuthorize("hasAnyRole('SALE','OWNER')")
 	public SuccessResponse create(@RequestParam Integer expenseTypeId, @RequestBody Expense requestItem) {
 		return new SuccessResponse("00", "Create Expense",
 				expenseService.create(requestItem, userProfile.getProfile().getUser().getId(), expenseTypeId));
 	}
 
 	@PatchMapping("reverse/{expenseId}")
+	@PreAuthorize("hasAnyRole('SALE','OWNER')")
 	public SuccessResponse delete(@PathVariable Integer expenseId) {
 		return new SuccessResponse("00", "Reverse Expense",
 				expenseService.reverse(expenseId, userProfile.getProfile().getUser().getId()));

@@ -1,6 +1,7 @@
 package com.spring.miniposbackend.controller.security;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.naming.AuthenticationException;
 
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.spring.miniposbackend.model.admin.User;
+import com.spring.miniposbackend.model.admin.UserRole;
 import com.spring.miniposbackend.model.security.JwtRequest;
 import com.spring.miniposbackend.modelview.UserResponse;
 import com.spring.miniposbackend.service.admin.UserService;
@@ -48,6 +50,7 @@ public class AuthenticationController {
 		authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
 		final String token = jwtTokenUtil.generateToken(authenticationRequest.getUsername());
 		User user = userService.setApiToken(authenticationRequest.getUsername(), token);
+		List<UserRole> userRoles = userService.getRoleByUserId(user.getId());
 		String fileLocation = String.format("%s/"+imagePath, System.getProperty("catalina.base"))+ "/"
 				+ user.getBranch().getLogo();
 		byte[] image;
@@ -56,7 +59,7 @@ public class AuthenticationController {
 		} catch (IOException e) {
 			image = null;
 		}
-		return new UserResponse(user,image);
+		return new UserResponse(user,userRoles,image);
 	}
 
 	private void authenticate(String username, String password) throws AuthenticationException {

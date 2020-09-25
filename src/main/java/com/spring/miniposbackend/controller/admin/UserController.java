@@ -21,7 +21,7 @@ public class UserController {
     @GetMapping("me")
     @PreAuthorize("hasAnyRole('OWNER','SALE')")
     public SuccessResponse getProfile() {
-    	return new SuccessResponse("00", "fetch ME",new UserResponse(userService.showByUsername(userProfile.getProfile().getUsername()), null));
+    	return new SuccessResponse("00", "fetch ME",new UserResponse(userService.showByUsername(userProfile.getProfile().getUsername()),userService.getRoleByUserId(userProfile.getProfile().getUser().getId()), null));
     }
 
 //    @GetMapping

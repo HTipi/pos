@@ -16,7 +16,7 @@ import com.spring.miniposbackend.exception.UnprocessableEntityException;
 import com.spring.miniposbackend.model.admin.StockType;
 import com.spring.miniposbackend.model.stock.StockEntry;
 import com.spring.miniposbackend.modelview.StockEntryRequest;
-import com.spring.miniposbackend.repository.admin.ItemRepository;
+import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
 import com.spring.miniposbackend.repository.admin.UserRepository;
 import com.spring.miniposbackend.repository.stock.StockEntryRepository;
 import com.spring.miniposbackend.repository.stock.StockRepository;
@@ -31,8 +31,7 @@ public class StockEntryService {
 	private StockEntryRepository stockEntryRepository;
 	@Autowired
 	private UserProfileUtil userProfile;
-	@Autowired
-	private ItemRepository itemRepository;
+	@Autowired ItemBranchRepository itemBranchRepository;
 
 	@Autowired
 	private UserRepository userRepository;
@@ -68,15 +67,15 @@ public class StockEntryService {
 					if (stockEntryRequest.getQuantity() < 1) {
 						throw new UnprocessableEntityException("Quantity must be greater than 0");
 					}
-					StockEntry stockEntry = itemRepository.findById(stockEntryRequest.getItemId()).map((item) -> {
-						if (item.getItemType().getCorporate().getId() != userProfile.getProfile().getCorporate()
+					StockEntry stockEntry = itemBranchRepository.findById(stockEntryRequest.getItemId()).map((itemBranch) -> {
+						if (itemBranch.getItem().getItemType().getCorporate().getId() != userProfile.getProfile().getCorporate()
 								.getId()) {
 							throw new UnauthorizedException("Item is unauthorized");
 						}
 						StockEntry stockEnt = new StockEntry();
 						stockEnt.setStockType(stockType);
 						stockEnt.setValueDate(stock.getValueDate());
-						stockEnt.setItem(item);
+						stockEnt.setItemBranch(itemBranch);
 						stockEnt.setPrice(stockEntryRequest.getPrice());
 						stockEnt.setQuantity(stockEntryRequest.getQuantity());
 						stockEnt.setBranch(stock.getBranch());
@@ -107,11 +106,11 @@ public class StockEntryService {
 			if (stockEntry.getStock().isPosted()) {
 				throw new ConflictException("Stock transaction is already posted");
 			}
-			return itemRepository.findById(stockEntryRequest.getItemId()).map((item) -> {
-				if (item.getItemType().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
+			return itemBranchRepository.findById(stockEntryRequest.getItemId()).map((itemBranch) -> {
+				if (itemBranch.getItem().getItemType().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
 					throw new UnauthorizedException("Item is unauthorized");
 				}
-				stockEntry.setItem(item);
+				stockEntry.setItemBranch(itemBranch);
 				stockEntry.setPrice(stockEntryRequest.getPrice());
 				stockEntry.setQuantity(stockEntryRequest.getQuantity());
 				return stockEntryRepository.save(stockEntry);

@@ -64,6 +64,14 @@ public class ItemBranch extends AuditModel{
 	@ColumnDefault("0")
     private Short discount;
 	
+	@Column(name = "stock_in", nullable = false)
+	@ColumnDefault("0")
+    private Long stockIn;
+	
+	@Column(name = "stock_out", nullable = false)
+	@ColumnDefault("0")
+    private Long stockOut;
+
 	public Long getId() {
 		return id;
 	}
@@ -110,6 +118,10 @@ public class ItemBranch extends AuditModel{
 		return enable;
 	}
 	
+	public boolean isStock() {
+		return item.isStock();
+	}
+	
 	public Integer getItemTypeId() {
 		return item.getItemType().getId();
 	}
@@ -124,5 +136,9 @@ public class ItemBranch extends AuditModel{
 	
 	public Short getVersion() {
 		return item.getVersion();
+	}
+	
+	public Long getItemBalance() {
+		return stockIn - stockOut;
 	}
 }

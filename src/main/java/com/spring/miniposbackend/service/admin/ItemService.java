@@ -169,8 +169,6 @@ public class ItemService {
 			item.setPrice(requestItem.getPrice());
 			item.setDiscount(requestItem.getDiscount());
 			item.setStock(requestItem.isStock());
-			item.setStockIn(0L);
-			item.setStockOut(0L);
 			item.setItemType(itemType);
 			item.setEnable(true);
 			item = itemRepository.save(item);
@@ -188,6 +186,8 @@ public class ItemService {
 						itemBr.setItem(itemb);
 						itemBr.setUseItemConfiguration(true);
 						itemBr.setEnable(false);
+						itemBr.setStockIn(0L);
+						itemBr.setStockOut(0L);
 						itemBr.setPrice(itemb.getPrice());
 						itemBr.setDiscount(itemBr.getDiscount());
 						itemBranchRepository.save(itemBr);
@@ -213,8 +213,8 @@ public class ItemService {
 			item.setName(requestItem.getName());
 			item.setNameKh(requestItem.getNameKh());
 			item.setPrice(requestItem.getPrice());
-			item.setStock(requestItem.isStock());
 			item.setDiscount(requestItem.getDiscount());
+			item.setStock(requestItem.isStock());
 			// item.setEnable(requestItem.isEnable());
 			return itemRepository.save(item);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));

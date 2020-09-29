@@ -18,7 +18,7 @@ import org.hibernate.annotations.ColumnDefault;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.AuditModel;
 import com.spring.miniposbackend.model.admin.Branch;
-import com.spring.miniposbackend.model.admin.Item;
+import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.model.admin.StockType;
 import com.spring.miniposbackend.model.admin.User;
 
@@ -46,9 +46,9 @@ public class StockEntry extends AuditModel{
     private Date valueDate;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id", nullable = false)
+    @JoinColumn(name = "item_branch_id", nullable = false)
     @JsonIgnore
-    private Item item;
+    private ItemBranch itemBranch;
 	
 	@Column(name = "price", nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
@@ -73,14 +73,14 @@ public class StockEntry extends AuditModel{
     private User user;
 	
 	public String getItemCode() {
-		return item.getCode();
+		return itemBranch.getCode();
 	}
 	
 	public String getItemName() {
-		return item.getName();
+		return itemBranch.getName();
 	}
 	public Long getStockBalance() {
-		return item.getItemBalance();
+		return itemBranch.getItemBalance();
 	}
 	public String getStockCode() {
 		return stockType.getCode();

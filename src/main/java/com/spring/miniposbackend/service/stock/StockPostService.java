@@ -14,7 +14,7 @@ import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.model.admin.StockType;
 import com.spring.miniposbackend.model.stock.StockEntry;
 import com.spring.miniposbackend.model.stock.StockPost;
-import com.spring.miniposbackend.repository.admin.ItemRepository;
+import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
 import com.spring.miniposbackend.repository.admin.UserRepository;
 import com.spring.miniposbackend.repository.stock.StockEntryRepository;
 import com.spring.miniposbackend.repository.stock.StockPostRepository;
@@ -35,7 +35,7 @@ public class StockPostService {
 	@Autowired
 	private UserRepository userRepository;
 	@Autowired
-	private ItemRepository itemRepository;
+	private ItemBranchRepository itemBranchRepository;
 	
 	@Transactional
 	public List<StockPost> create(Long stockId) {
@@ -57,25 +57,25 @@ public class StockPostService {
 				List<StockEntry> stockEntries = stockEntryRepository.findByStockId(stockId);
 				List<StockPost> stockPosts = new ArrayList<StockPost>();
 				stockEntries.forEach((stockEntry) -> {
-					StockPost stockPost = itemRepository.findById(stockEntry.getItem().getId()).map((item) -> {
-						if(!item.isStock()) {
+					StockPost stockPost = itemBranchRepository.findById(stockEntry.getItemBranch().getId()).map((itemBranch) -> {
+						if(!itemBranch.isStock()) {
 							throw new ConflictException("Item is not allowed");
 						}
 						StockPost stockPostTem  = new StockPost();
 						stockPostTem.setStockType(stockType);
 						stockPostTem.setValueDate(stock.getValueDate());
-						stockPostTem.setItem(stockEntry.getItem());
+						stockPostTem.setItemBranch(stockEntry.getItemBranch());
 						stockPostTem.setPrice(stockEntry.getPrice());
 						stockPostTem.setQuantity(stockEntry.getQuantity());
 						stockPostTem.setBranch(stock.getBranch());
 						stockPostTem.setUser(user);
 						stockPostTem.setStock(stock);
 						if(stockType.getCode().compareTo("STOCK-IN") == 0) {
-							item.setStockIn(item.getStockIn()+stockEntry.getQuantity());
+							itemBranch.setStockIn(itemBranch.getStockIn()+stockEntry.getQuantity());
 						}else {
-							item.setStockOut(item.getStockOut()+stockEntry.getQuantity());
+							itemBranch.setStockOut(itemBranch.getStockOut()+stockEntry.getQuantity());
 						}
-						itemRepository.save(item);
+						itemBranchRepository.save(itemBranch);
 						return stockPostRepository.save(stockPostTem);
 					}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 					

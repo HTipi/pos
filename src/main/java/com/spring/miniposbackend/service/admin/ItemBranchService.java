@@ -142,6 +142,8 @@ public class ItemBranchService {
 					itemBr.setItem(item);
 					itemBr.setUseItemConfiguration(true);
 					itemBr.setEnable(false);
+					itemBr.setStockIn(0L);
+					itemBr.setStockOut(0L);
 					itemBr.setPrice(item.getPrice());
 					itemBr.setDiscount(itemBr.getDiscount());
 					itemBranchRepository.save(itemBr);

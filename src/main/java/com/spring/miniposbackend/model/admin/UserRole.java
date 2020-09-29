@@ -31,8 +31,7 @@ public class UserRole extends AuditModel {
 	public Integer getRoleId() {
 		return userRoleIdentity.getRole().getId(); 
 	}
-	
-	public Integer getUserId() {
-		return userRoleIdentity.getUser().getId(); 
+	public String getRoleName() {
+		return userRoleIdentity.getRole().getName();
 	}
 }

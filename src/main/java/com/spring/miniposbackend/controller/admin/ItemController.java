@@ -47,7 +47,7 @@ public class ItemController {
 	}
 
 	@GetMapping("by-corporate")
-	@PreAuthorize("hasAnyRole('OWNER')")
+	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
 	public SuccessResponse getByCorporateId() {
 		return new SuccessResponse("00", "fetch Item",
 				itemService.showByCorpoateId(userProfile.getProfile().getCorporate().getId(), Optional.of(true)));

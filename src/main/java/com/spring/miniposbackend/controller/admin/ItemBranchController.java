@@ -1,5 +1,6 @@
 package com.spring.miniposbackend.controller.admin;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,31 +35,41 @@ public class ItemBranchController {
 	private UserProfileUtil userProfile;
 	
 	@GetMapping("by-branch")
-	@PreAuthorize("hasAnyRole('SALE')")
+	@PreAuthorize("hasAnyRole('BRANCH','SALE')")
 	public SuccessResponse getByBranchId(){
 		return new SuccessResponse("00", "fetch item branch", itemBranchService.showByBranchId(userProfile.getProfile().getBranch().getId(),Optional.of(true)));
 	}
 	
 	@GetMapping("{itemBranchId}/get-image")
-	@PreAuthorize("hasAnyRole('SALE')")
+	@PreAuthorize("hasAnyRole('BRANCH','SALE')")
 	public SuccessResponse getImage(@PathVariable Long itemBranchId) {
 		return new SuccessResponse("00", "fetch image", itemBranchService.getImage(itemBranchId));
 	}
 	
 	@GetMapping("image-list")
-	@PreAuthorize("hasAnyRole('SALE')")
+	@PreAuthorize("hasAnyRole('BRANCH','SALE')")
 	public SuccessResponse getImages(){
 		return new SuccessResponse("00", "fetch images", itemBranchService.getImages(userProfile.getProfile().getBranch().getId()));
 	}
 	
 	@PostMapping("image-update")
-	@PreAuthorize("hasAnyRole('SALE')")
+	@PreAuthorize("hasAnyRole('BRANCH')")
 	public SuccessResponse getUpdatedImages(@Valid @RequestBody List<ImageRequest> requestImages){
 		return new SuccessResponse("00", "Image updated", itemBranchService.getImages(requestImages));
 	}
 	@PostMapping("image-list")
 	public SuccessResponse getImagesList( @RequestBody List<ImageRequest> requestImages){
 		return new SuccessResponse("00", "fetch Image Item List", itemBranchService.getImagesFromList(requestImages));
+	}
+	@PatchMapping("{itemBranchId}/set-price")
+	@PreAuthorize("hasAnyRole('BRANCH')")
+	public ItemBranch setPrice(@PathVariable Long itemBranchId, @RequestParam BigDecimal price,@RequestParam Short discount) {
+		return itemBranchService.setPrice(itemBranchId, price,discount);
+	}
+	@PatchMapping("{itemBranchId}/set-discount")
+	@PreAuthorize("hasAnyRole('BRANCH')")
+	public ItemBranch setDiscount(@PathVariable Long itemBranchId, @RequestParam Short discount) {
+		return itemBranchService.setDiscount(itemBranchId, discount);
 	}
 	/*
 	 * Admin Controller

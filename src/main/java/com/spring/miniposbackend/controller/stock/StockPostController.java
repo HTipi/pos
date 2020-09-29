@@ -18,7 +18,7 @@ public class StockPostController {
 	private StockPostService stockPostService;
 	
 	@PostMapping("{stockId}")
-	@PreAuthorize("hasAnyRole('OWNER')")
+	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
 	public SuccessResponse create(@PathVariable Long stockId){
 		return new SuccessResponse("00", "fetch Stock", stockPostService.create(stockId));
 	}

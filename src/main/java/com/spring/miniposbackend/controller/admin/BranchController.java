@@ -2,11 +2,13 @@ package com.spring.miniposbackend.controller.admin;
 
 import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.model.admin.Branch;
+import com.spring.miniposbackend.model.admin.UserRole;
 import com.spring.miniposbackend.modelview.ImageResponse;
 //import com.spring.miniposbackend.model.admin.Branch;
 import com.spring.miniposbackend.service.admin.BranchService;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +28,9 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("branch")
 public class BranchController {
 
-    @Autowired
-    private BranchService branchService;
-    
+	@Autowired
+	private BranchService branchService;
+
 	@Autowired
 	private UserProfileUtil userProfile;
 
@@ -37,19 +39,31 @@ public class BranchController {
 	public Branch uploadImage(@PathVariable Integer branchId, @RequestParam("imageFile") MultipartFile file) {
 		return branchService.uploadImage(branchId, file);
 	}
-	
+
 	@GetMapping("{branchId}/get-image")
 	@PreAuthorize("hasAnyRole('OWNER')")
 	public ImageResponse getImage(@PathVariable Integer branchId) {
 		return branchService.getImage(branchId);
 	}
-	
+
 	@GetMapping("by-corporate")
-	@PreAuthorize("hasAnyRole('OWNER')")
+	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
 	public SuccessResponse getByCorporateId() {
-		return new SuccessResponse("00", "Branch Retrieve", branchService.showByCorpoateId(userProfile.getProfile().getCorporate().getId(), Optional.of(true)));
+		boolean BRANCH = false;
+		List<UserRole> roles = userProfile.getProfile().getUserRole();
+		for (UserRole role : roles) {
+
+			BRANCH = role.getRoleName().equalsIgnoreCase("BRANCH");
+			break;
+		}
+		if (BRANCH)
+			return new SuccessResponse("00", "Branch Retrieve",
+					branchService.showByBranchId(userProfile.getProfile().getBranch().getId(), Optional.of(true)));
+		else
+			return new SuccessResponse("00", "Branch Retrieve",
+					branchService.showByCorpoateId(userProfile.getProfile().getCorporate().getId(), Optional.of(true)));
 	}
-    
+
 //    @GetMapping
 //    public List<Branch> shows() {
 //        return this.branchService.shows();

@@ -29,7 +29,7 @@ public class StockController {
 	private UserProfileUtil userProfile;
 
 	@GetMapping("stock-in")
-	@PreAuthorize("hasAnyRole('OWNER')")
+	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
 	public SuccessResponse getStockIn() {
 		return new SuccessResponse("00", "fetch Stock",
 				stockService.showStockInByBranchId(userProfile.getProfile().getBranch().getId(), Optional.of(false)));
@@ -43,28 +43,28 @@ public class StockController {
 	}
 
 	@GetMapping("stock-dispose")
-	@PreAuthorize("hasAnyRole('OWNER')")
+	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
 	public SuccessResponse getStockDispose() {
 		return new SuccessResponse("00", "fetch Stock", stockService
 				.showStockDisposeByCorporateId(userProfile.getProfile().getCorporate().getId(), Optional.of(false)));
 	}
 
 	@PostMapping("branch/{branchId}/stock-type/{stockType}")
-	@PreAuthorize("hasAnyRole('OWNER')")
+	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
 	public SuccessResponse create(@PathVariable Integer branchId, @PathVariable String stockType,
 			@RequestBody Stock stock) {
 		return new SuccessResponse("00", "create Stock", stockService.create(branchId, stockType, stock));
 	}
 
 	@PatchMapping("{stockId}/description-update")
-	@PreAuthorize("hasAnyRole('OWNER')")
+	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
 	public SuccessResponse updateDescription(@PathVariable Long stockId,
 			@RequestParam(name = "description") String description) {
 		return new SuccessResponse("00", "delete Stock", stockService.updateDescription(stockId, description));
 	}
 
 	@DeleteMapping("{stockId}")
-	@PreAuthorize("hasAnyRole('OWNER')")
+	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
 	public SuccessResponse delete(@PathVariable Long stockId) {
 		return new SuccessResponse("00", "delete Stock", stockService.delete(stockId));
 	}

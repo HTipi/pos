@@ -15,4 +15,9 @@ public interface BranchRepository extends JpaRepository<Branch,Integer> {
 	List<Branch> findByCorporateId(Integer corporateId);
 	@Query(value = "select b from Branch b where b.corporate.id = ?1 and b.enable = ?2")
 	List<Branch> findByCorporateId(Integer corporateId, boolean enable);
+	@Query(value = "select b from Branch b where b.id = ?1")
+	List<Branch> findByBranchId(Integer branchId);
+	@Query(value = "select b from Branch b where b.id = ?1 and b.enable = ?2")
+	List<Branch> findByBranchId(Integer branchId, boolean enable);
+	
 }

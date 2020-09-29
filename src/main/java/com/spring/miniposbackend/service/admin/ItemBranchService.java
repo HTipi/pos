@@ -1,5 +1,6 @@
 package com.spring.miniposbackend.service.admin;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -145,6 +146,12 @@ public class ItemBranchService {
 					itemBr.setDiscount(itemBr.getDiscount());
 					itemBranchRepository.save(itemBr);
 				}
+//				else {
+//					itemBranch.get().setPrice(item.getPrice());
+//					itemBranch.get().setDiscount(item.getDiscount());
+//					itemBranchRepository.save(itemBranch.get());
+//					
+//				}
 			});
 		});
 	}
@@ -162,6 +169,19 @@ public class ItemBranchService {
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
 
+	public ItemBranch setPrice(Long itemBranchId, BigDecimal price,Short discount) {
+		return itemBranchRepository.findById(itemBranchId).map(itemBranch -> {
+			itemBranch.setPrice(price);
+			itemBranch.setDiscount(discount);
+			return itemBranchRepository.save(itemBranch);
+		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
+	}
+	public ItemBranch setDiscount(Long itemBranchId, Short discount) {
+		return itemBranchRepository.findById(itemBranchId).map(itemBranch -> {
+			itemBranch.setDiscount(discount);
+			return itemBranchRepository.save(itemBranch);
+		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
+	}
 	public ItemBranch setEnable(Long itemBranchId, Boolean enable) {
 		return itemBranchRepository.findById(itemBranchId).map(itemBranch -> {
 			if (itemBranch.getBranch().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {

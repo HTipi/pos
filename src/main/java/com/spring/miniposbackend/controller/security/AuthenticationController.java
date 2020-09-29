@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.model.admin.User;
 import com.spring.miniposbackend.model.admin.UserRole;
 import com.spring.miniposbackend.model.security.JwtRequest;
@@ -44,7 +45,7 @@ public class AuthenticationController {
 	private String imagePath;
 
 	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-	public UserResponse createAuthenticationToken(@RequestBody JwtRequest authenticationRequest)
+	public SuccessResponse createAuthenticationToken(@RequestBody JwtRequest authenticationRequest)
 			throws AuthenticationException {
 
 		authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
@@ -59,7 +60,7 @@ public class AuthenticationController {
 		} catch (IOException e) {
 			image = null;
 		}
-		return new UserResponse(user,userRoles,image);
+		return new SuccessResponse("00", "login Successfully",new UserResponse(user,userRoles,image));
 	}
 
 	private void authenticate(String username, String password) throws AuthenticationException {

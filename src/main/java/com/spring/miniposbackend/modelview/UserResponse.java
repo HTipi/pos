@@ -54,4 +54,7 @@ public class UserResponse {
 	public List<UserRole> getRoles() {
 		return userRoles;
 	}
+	public Integer getBranchId() {
+		return branch.getId();
+	}
 }

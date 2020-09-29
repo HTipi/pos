@@ -26,20 +26,19 @@ public class SeatController {
 	private UserProfileUtil userProfile;
 
 	@GetMapping("by-branch")
-	@PreAuthorize("hasAnyRole('SALE','OWNER')")
 	public SuccessResponse getAll() {
 		return new SuccessResponse("00", "fetch Seat", seatService.showByBranchId(userProfile.getProfile().getBranch().getId()));
 	}
 
 	@PostMapping
-	@PreAuthorize("hasAnyRole('OWNER')")
+	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
 	public SuccessResponse create(@RequestBody Seat requestItem) {
 		return new SuccessResponse("00", "Seat create",
 				seatService.create(requestItem, userProfile.getProfile().getUser().getId()));
 	}
 
 	@PutMapping("{seatId}")
-	@PreAuthorize("hasAnyRole('OWNER')")
+	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
 	public SuccessResponse update(@PathVariable Integer seatId, @RequestBody Seat seat) {
 		return new SuccessResponse("00", "Seat updated",
 				seatService.update(seatId, seat, userProfile.getProfile().getUser().getId()));
@@ -47,7 +46,7 @@ public class SeatController {
 	}
 
 	@PatchMapping("delete/{seatId}")
-	@PreAuthorize("hasAnyRole('OWNER')")
+	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
 	public SuccessResponse delete(@PathVariable Integer seatId) {
 		return new SuccessResponse("00", "Seat disabled",
 				seatService.delete(seatId, userProfile.getProfile().getUser().getId()));

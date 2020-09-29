@@ -9,16 +9,21 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.exception.UnauthorizedException;
+import com.spring.miniposbackend.model.admin.Branch;
 import com.spring.miniposbackend.model.admin.Item;
+import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.modelview.ImageRequest;
 import com.spring.miniposbackend.modelview.ImageResponse;
+import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.admin.CorporateRepository;
 import com.spring.miniposbackend.repository.admin.ImageRepository;
+import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
 import com.spring.miniposbackend.repository.admin.ItemRepository;
 import com.spring.miniposbackend.repository.admin.ItemTypeRepository;
 import com.spring.miniposbackend.util.ImageUtil;
@@ -39,7 +44,11 @@ public class ItemService {
 	private UserProfileUtil userProfile;
 	@Autowired
 	ImageRepository imageRepository;
-
+	@Autowired
+	private ItemBranchRepository itemBranchRepository;
+	@Autowired
+	private BranchRepository branchRepository;
+	
 	@Value("${file.path.image.item}")
 	private String imagePath;
 
@@ -70,6 +79,7 @@ public class ItemService {
 		}).orElseThrow(() -> new ResourceNotFoundException("Image does not exist"));
 	}
 
+	@Transactional
 	public Item uploadImage(Long itemId, MultipartFile file) {
 		return itemRepository.findById(itemId).map(item -> {
 			if (file.isEmpty()) {
@@ -163,7 +173,34 @@ public class ItemService {
 			item.setStockOut(0L);
 			item.setItemType(itemType);
 			item.setEnable(true);
-			return itemRepository.save(item);
+			item = itemRepository.save(item);
+			List<Branch> branches = branchRepository.findAll();
+			branches.forEach((branch) -> {
+				List<Item> items = itemRepository.findByCorporateId(branch.getCorporate().getId());
+				items.forEach((itemb) -> {
+					Long itemId = itemb.getId();
+					Integer branchId = branch.getId();
+					Optional<ItemBranch> itemBranch = itemBranchRepository
+							.findFirstByBranchIdAndItemIdOrderByIdDesc(branchId, itemId);
+					if (!itemBranch.isPresent()) {
+						ItemBranch itemBr = new ItemBranch();
+						itemBr.setBranch(branch);
+						itemBr.setItem(itemb);
+						itemBr.setUseItemConfiguration(true);
+						itemBr.setEnable(false);
+						itemBr.setPrice(itemb.getPrice());
+						itemBr.setDiscount(itemBr.getDiscount());
+						itemBranchRepository.save(itemBr);
+					}
+//					else {
+//						itemBranch.get().setPrice(item.getPrice());
+//						itemBranch.get().setDiscount(item.getDiscount());
+//						itemBranchRepository.save(itemBranch.get());
+//						
+//					}
+				});
+			});
+			return item;
 		}).orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
 	}
 

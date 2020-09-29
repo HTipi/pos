@@ -25,11 +25,10 @@ public class BranchSettingController {
 	private UserProfileUtil userProfile;
 
 	@GetMapping("by-branch")
-	@PreAuthorize("hasAnyRole('OWNER','SALE')")
+	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
 	public SuccessResponse getByBranchId() {
 		return new SuccessResponse("00", "fetch Setting", branchSettingService.showByBranchId(userProfile.getProfile().getBranch().getId(), Optional.empty()));
 	}
-
 	@PatchMapping
 	@PreAuthorize("hasAnyRole('OWNER')")
 	public SuccessResponse modifyEnable(@RequestParam Integer branchId, @RequestParam Integer settingId,
@@ -38,6 +37,7 @@ public class BranchSettingController {
 				branchSettingService.updateEnable(branchId, settingId, enable));
 	}
 	@PatchMapping("{settingId}/set-value")
+	@PreAuthorize("hasAnyRole('BRANCH','OWNER')")
 	public SuccessResponse modifySettingValue(@PathVariable Integer settingId,
 			@RequestParam Boolean enable) {
 		return new SuccessResponse("00", "Record is updated",

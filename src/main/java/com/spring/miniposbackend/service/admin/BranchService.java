@@ -58,6 +58,14 @@ public class BranchService {
 		}).orElseThrow(() -> new ResourceNotFoundException("Corporate does not exist"));
 
 	}
+	public List<Branch> showByBranchId(Integer branchId, Optional<Boolean> enable) {
+		
+		if (enable.isPresent()) {
+			return branchRepository.findByBranchId(branchId, enable.get());
+		} else {
+			return branchRepository.findByBranchId(branchId);
+		}
+	}
     
     public Branch uploadImage(Integer branchId, MultipartFile file) {
 		return branchRepository.findById(branchId).map(branch -> {

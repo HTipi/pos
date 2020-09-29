@@ -52,14 +52,14 @@ public class ExpenseDashboardController {
 	}
 
 	@GetMapping("/branch/summary")
-	@PreAuthorize("hasAnyRole('USER','OWNER')")
+	@PreAuthorize("hasAnyRole('BRANCH','OWNER')")
 	public SuccessResponse branchSummaryDetail() {
 		getDate();
 		return new SuccessResponse("00", "fetch report", expenseDashboardService
 				.expenseSummaryByBranchId(userProfile.getProfile().getBranch().getId(), startMonth, startWeek, today));
 	}
 	@GetMapping("/expense-type/summary")
-	@PreAuthorize("hasAnyRole('USER','OWNER')")
+	@PreAuthorize("hasAnyRole('BRANCH','OWNER')")
 	public SuccessResponse expenseTypeSummaryDetail(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to) {
 		return new SuccessResponse("00", "fetch report", expenseDashboardService
@@ -67,7 +67,7 @@ public class ExpenseDashboardController {
 	}
 
 	@GetMapping("/detail")
-	@PreAuthorize("hasAnyRole('SALE','OWNER')")
+	@PreAuthorize("hasAnyRole('BRANCH','OWNER')")
 	public SuccessResponse expenseDetail(@RequestParam Integer page, @RequestParam Integer length,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to) {

@@ -28,25 +28,25 @@ public class StockEntryController {
 	private StockEntryService stockEntryService;
 	
 	@PostMapping("{stockId}")
-	@PreAuthorize("hasAnyRole('OWNER')")
+	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
 	public SuccessResponse create(@PathVariable Long stockId,@RequestBody List<StockEntryRequest> stockEntries){
 		return new SuccessResponse("00", "create StockEntry", stockEntryService.create(stockId, stockEntries));
 	}
 	
 	@PutMapping("{stockEntryId}")
-	@PreAuthorize("hasAnyRole('OWNER')")
+	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
 	public StockEntry update(@PathVariable Long stockEntryId,@RequestBody StockEntryRequest stockEntry){
 		return stockEntryService.update(stockEntryId, stockEntry);
 	}
 	
 	@DeleteMapping("{stockEntryId}")
-	@PreAuthorize("hasAnyRole('OWNER')")
+	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
 	public SuccessResponse delete(@PathVariable Long stockEntryId) {
 		return new SuccessResponse("00", "fetch StockEntry",stockEntryService.delete(stockEntryId));
 	}
 	
 	@GetMapping("get-by-stock-id/{stockId}")
-	@PreAuthorize("hasAnyRole('OWNER')")
+	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
 	SuccessResponse getByStockId(@PathVariable Long stockId,@RequestParam Optional<Boolean> posted){
 		return new SuccessResponse("00", "fetch StockEntry", stockEntryService.showByStockId(stockId,posted));
 	}

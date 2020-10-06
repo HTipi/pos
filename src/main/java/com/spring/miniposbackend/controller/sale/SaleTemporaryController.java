@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.spring.miniposbackend.exception.InternalErrorException;
 import com.spring.miniposbackend.model.SuccessResponse;
+import com.spring.miniposbackend.repository.admin.BranchSettingRepository;
 import com.spring.miniposbackend.service.sale.SaleTemporaryService;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
@@ -29,48 +30,63 @@ public class SaleTemporaryController {
 	private SaleTemporaryService saleService;
 	@Autowired
 	private UserProfileUtil userProfile;
-	
+	@Autowired
+	private BranchSettingRepository branchSettingRepository;
+
 	@GetMapping("by-seat")
 	@PreAuthorize("hasAnyRole('SALE')")
-	public SuccessResponse getBySeatId(@RequestParam Integer seatId, @RequestParam Optional<Boolean> isPrinted,@RequestParam Optional<Boolean> cancel){
-		return new SuccessResponse("00", "fetch Sale Tmp by Seat", saleService.showBySeatId(seatId, isPrinted,cancel));
+	public SuccessResponse getBySeatId(@RequestParam Integer seatId, @RequestParam Optional<Boolean> isPrinted,
+			@RequestParam Optional<Boolean> cancel) {
+		return new SuccessResponse("00", "fetch Sale Tmp by Seat", saleService.showBySeatId(seatId, isPrinted, cancel));
 	}
 
 	@GetMapping("by-user")
 	@PreAuthorize("hasAnyRole('SALE')")
-	public SuccessResponse getByUserId(@RequestParam Optional<Boolean> isPrinted,@RequestParam Optional<Boolean> cancel){
-		
-		return new SuccessResponse("00", "fetch Sale Tmp by User",saleService.showByUserId(userProfile.getProfile().getUser().getId(), isPrinted,cancel));
+	public SuccessResponse getByUserId(@RequestParam Optional<Boolean> isPrinted,
+			@RequestParam Optional<Boolean> cancel, @RequestParam boolean OBU) {
+
+		return new SuccessResponse("00", "fetch Sale Tmp by User",
+				saleService.showByUserId(userProfile.getProfile().getUser().getId(), isPrinted, cancel, OBU));
 	}
-	
+
 	@PostMapping
 	@PreAuthorize("hasAnyRole('SALE')")
-	public SuccessResponse create(@RequestBody List<Map<String, Integer>> requestItem) {
-		return new SuccessResponse("00", "add SaleTmp", saleService.addItem(requestItem));
+	public SuccessResponse create(@RequestBody List<Map<String, Integer>> requestItem, @RequestParam boolean OBU) {
+		String val = "false";
+		if (OBU)
+			val = "true";
+		String setting = branchSettingRepository.findByOBU(userProfile.getProfile().getBranch().getId()).orElse("");
+		if (val == setting)
+			return new SuccessResponse("00", "add SaleTmp",
+					saleService.addItem(requestItem, OBU, userProfile.getProfile().getUser().getId()));
+		else
+			throw new InternalErrorException("Setting was updated, Please restart!", "12");
 	}
-	
+
 	@DeleteMapping("item/{saleTempId}")
 	@PreAuthorize("hasAnyRole('SALE')")
-	public SuccessResponse remove(@PathVariable Long saleTempId,@RequestParam(value = "seatId") Integer seatId){
-		return new SuccessResponse("00", "remove SaleTmp", saleService.removeItem(saleTempId,seatId));
+	public SuccessResponse remove(@PathVariable Long saleTempId, @RequestParam(value = "seatId") Integer seatId) {
+		return new SuccessResponse("00", "remove SaleTmp", saleService.removeItem(saleTempId, seatId));
 	}
-	
-	
+
 	@PatchMapping("qty/{saleTempId}")
 	@PreAuthorize("hasAnyRole('SALE')")
-	public SuccessResponse updateQuantity(@PathVariable Long saleTempId, @RequestParam(value = "quantity") Short quantity,@RequestParam(value = "seatId") Integer seatId) {
-		return new SuccessResponse("00", "update QTY", saleService.setQuantity(saleTempId, quantity,seatId));
+	public SuccessResponse updateQuantity(@PathVariable Long saleTempId,
+			@RequestParam(value = "quantity") Short quantity, @RequestParam(value = "seatId") Integer seatId) {
+		return new SuccessResponse("00", "update QTY",
+				saleService.setQuantity(saleTempId, quantity, seatId, userProfile.getProfile().getUser().getId()));
 	}
+
 	@PatchMapping("{seatId}")
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse printBySeat(@PathVariable Integer seatId) {
 		try {
-			return new SuccessResponse("00", "do Print",saleService.printBySeat(seatId));
+			return new SuccessResponse("00", "do Print", saleService.printBySeat(seatId));
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new InternalErrorException("prin SaleTmp Failed","04");
+			throw new InternalErrorException("print SaleTmp Failed", "04");
 		}
-		
+
 	}
-	
+
 }

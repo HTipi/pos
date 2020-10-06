@@ -1,11 +1,13 @@
 package com.spring.miniposbackend.service.admin;
 
+import com.spring.miniposbackend.exception.InternalErrorException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.model.admin.BranchSetting;
 import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.admin.BranchSettingRepository;
 import com.spring.miniposbackend.repository.admin.SettingRepository;
+import com.spring.miniposbackend.repository.sale.SaleTemporaryRepository;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,8 @@ public class BranchSettingService {
 	private BranchRepository branchRepository;
 	@Autowired
 	private UserProfileUtil userProfile;
+	@Autowired
+	private SaleTemporaryRepository saleTemporaryRepository;
 
 	@Transactional
 	public BranchSetting delete(Integer branchSettingId, Integer branchId, Integer settingId) {
@@ -60,10 +64,24 @@ public class BranchSettingService {
 			return settingBranchRepository.save(branchSetting);
 		}).orElseThrow(() -> new ResourceNotFoundException("Record does not exist", "01"));
 	}
+
 	public BranchSetting updateSettingValue(Integer branchId, Integer settingId, boolean enable) {
 		return settingBranchRepository.findFirstByBranchIdAndSettingId(branchId, settingId).map((branchSetting) -> {
+			String settingVal = "false";
+			if (enable) {
+				settingVal = "true";
+			}
+			if (settingVal == branchSetting.getSettingValue()) {
+
+				return branchSetting;
+			}
+			int saleTmp;
+			saleTmp = saleTemporaryRepository.findByBranchId(branchId).orElse(0);
+			if (saleTmp > 0) {
+				throw new InternalErrorException("Pending Ordered", "11");
+			}
 			String val = "true";
-			if(!enable)
+			if (!enable)
 				val = "false";
 			branchSetting.setSettingValue(val);
 			return settingBranchRepository.save(branchSetting);

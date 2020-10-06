@@ -9,10 +9,12 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.spring.miniposbackend.exception.BadRequestException;
 import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.exception.UnprocessableEntityException;
+import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.model.admin.StockType;
 import com.spring.miniposbackend.model.stock.StockEntry;
 import com.spring.miniposbackend.modelview.StockEntryRequest;
@@ -31,7 +33,8 @@ public class StockEntryService {
 	private StockEntryRepository stockEntryRepository;
 	@Autowired
 	private UserProfileUtil userProfile;
-	@Autowired ItemBranchRepository itemBranchRepository;
+	@Autowired
+	ItemBranchRepository itemBranchRepository;
 
 	@Autowired
 	private UserRepository userRepository;
@@ -46,7 +49,7 @@ public class StockEntryService {
 	}
 
 	@Transactional
-	public List<StockEntry> create(Long stockId,List<StockEntryRequest> stockEntries) {
+	public List<StockEntry> create(Long stockId, List<StockEntryRequest> stockEntries) {
 		return stockRepository.findById(stockId).map((stock) -> {
 			StockType stockType = stock.getStockType();
 			if (stockType.getCode().compareTo("STOCK-IN") == 0) {
@@ -57,6 +60,16 @@ public class StockEntryService {
 				if (stock.getBranch().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
 					throw new UnauthorizedException("Corporate is unauthorized");
 				}
+				stockEntries.forEach((entries) -> {
+					ItemBranch itemBr = itemBranchRepository.findById(entries.getItemId())
+							.orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
+					int stockEntry = 0;
+					stockEntry = stockEntryRepository.findByItemBranchId(itemBr.getId(), stockId).orElse(0);
+					int stockBalance = entries.getQuantity() + stockEntry;
+					if (itemBr.getItemBalance() < stockBalance) {
+						throw new ResourceNotFoundException("QTY is greater than StockBalance", "09");
+					}
+				});
 			}
 			if (stock.isPosted()) {
 				throw new ConflictException("Stock transaction is already posted");
@@ -67,22 +80,23 @@ public class StockEntryService {
 					if (stockEntryRequest.getQuantity() < 1) {
 						throw new UnprocessableEntityException("Quantity must be greater than 0");
 					}
-					StockEntry stockEntry = itemBranchRepository.findById(stockEntryRequest.getItemId()).map((itemBranch) -> {
-						if (itemBranch.getItem().getItemType().getCorporate().getId() != userProfile.getProfile().getCorporate()
-								.getId()) {
-							throw new UnauthorizedException("Item is unauthorized");
-						}
-						StockEntry stockEnt = new StockEntry();
-						stockEnt.setStockType(stockType);
-						stockEnt.setValueDate(stock.getValueDate());
-						stockEnt.setItemBranch(itemBranch);
-						stockEnt.setPrice(stockEntryRequest.getPrice());
-						stockEnt.setQuantity(stockEntryRequest.getQuantity());
-						stockEnt.setBranch(stock.getBranch());
-						stockEnt.setUser(user);
-						stockEnt.setStock(stock);
-						return stockEntryRepository.save(stockEnt);
-					}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
+					StockEntry stockEntry = itemBranchRepository.findById(stockEntryRequest.getItemId())
+							.map((itemBranch) -> {
+								if (itemBranch.getItem().getItemType().getCorporate().getId() != userProfile
+										.getProfile().getCorporate().getId()) {
+									throw new UnauthorizedException("Item is unauthorized");
+								}
+								StockEntry stockEnt = new StockEntry();
+								stockEnt.setStockType(stockType);
+								stockEnt.setValueDate(stock.getValueDate());
+								stockEnt.setItemBranch(itemBranch);
+								stockEnt.setPrice(stockEntryRequest.getPrice());
+								stockEnt.setQuantity(stockEntryRequest.getQuantity());
+								stockEnt.setBranch(stock.getBranch());
+								stockEnt.setUser(user);
+								stockEnt.setStock(stock);
+								return stockEntryRepository.save(stockEnt);
+							}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 					entries.add(stockEntry);
 				});
 				return entries;
@@ -107,7 +121,8 @@ public class StockEntryService {
 				throw new ConflictException("Stock transaction is already posted");
 			}
 			return itemBranchRepository.findById(stockEntryRequest.getItemId()).map((itemBranch) -> {
-				if (itemBranch.getItem().getItemType().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
+				if (itemBranch.getItem().getItemType().getCorporate().getId() != userProfile.getProfile().getCorporate()
+						.getId()) {
 					throw new UnauthorizedException("Item is unauthorized");
 				}
 				stockEntry.setItemBranch(itemBranch);

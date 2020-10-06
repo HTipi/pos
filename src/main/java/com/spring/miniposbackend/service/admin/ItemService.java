@@ -185,7 +185,13 @@ public class ItemService {
 						itemBr.setBranch(branch);
 						itemBr.setItem(itemb);
 						itemBr.setUseItemConfiguration(true);
-						itemBr.setEnable(false);
+						if(branchId==userProfile.getProfile().getBranch().getId()) {
+							itemBr.setEnable(true);
+						}
+						else
+						{
+							itemBr.setEnable(false);
+						}
 						itemBr.setStockIn(0L);
 						itemBr.setStockOut(0L);
 						itemBr.setPrice(itemb.getPrice());

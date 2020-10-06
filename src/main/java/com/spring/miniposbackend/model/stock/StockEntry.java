@@ -85,4 +85,7 @@ public class StockEntry extends AuditModel{
 	public String getStockCode() {
 		return stockType.getCode();
 	}
+	public Long getItemId() {
+		return itemBranch.getId();
+	}
 }

@@ -1,6 +1,7 @@
 package com.spring.miniposbackend.controller.admin;
 
 import com.spring.miniposbackend.model.SuccessResponse;
+import com.spring.miniposbackend.repository.sale.SaleTemporaryRepository;
 import com.spring.miniposbackend.service.admin.BranchSettingService;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
@@ -25,7 +26,6 @@ public class BranchSettingController {
 	private UserProfileUtil userProfile;
 
 	@GetMapping("by-branch")
-	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
 	public SuccessResponse getByBranchId() {
 		return new SuccessResponse("00", "fetch Setting", branchSettingService.showByBranchId(userProfile.getProfile().getBranch().getId(), Optional.empty()));
 	}
@@ -44,3 +44,5 @@ public class BranchSettingController {
 				branchSettingService.updateSettingValue(userProfile.getProfile().getBranch().getId(), settingId, enable));
 	}
 }
+
+

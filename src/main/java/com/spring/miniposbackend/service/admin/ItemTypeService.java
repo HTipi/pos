@@ -179,7 +179,6 @@ public class ItemTypeService {
 			}
 			itemType.setName(requestItemType.getName());
 			itemType.setNameKh(requestItemType.getNameKh());
-			itemType.setEnable(requestItemType.isEnable());
 			return itemTypeRepository.save(itemType);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
 	}

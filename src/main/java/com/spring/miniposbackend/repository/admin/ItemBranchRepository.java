@@ -17,5 +17,8 @@ public interface ItemBranchRepository extends  JpaRepository<ItemBranch, Long>{
 	List<ItemBranch> findByItemId(Long itemId);
 	@Query(value = "select ib from ItemBranch ib where ib.item.id = ?1 and ib.enable= ?2")
 	List<ItemBranch> findByItemId(Long itemId, boolean enable);
+	@Query(value = "select ib from ItemBranch ib where ib.item.id = ?1 and ib.branch.isMain =false")
+	List<ItemBranch> findByItemCheckListId(Long itemId);
+	
 	Optional<ItemBranch> findFirstByBranchIdAndItemIdOrderByIdDesc(Integer branchId, Long itemId);
 }

@@ -65,7 +65,7 @@ public class SaleTemporary extends AuditModel {
     private boolean cancel;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "seat_id", nullable = false)
+    @JoinColumn(name = "seat_id", nullable = true)
     @JsonIgnore
     private Seat seat;
 

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.model.admin.Branch;
@@ -18,16 +19,19 @@ import com.spring.miniposbackend.model.admin.Item;
 import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.modelview.ImageRequest;
 import com.spring.miniposbackend.modelview.ImageResponse;
+import com.spring.miniposbackend.modelview.ItemBranchCheckList;
 import com.spring.miniposbackend.modelview.ItemBranchUpdate;
 import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
 import com.spring.miniposbackend.repository.admin.ItemRepository;
+import com.spring.miniposbackend.repository.sale.SaleTemporaryRepository;
 import com.spring.miniposbackend.util.ImageUtil;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
 @Service
 public class ItemBranchService {
-
+	@Autowired
+	private SaleTemporaryRepository saleTemporaryRepository;
 	@Autowired
 	private ItemBranchRepository itemBranchRepository;
 	@Autowired
@@ -50,6 +54,27 @@ public class ItemBranchService {
 		}
 	}
 
+	public List<ItemBranch> showByItemCheckListId(Long itemId) {
+
+		return itemBranchRepository.findByItemCheckListId(itemId);
+	}
+
+	public List<ItemBranch> doCheckList(List<ItemBranchCheckList> checkList){
+		List<ItemBranch> itemList = new ArrayList<ItemBranch>();
+		checkList.forEach((item) -> {
+			ItemBranch itemBr =  itemBranchRepository.findById(item.getItemBranchId()).orElseThrow(() -> new ResourceNotFoundException("ItemBranch does not exist"));
+			if(itemBr.getItemBalance()>0) {
+				throw new ConflictException("We still have the item in stock", "10");
+			}
+			 if(saleTemporaryRepository.existsByItemId(itemBr.getId())) {
+				 throw new ConflictException("The item is pending ordered", "11");
+			 }
+			itemBr.setEnable(item.isEnable());
+			itemBranchRepository.save(itemBr);
+			itemList.add(itemBr);
+		});
+		return itemList;
+	}
 	public List<ItemBranch> showByBranchId(Integer branchId, Optional<Boolean> enable) {
 		return branchRepository.findById(branchId).map(branch -> {
 			if (branch.getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
@@ -171,19 +196,22 @@ public class ItemBranchService {
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
 
-	public ItemBranch setPrice(Long itemBranchId, BigDecimal price,Short discount) {
+	public ItemBranch setPrice(Long itemBranchId, BigDecimal price, Short discount) {
 		return itemBranchRepository.findById(itemBranchId).map(itemBranch -> {
+			System.out.print(price);
 			itemBranch.setPrice(price);
 			itemBranch.setDiscount(discount);
 			return itemBranchRepository.save(itemBranch);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
+
 	public ItemBranch setDiscount(Long itemBranchId, Short discount) {
 		return itemBranchRepository.findById(itemBranchId).map(itemBranch -> {
 			itemBranch.setDiscount(discount);
 			return itemBranchRepository.save(itemBranch);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
+
 	public ItemBranch setEnable(Long itemBranchId, Boolean enable) {
 		return itemBranchRepository.findById(itemBranchId).map(itemBranch -> {
 			if (itemBranch.getBranch().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {

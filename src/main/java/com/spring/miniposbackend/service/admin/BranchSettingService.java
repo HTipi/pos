@@ -1,5 +1,6 @@
 package com.spring.miniposbackend.service.admin;
 
+import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.InternalErrorException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.exception.UnauthorizedException;
@@ -78,7 +79,7 @@ public class BranchSettingService {
 			int saleTmp;
 			saleTmp = saleTemporaryRepository.findByBranchId(branchId).orElse(0);
 			if (saleTmp > 0) {
-				throw new InternalErrorException("Pending Ordered", "11");
+				throw new ConflictException("Pending Ordered", "11");
 			}
 			String val = "true";
 			if (!enable)

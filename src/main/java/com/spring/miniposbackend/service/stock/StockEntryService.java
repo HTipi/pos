@@ -78,7 +78,7 @@ public class StockEntryService {
 			return userRepository.findById(userProfile.getProfile().getUser().getId()).map((user) -> {
 				stockEntries.forEach((stockEntryRequest) -> {
 					if (stockEntryRequest.getQuantity() < 1) {
-						throw new UnprocessableEntityException("Quantity must be greater than 0");
+						throw new ConflictException("Quantity must be greater than 0");
 					}
 					StockEntry stockEntry = itemBranchRepository.findById(stockEntryRequest.getItemId())
 							.map((itemBranch) -> {

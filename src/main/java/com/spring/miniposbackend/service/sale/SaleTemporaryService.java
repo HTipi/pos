@@ -82,7 +82,7 @@ public class SaleTemporaryService {
 							int itembalance = saleRepository.findItemBalanceByUserId(userId, item.getId()).orElse(0);
 							if (item.getItemBalance() < (quantity + itembalance)) {
 
-								throw new InternalErrorException("QTY is greater than StockBalance", "09");
+								throw new ConflictException("QTY is greater than StockBalance", "09");
 							}
 							SaleTemporary sale = new SaleTemporary();
 							sale.setItemBranch(item);
@@ -111,7 +111,7 @@ public class SaleTemporaryService {
 								int itembalance = saleRepository.findItemBalanceByUserId(userId, item.getId()).orElse(0);
 								if (item.getItemBalance() < (quantity + itembalance)) {
 
-									throw new InternalErrorException("QTY is greater than StockBalance", "09");
+									throw new ConflictException("QTY is greater than StockBalance", "09");
 								}
 								SaleTemporary sale = new SaleTemporary();
 								sale.setSeat(seat);
@@ -183,7 +183,7 @@ public class SaleTemporaryService {
 			int itembalance = saleRepository.findItemBalanceByUserId(userId, sale.getItemBranch().getId()).orElse(0);
 			if (sale.getItemBranch().getItemBalance() < (quantity + itembalance)) {
 
-				throw new InternalErrorException("QTY is greater than StockBalance", "09");
+				throw new ConflictException("QTY is greater than StockBalance", "09");
 			}
 			ItemBranch itemBranch = sale.getItemBranch();
 			if ((itemBranch.getBranch().getId() != userProfile.getProfile().getBranch().getId())
@@ -211,7 +211,7 @@ public class SaleTemporaryService {
 			});
 			return true;
 		} catch (Exception ex) {
-			throw new InternalErrorException("prin SaleTmp Failed", "04");
+			throw new ConflictException("prin SaleTmp Failed", "04");
 		}
 	}
 

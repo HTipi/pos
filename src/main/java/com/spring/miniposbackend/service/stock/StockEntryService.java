@@ -94,6 +94,8 @@ public class StockEntryService {
 								stockEnt.setQuantity(stockEntryRequest.getQuantity());
 								stockEnt.setBranch(stock.getBranch());
 								stockEnt.setUser(user);
+								stockEnt.setDiscount(stockEntryRequest.getDiscount());
+								stockEnt.setTotal(stockEntryRequest.getTotal());
 								stockEnt.setStock(stock);
 								return stockEntryRepository.save(stockEnt);
 							}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));

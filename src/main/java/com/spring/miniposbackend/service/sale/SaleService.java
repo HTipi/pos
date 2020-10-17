@@ -11,6 +11,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.model.admin.Branch;
@@ -80,6 +81,9 @@ public class SaleService {
 				.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
 		Seat seat = null;
 		String seatName = "";
+		List<SaleDetail> listsales;
+		Sale saleResult;
+		Sale sale;
 		if (!OBU) {
 			seat = seatRepository.findById(seatId)
 					.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
@@ -88,40 +92,82 @@ public class SaleService {
 				throw new UnauthorizedException("Transaction is unauthorized");
 			}
 			seatName = seat.getName();
+
+			List<SaleTemporary> saleTemps = saleTemporaryRepository.findBySeatId(seatId);
+			if (saleTemps.size() == 0) {
+				throw new ResourceNotFoundException("Seat not found");
+			}
+			sale = new Sale();
+			listsales = new ArrayList<>();
+			sale.setBranch(branch);
+			sale.setUser(user);
+			sale.setSeatName(seatName);
+			sale.setTotal(0.00);
+			sale.setReceiptNumber("0");
+			sale.setValueDate(new Date());
+			saleResult = saleRepository.save(sale);
+			saleTemps.forEach((saleTemp) -> {
+
+				SaleDetail saleDeail = new SaleDetail();
+				ItemBranch item = itemRepository.findById(saleTemp.getItemId())
+						.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
+				saleDeail.setItemBranch(item);
+				saleDeail.setBranch(branch);
+				saleDeail.setUser(user);
+				saleDeail.setSale(saleResult);
+				saleDeail.setValueDate(new Date());
+				saleDeail.setDiscount(saleTemp.getDiscountAmount());
+				saleDeail.setPrice(saleTemp.getPrice());
+				saleDeail.setQuantity(saleTemp.getQuantity());
+				saleDeail.setTotal(saleTemp.getTotal());
+
+				listsales.add(saleDetailRepository.save(saleDeail));
+
+			});
+			saleTemporaryRepository.deleteBySeatId(seatId);
+		} else {
+			List<SaleTemporary> saleTemps = saleTemporaryRepository.findByUserId(userId);
+			if (saleTemps.size() == 0) {
+				throw new ResourceNotFoundException("Record not found");
+			}
+			sale = new Sale();
+			listsales = new ArrayList<>();
+			sale.setBranch(branch);
+			sale.setUser(user);
+			sale.setSeatName(seatName);
+			sale.setTotal(0.00);
+			sale.setReceiptNumber("0");
+			sale.setValueDate(new Date());
+			saleResult = saleRepository.save(sale);
+			saleTemps.forEach((saleTemp) -> {
+
+				SaleDetail saleDeail = new SaleDetail();
+				ItemBranch item = itemRepository.findById(saleTemp.getItemId())
+						.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
+				if (item.isStock()) {
+					int itembalance = saleTemporaryRepository.findItemBalanceByUserId(userId, item.getId())
+							.orElse(0);
+					if (item.getItemBalance() < itembalance) {
+
+						throw new ConflictException("QTY is greater than StockBalance", "09");
+					}
+				}
+				saleDeail.setItemBranch(item);
+				saleDeail.setBranch(branch);
+				saleDeail.setUser(user);
+				saleDeail.setSale(saleResult);
+				saleDeail.setValueDate(new Date());
+				saleDeail.setDiscount(saleTemp.getDiscountAmount());
+				saleDeail.setPrice(saleTemp.getPrice());
+				saleDeail.setQuantity(saleTemp.getQuantity());
+				saleDeail.setTotal(saleTemp.getTotal());
+
+				listsales.add(saleDetailRepository.save(saleDeail));
+				item.setStockOut(item.getStockOut()+saleTemp.getQuantity());
+				itemRepository.save(item);
+			});
+			saleTemporaryRepository.deleteByUserId(userId);
 		}
-
-		List<SaleTemporary> saleTemps = saleTemporaryRepository.findBySeatId(seatId);
-		if (saleTemps.size() == 0) {
-			throw new ResourceNotFoundException("Seat not found");
-		}
-		final Sale sale = new Sale();
-		List<SaleDetail> listsales = new ArrayList<>();
-		sale.setBranch(branch);
-		sale.setUser(user);
-		sale.setSeatName(seatName);
-		sale.setTotal(0.00);
-		sale.setReceiptNumber("0");
-		sale.setValueDate(new Date());
-		final Sale saleResult = saleRepository.save(sale);
-		saleTemps.forEach((saleTemp) -> {
-
-			SaleDetail saleDeail = new SaleDetail();
-			ItemBranch item = itemRepository.findById(saleTemp.getItemId())
-					.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
-			saleDeail.setItemBranch(item);
-			saleDeail.setBranch(branch);
-			saleDeail.setUser(user);
-			saleDeail.setSale(saleResult);
-			saleDeail.setValueDate(new Date());
-			saleDeail.setDiscount(saleTemp.getDiscountAmount());
-			saleDeail.setPrice(saleTemp.getPrice());
-			saleDeail.setQuantity(saleTemp.getQuantity());
-			saleDeail.setTotal(saleTemp.getTotal());
-
-			listsales.add(saleDetailRepository.save(saleDeail));
-
-		});
-		saleTemporaryRepository.deleteBySeatId(seatId);
 		double sum = 0.00;
 		for (int i = 0; i < listsales.size(); i++) {
 			sum += listsales.get(i).getTotal();

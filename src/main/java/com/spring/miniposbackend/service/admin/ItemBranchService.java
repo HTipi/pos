@@ -59,22 +59,24 @@ public class ItemBranchService {
 		return itemBranchRepository.findByItemCheckListId(itemId);
 	}
 
-	public List<ItemBranch> doCheckList(List<ItemBranchCheckList> checkList){
+	public List<ItemBranch> doCheckList(List<ItemBranchCheckList> checkList) {
 		List<ItemBranch> itemList = new ArrayList<ItemBranch>();
 		checkList.forEach((item) -> {
-			ItemBranch itemBr =  itemBranchRepository.findById(item.getItemBranchId()).orElseThrow(() -> new ResourceNotFoundException("ItemBranch does not exist"));
-			if(itemBr.getItemBalance()>0) {
+			ItemBranch itemBr = itemBranchRepository.findById(item.getItemBranchId())
+					.orElseThrow(() -> new ResourceNotFoundException("ItemBranch does not exist"));
+			if (itemBr.getItemBalance() > 0) {
 				throw new ConflictException("We still have the item in stock", "10");
 			}
-			 if(saleTemporaryRepository.existsByItemId(itemBr.getId())) {
-				 throw new ConflictException("The item is pending ordered", "11");
-			 }
+			if (saleTemporaryRepository.existsByItemId(itemBr.getId())) {
+				throw new ConflictException("The item is pending ordered", "11");
+			}
 			itemBr.setEnable(item.isEnable());
 			itemBranchRepository.save(itemBr);
 			itemList.add(itemBr);
 		});
 		return itemList;
 	}
+
 	public List<ItemBranch> showByBranchId(Integer branchId, Optional<Boolean> enable) {
 		return branchRepository.findById(branchId).map(branch -> {
 			if (branch.getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {

@@ -15,7 +15,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-
 import com.spring.miniposbackend.model.AuditModel;
 import com.spring.miniposbackend.model.admin.User;
 import org.hibernate.annotations.ColumnDefault;
@@ -36,90 +35,95 @@ public class SaleTemporary extends AuditModel {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
-    private Long id;
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name = "id", nullable = false)
+	private Long id;
 
-    @Column(name = "value_date", nullable = false, updatable = false)
-    private Date valueDate;
+	@Column(name = "value_date", nullable = false, updatable = false)
+	private Date valueDate;
 
-    @Column(name = "price", nullable = false, precision = 10, scale = 2)
-    private BigDecimal price;
+	@Column(name = "price", nullable = false, precision = 10, scale = 2)
+	private BigDecimal price;
 
-    @Column(name = "quantity", nullable = false)
-    @ColumnDefault("1")
-    private Short quantity;
+	@Column(name = "quantity", nullable = false)
+	@ColumnDefault("1")
+	private Short quantity;
 
-    @Column(name = "discount", nullable = false)
-    @Min(0)
-    @Max(100)
-    @ColumnDefault("0")
-    private Short discount;
+	@Column(name = "discount", nullable = false, precision = 10, scale = 2)
+	@Min(0)
+	@Max(100)
+	@ColumnDefault("0")
+	private Short discount;
 
-    @Column(name = "is_printed", nullable = false)
-    @ColumnDefault("false")
-    private boolean isPrinted;
+	@Column(name = "is_printed", nullable = false)
+	@ColumnDefault("false")
+	private boolean isPrinted;
 
-    @Column(name = "cancel", nullable = false)
-    @ColumnDefault("false")
-    private boolean cancel;
+	@Column(name = "cancel", nullable = false)
+	@ColumnDefault("false")
+	private boolean cancel;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "seat_id", nullable = true)
-    @JsonIgnore
-    private Seat seat;
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "seat_id", nullable = true)
+	@JsonIgnore
+	private Seat seat;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", nullable = false)
-    @JsonIgnore
-    private User user;
-    
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "useredit_id", nullable = false)
-    @JsonIgnore
-    private User userEdit;
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "user_id", nullable = false)
+	@JsonIgnore
+	private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "item_branch_id", nullable = false)
-    @JsonIgnore
-    private ItemBranch itemBranch;
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "useredit_id", nullable = false)
+	@JsonIgnore
+	private User userEdit;
 
-    public String getItemCode() {
-        return itemBranch.getCode();
-    }
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "item_branch_id", nullable = false)
+	@JsonIgnore
+	private ItemBranch itemBranch;
 
-    public String getItemName() {
-        return itemBranch.getName();
-    }
+	public String getItemCode() {
+		return itemBranch.getCode();
+	}
 
-    public Long getItemId() {
-        return itemBranch.getId();
-    }
+	public String getItemName() {
+		return itemBranch.getName();
+	}
 
-    public Integer getSeat_id() {
-        return seat.getId();
-    }
-    public String getSeat_name() {
-    	return seat.getName();
-    }
+	public Long getItemId() {
+		return itemBranch.getId();
+	}
 
-    public Integer getUser_id() {
-        return user.getId();
-    }
-    
-    public Integer getUseredit_id() {
-        return userEdit.getId();
-    }
+	public Integer getSeat_id() {
+		if (seat == null)
+			return 0;
+		return seat.getId();
+	}
 
-    public double getDiscountAmount() {
-        return Math.round(price.doubleValue() * quantity * discount / 100 * 100) / 100.0;
-    }
+	public String getSeat_name() {
+		if (seat == null)
+			return "";
+		return seat.getName();
+	}
 
-    public double getSubTotal() {
-        return Math.round(price.doubleValue() * quantity * 100) / 100.0;
-    }
+	public Integer getUser_id() {
+		return user.getId();
+	}
 
-    public double getTotal() {
-        return getSubTotal() - getDiscountAmount();
-    }
+	public Integer getUseredit_id() {
+		return userEdit.getId();
+	}
+
+	public double getDiscountAmount() {
+		return Math.round(price.doubleValue() * quantity * discount / 100 * 100) / 100.0;
+	}
+
+	public double getSubTotal() {
+		return Math.round(price.doubleValue() * quantity * 100) / 100.0;
+	}
+
+	public double getTotal() {
+		return getSubTotal() - getDiscountAmount();
+	}
 }

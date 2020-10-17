@@ -52,6 +52,10 @@ public class StockEntry extends AuditModel{
 	
 	@Column(name = "price", nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
+	
+	@Column(name = "discount", nullable = false, precision = 10, scale = 2)
+	@ColumnDefault("0")
+    private Double discount;
 
     @Column(name = "quantity", nullable = false)
     @ColumnDefault("1")
@@ -61,7 +65,10 @@ public class StockEntry extends AuditModel{
     @JoinColumn(name = "stock_id", nullable = false)
     @JsonIgnore
     private Stock stock;
-
+    
+    @Column(name = "total", nullable = true, precision = 10, scale = 2)
+    private BigDecimal total;
+    
 	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "branch_id", nullable = false)
     @JsonIgnore

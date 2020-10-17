@@ -58,6 +58,9 @@ public class StockPost extends AuditModel{
     @ColumnDefault("1")
     private Short quantity;
     
+    @Column(name = "stock_balance", nullable = false)
+    private Long stockBalance;
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stock_id", nullable = false)
     @JsonIgnore

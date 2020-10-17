@@ -65,7 +65,6 @@ public class ExpenseDashboardController {
 		return new SuccessResponse("00", "fetch report", expenseDashboardService
 				.expenseTypeSummaryByBranchId(userProfile.getProfile().getBranch().getId(), from, to));
 	}
-
 	@GetMapping("/detail")
 	@PreAuthorize("hasAnyRole('BRANCH','OWNER')")
 	public SuccessResponse expenseDetail(@RequestParam Integer page, @RequestParam Integer length,

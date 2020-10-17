@@ -62,9 +62,11 @@ public class SaleTemporaryService {
 			}
 		}
 		requestItems.forEach((requestItem) -> {
+			Long saleTmpId = requestItem.get("saleTmpId").longValue();
 			Integer seatId = requestItem.get("seatId");
 			Long itemId = requestItem.get("itemId").longValue();
 			Short quantity = requestItem.get("quantity").shortValue();
+			Short discount = requestItem.get("discount").shortValue();
 			if (quantity < 1) {
 				throw new UnprocessableEntityException("Quantity must be greater than 0");
 			}
@@ -79,22 +81,36 @@ public class SaleTemporaryService {
 									|| !item.isEnable()) {
 								throw new UnauthorizedException("Item is unauthorized");
 							}
-							int itembalance = saleRepository.findItemBalanceByUserId(userId, item.getId()).orElse(0);
-							if (item.getItemBalance() < (quantity + itembalance)) {
+							if (item.isStock()) {
+								int itembalance = saleRepository.findItemBalanceByUserId(userId, item.getId())
+										.orElse(0);
+								if (item.getItemBalance() < (quantity + itembalance)) {
 
-								throw new ConflictException("QTY is greater than StockBalance", "09");
+									throw new ConflictException("QTY is greater than StockBalance", "09");
+								}
 							}
-							SaleTemporary sale = new SaleTemporary();
-							sale.setItemBranch(item);
-							sale.setValueDate(new Date());
-							sale.setQuantity(quantity);
-							sale.setPrice(item.getPrice());
-							sale.setDiscount(item.getDiscount());
-							sale.setPrinted(false);
-							sale.setCancel(false);
-							sale.setUser(user);
-							sale.setUserEdit(user);
-							return saleRepository.save(sale);
+
+							SaleTemporary saleCheck = saleRepository.findById(saleTmpId).map(saleTmp -> {
+
+								saleTmp.setValueDate(new Date());
+								saleTmp.setQuantity(quantity);
+								saleTmp.setDiscount(discount);
+								return saleRepository.save(saleTmp);
+							}).orElse(null);
+							if (saleCheck == null) {
+								saleCheck = new SaleTemporary();
+								saleCheck.setItemBranch(item);
+								saleCheck.setValueDate(new Date());
+								saleCheck.setQuantity(quantity);
+								saleCheck.setPrice(item.getPrice());
+								saleCheck.setDiscount(discount);
+								saleCheck.setPrinted(false);
+								saleCheck.setCancel(false);
+								saleCheck.setUser(user);
+								saleCheck.setUserEdit(user);
+								return saleRepository.save(saleCheck);
+							}
+							return saleCheck;
 						}).orElseThrow(() -> new ResourceNotFoundException("Record does not exist")))
 						.orElseThrow(() -> new ResourceNotFoundException("User does not exist"));
 			} else {
@@ -108,10 +124,13 @@ public class SaleTemporaryService {
 										|| !item.isEnable()) {
 									throw new UnauthorizedException("Item is unauthorized");
 								}
-								int itembalance = saleRepository.findItemBalanceByUserId(userId, item.getId()).orElse(0);
-								if (item.getItemBalance() < (quantity + itembalance)) {
+								if (item.isStock()) {
+									int itembalance = saleRepository.findItemBalanceByUserId(userId, item.getId())
+											.orElse(0);
+									if (item.getItemBalance() < (quantity + itembalance)) {
 
-									throw new ConflictException("QTY is greater than StockBalance", "09");
+										throw new ConflictException("QTY is greater than StockBalance", "09");
+									}
 								}
 								SaleTemporary sale = new SaleTemporary();
 								sale.setSeat(seat);
@@ -137,12 +156,15 @@ public class SaleTemporaryService {
 	}
 
 	@Transactional
-	public List<SaleTemporary> removeItem(Long saleTempId, Integer seatId) {
+	public List<SaleTemporary> removeItem(Long saleTempId, Integer seatId, boolean OBU) {
 		List<SaleTemporary> list = new ArrayList<SaleTemporary>();
-		List<SaleTemporary> saletmp = saleRepository.findBySeatId(seatId);
-		if (!saletmp.get(0).getUserEdit().getId().equals(userProfile.getProfile().getUser().getId())) {
-			saleRepository.updateUserEdit(userProfile.getProfile().getUser().getId(), seatId);
-			return saletmp;
+		if (!OBU) {
+			List<SaleTemporary> saletmp = saleRepository.findBySeatId(seatId);
+			if (!saletmp.get(0).getUserEdit().getId().equals(userProfile.getProfile().getUser().getId())) {
+				saleRepository.updateUserEdit(userProfile.getProfile().getUser().getId(), seatId);
+				return saletmp;
+
+			}
 		}
 		SaleTemporary saletemp = saleRepository.findById(saleTempId).map(sale -> {
 			if (sale.isPrinted()) {
@@ -158,19 +180,23 @@ public class SaleTemporaryService {
 			return sale;
 		}).orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
 		list.add(saletemp);
-		saleRepository.updateUserEdit(userProfile.getProfile().getUser().getId(), seatId);
+		if (!OBU)
+			saleRepository.updateUserEdit(userProfile.getProfile().getUser().getId(), seatId);
 
 		return list;
 
 	}
 
 	@Transactional
-	public List<SaleTemporary> setQuantity(Long saleTempId, Short quantity, Integer seatId,Integer userId) {
+	public List<SaleTemporary> setQuantity(Long saleTempId, Short quantity, Integer seatId, Integer userId,
+			boolean OBU) {
 		List<SaleTemporary> list = new ArrayList<SaleTemporary>();
-		List<SaleTemporary> saletmp = saleRepository.findBySeatId(seatId);
-		if (!saletmp.get(0).getUserEdit().getId().equals(userProfile.getProfile().getUser().getId())) {
-			saleRepository.updateUserEdit(userProfile.getProfile().getUser().getId(), seatId);
-			return saletmp;
+		if (!OBU) {
+			List<SaleTemporary> saletmp = saleRepository.findBySeatId(seatId);
+			if (!saletmp.get(0).getUserEdit().getId().equals(userProfile.getProfile().getUser().getId())) {
+				saleRepository.updateUserEdit(userProfile.getProfile().getUser().getId(), seatId);
+				return saletmp;
+			}
 		}
 		SaleTemporary saletemp = saleRepository.findById(saleTempId).map(sale -> {
 			if (sale.isPrinted()) {
@@ -180,10 +206,14 @@ public class SaleTemporaryService {
 			if (sale.getQuantity() < 1) {
 				throw new ConflictException("Qty must be greater than one");
 			}
-			int itembalance = saleRepository.findItemBalanceByUserId(userId, sale.getItemBranch().getId()).orElse(0);
-			if (sale.getItemBranch().getItemBalance() < (quantity + itembalance)) {
+			if (sale.getItemBranch().isStock()) {
+				// int itembalance = saleRepository.findItemBalanceByUserId(userId,
+				// sale.getItemBranch().getId())
+				// .orElse(0);
+				if (sale.getItemBranch().getItemBalance() < quantity) {
 
-				throw new ConflictException("QTY is greater than StockBalance", "09");
+					throw new ConflictException("QTY is greater than StockBalance", "09");
+				}
 			}
 			ItemBranch itemBranch = sale.getItemBranch();
 			if ((itemBranch.getBranch().getId() != userProfile.getProfile().getBranch().getId())

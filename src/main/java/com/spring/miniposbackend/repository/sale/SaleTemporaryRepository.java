@@ -49,6 +49,9 @@ public interface SaleTemporaryRepository extends JpaRepository<SaleTemporary, Lo
 	@Modifying
 	@Query(value = "delete from Sales_temp where seat_id=?1", nativeQuery = true)
 	void deleteBySeatId(Integer seatId);
+	@Modifying
+	@Query(value = "delete from Sales_temp where user_id=?1", nativeQuery = true)
+	void deleteByUserId(Integer userId);
 
 	@Modifying
 	@Query(value = "delete from Sales_temp where id=?1", nativeQuery = true)
@@ -58,7 +61,7 @@ public interface SaleTemporaryRepository extends JpaRepository<SaleTemporary, Lo
 	@Query(value = "update Sales_temp set useredit_id=?1 where seat_id=?2", nativeQuery = true)
 	void updateUserEdit(Integer userId, Integer seatId);
 
-	@Query(value = "select s from SaleTemporary s where s.user.branch.id = ?1")
+	@Query(value = "select count(s) from SaleTemporary s where s.user.branch.id = ?1")
 	Optional<Integer> findByBranchId(Integer branchId);
 	
 	@Query(value = "select sum(s.quantity) from SaleTemporary s where s.user.id = ?1 and s.itemBranch.id=?2")

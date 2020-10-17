@@ -113,13 +113,13 @@ public class ItemBranch extends AuditModel {
 //		}
 //	}
 
-	public Short getDiscount() {
-		if (useItemConfiguration) {
-			return item.getDiscount();
-		} else {
-			return discount;
-		}
-	}
+//	public double getDiscount() {
+//		if (useItemConfiguration) {
+//			return item.getDiscount();
+//		} else {
+//			return discount;
+//		}
+//	}
 
 	public boolean isEnable() {
 		return enable;

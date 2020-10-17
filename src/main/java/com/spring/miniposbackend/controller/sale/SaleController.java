@@ -52,7 +52,7 @@ public class SaleController {
 		if (OBU)
 			val = "true";
 		String setting = branchSettingRepository.findByOBU(userProfile.getProfile().getBranch().getId()).orElse("");
-		if (val == setting)
+		if (val.equalsIgnoreCase(setting))
 			return new SuccessResponse("00", "make Payment", saleService.create(seatId.get(),
 					userProfile.getProfile().getBranch().getId(), userProfile.getProfile().getUser().getId(), OBU));
 		else

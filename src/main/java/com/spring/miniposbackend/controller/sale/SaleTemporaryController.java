@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.InternalErrorException;
 import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.repository.admin.BranchSettingRepository;
@@ -52,29 +53,44 @@ public class SaleTemporaryController {
 	@PostMapping
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse create(@RequestBody List<Map<String, Integer>> requestItem, @RequestParam boolean OBU) {
+
 		String val = "false";
 		if (OBU)
 			val = "true";
 		String setting = branchSettingRepository.findByOBU(userProfile.getProfile().getBranch().getId()).orElse("");
-		if (val == setting)
+		if (val.equalsIgnoreCase(setting))
 			return new SuccessResponse("00", "add SaleTmp",
 					saleService.addItem(requestItem, OBU, userProfile.getProfile().getUser().getId()));
 		else
-			throw new InternalErrorException("Setting was updated, Please restart!", "12");
+			throw new ConflictException("Setting was updated, Please restart!", "12");
 	}
 
 	@DeleteMapping("item/{saleTempId}")
 	@PreAuthorize("hasAnyRole('SALE')")
-	public SuccessResponse remove(@PathVariable Long saleTempId, @RequestParam(value = "seatId") Integer seatId) {
-		return new SuccessResponse("00", "remove SaleTmp", saleService.removeItem(saleTempId, seatId));
+	public SuccessResponse remove(@PathVariable Long saleTempId, @RequestParam(value = "seatId") Integer seatId,@RequestParam boolean OBU) {
+		String val = "false";
+		if (OBU)
+			val = "true";
+		String setting = branchSettingRepository.findByOBU(userProfile.getProfile().getBranch().getId()).orElse("");
+		if (val.equalsIgnoreCase(setting))
+		return new SuccessResponse("00", "remove SaleTmp", saleService.removeItem(saleTempId, seatId,OBU));
+		else
+			throw new ConflictException("Setting was updated, Please restart!", "12");
 	}
 
 	@PatchMapping("qty/{saleTempId}")
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse updateQuantity(@PathVariable Long saleTempId,
-			@RequestParam(value = "quantity") Short quantity, @RequestParam(value = "seatId") Integer seatId) {
+			@RequestParam(value = "quantity") Short quantity, @RequestParam(value = "seatId") Integer seatId,@RequestParam boolean OBU) {
+		String val = "false";
+		if (OBU)
+			val = "true";
+		String setting = branchSettingRepository.findByOBU(userProfile.getProfile().getBranch().getId()).orElse("");
+		if (val.equalsIgnoreCase(setting))
 		return new SuccessResponse("00", "update QTY",
-				saleService.setQuantity(saleTempId, quantity, seatId, userProfile.getProfile().getUser().getId()));
+				saleService.setQuantity(saleTempId, quantity, seatId, userProfile.getProfile().getUser().getId(),OBU));
+		else
+			throw new ConflictException("Setting was updated, Please restart!", "12");
 	}
 
 	@PatchMapping("{seatId}")

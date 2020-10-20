@@ -50,7 +50,7 @@ public class SaleDetail extends AuditModel {
 	private Short quantity;
 
 	@Column(name = "discount", nullable = false, length = 10, precision = 2)
-	private Double discount;
+	private Short discount;
 
 	@Column(name = "total", nullable = false, length = 10, precision = 2)
 	private Double total;

@@ -21,7 +21,7 @@ public class SaleTransaction{
     private Short quantity;
 	
 
-    private Double discount;
+    private int discount;
 
     private Double total;
 

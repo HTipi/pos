@@ -116,7 +116,7 @@ public class SaleService {
 				saleDeail.setUser(user);
 				saleDeail.setSale(saleResult);
 				saleDeail.setValueDate(new Date());
-				saleDeail.setDiscount(saleTemp.getDiscountAmount());
+				saleDeail.setDiscount(saleTemp.getDiscount());
 				saleDeail.setPrice(saleTemp.getPrice());
 				saleDeail.setQuantity(saleTemp.getQuantity());
 				saleDeail.setTotal(saleTemp.getTotal());
@@ -157,7 +157,7 @@ public class SaleService {
 				saleDeail.setUser(user);
 				saleDeail.setSale(saleResult);
 				saleDeail.setValueDate(new Date());
-				saleDeail.setDiscount(saleTemp.getDiscountAmount());
+				saleDeail.setDiscount(saleTemp.getDiscount());
 				saleDeail.setPrice(saleTemp.getPrice());
 				saleDeail.setQuantity(saleTemp.getQuantity());
 				saleDeail.setTotal(saleTemp.getTotal());

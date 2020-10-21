@@ -13,5 +13,5 @@ public class StockEntryRequest {
 	private BigDecimal price;
 	private Short quantity;
 	private BigDecimal total;
-	private Double discount;
+	private Short discount;
 }

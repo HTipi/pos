@@ -21,4 +21,5 @@ public interface ItemBranchRepository extends  JpaRepository<ItemBranch, Long>{
 	List<ItemBranch> findByItemCheckListId(Long itemId);
 	
 	Optional<ItemBranch> findFirstByBranchIdAndItemIdOrderByIdDesc(Integer branchId, Long itemId);
+	
 }

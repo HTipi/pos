@@ -26,6 +26,7 @@ import com.spring.miniposbackend.repository.admin.ImageRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
 import com.spring.miniposbackend.repository.admin.ItemRepository;
 import com.spring.miniposbackend.repository.admin.ItemTypeRepository;
+import com.spring.miniposbackend.repository.sale.SaleTemporaryRepository;
 import com.spring.miniposbackend.util.ImageUtil;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
@@ -48,6 +49,8 @@ public class ItemService {
 	private ItemBranchRepository itemBranchRepository;
 	@Autowired
 	private BranchRepository branchRepository;
+	@Autowired
+	private SaleTemporaryRepository saleTemporaryRepository;
 	
 	@Value("${file.path.image.item}")
 	private String imagePath;
@@ -156,7 +159,7 @@ public class ItemService {
 		});
 		return images;
 	}
-
+	@Transactional
 	public Item create(Integer itemTypeId, Item requestItem) {
 		return itemTypeRepository.findById(itemTypeId).map((itemType) -> {
 			if (userProfile.getProfile().getCorporate().getId() != itemType.getCorporate().getId()) {
@@ -171,19 +174,13 @@ public class ItemService {
 			item.setStock(requestItem.isStock());
 			item.setItemType(itemType);
 			item.setEnable(true);
-			item = itemRepository.save(item);
-			List<Branch> branches = branchRepository.findAll();
+			itemRepository.save(item);
+			List<Branch> branches = branchRepository.findByCorporateId(itemType.getCorporate().getId(),true);
 			branches.forEach((branch) -> {
-				List<Item> items = itemRepository.findByCorporateId(branch.getCorporate().getId());
-				items.forEach((itemb) -> {
-					Long itemId = itemb.getId();
 					Integer branchId = branch.getId();
-					Optional<ItemBranch> itemBranch = itemBranchRepository
-							.findFirstByBranchIdAndItemIdOrderByIdDesc(branchId, itemId);
-					if (!itemBranch.isPresent()) {
 						ItemBranch itemBr = new ItemBranch();
 						itemBr.setBranch(branch);
-						itemBr.setItem(itemb);
+						itemBr.setItem(item);
 						itemBr.setUseItemConfiguration(true);
 						if(branchId==userProfile.getProfile().getBranch().getId()) {
 							itemBr.setEnable(true);
@@ -194,17 +191,17 @@ public class ItemService {
 						}
 						itemBr.setStockIn(0L);
 						itemBr.setStockOut(0L);
-						itemBr.setPrice(itemb.getPrice());
-						itemBr.setDiscount(itemBr.getDiscount());
+						itemBr.setPrice(item.getPrice());
+						itemBr.setDiscount(item.getDiscount());
 						itemBranchRepository.save(itemBr);
-					}
+					
 //					else {
 //						itemBranch.get().setPrice(item.getPrice());
 //						itemBranch.get().setDiscount(item.getDiscount());
 //						itemBranchRepository.save(itemBranch.get());
 //						
 //					}
-				});
+		
 			});
 			return item;
 		}).orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
@@ -215,13 +212,24 @@ public class ItemService {
 			if (userProfile.getProfile().getCorporate().getId() != item.getItemType().getCorporate().getId()) {
 				throw new UnauthorizedException("Item is unauthorized");
 			}
+			List<ItemBranch> itemBr = itemBranchRepository.findByItemId(itemId, true);
+			itemBr.forEach((items) -> {
+				boolean pending = false;
+				if(items.getItemBalance()>0)
+				{
+					throw new ConflictException("The item is still in stock", "13");
+				}
+				pending = saleTemporaryRepository.existsByItemId(itemId);
+				if(pending)
+					throw new ConflictException("The item is pending ordered", "10");
+			});
+			
 			item.setCode(requestItem.getCode());
 			item.setName(requestItem.getName());
 			item.setNameKh(requestItem.getNameKh());
 			item.setPrice(requestItem.getPrice());
 			item.setDiscount(requestItem.getDiscount());
 			item.setStock(requestItem.isStock());
-			// item.setEnable(requestItem.isEnable());
 			return itemRepository.save(item);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
@@ -231,6 +239,17 @@ public class ItemService {
 			if (userProfile.getProfile().getCorporate().getId() != item.getItemType().getCorporate().getId()) {
 				throw new UnauthorizedException("Item is unauthorized");
 			}
+			List<ItemBranch> itemBr = itemBranchRepository.findByItemId(itemId, true);
+			itemBr.forEach((items) -> {
+				boolean pending = false;
+				if(items.getItemBalance()>0)
+				{
+					throw new ConflictException("The item is still in stock", "13");
+				}
+				pending = saleTemporaryRepository.existsByItemId(itemId);
+				if(pending)
+					throw new ConflictException("The item is pending ordered", "10");
+			});
 			item.setEnable(false);
 			return itemRepository.save(item);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));

@@ -55,7 +55,7 @@ public class StockEntry extends AuditModel{
 	
 	@Column(name = "discount", nullable = false, precision = 10, scale = 2)
 	@ColumnDefault("0")
-    private Double discount;
+    private Short discount;
 
     @Column(name = "quantity", nullable = false)
     @ColumnDefault("1")

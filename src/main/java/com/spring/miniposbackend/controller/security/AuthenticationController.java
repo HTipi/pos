@@ -71,7 +71,7 @@ public class AuthenticationController {
 		} catch (LockedException e) {
 			throw new LockedException("USER_LOCKED", e);
 		} catch (BadCredentialsException e) {
-			throw new BadCredentialsException("INVALID_CREDENTIALS", e);
+			throw new BadCredentialsException("Login Failed", e);
 		}
 	}
 }

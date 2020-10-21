@@ -56,7 +56,7 @@ public class Item extends AuditModel{
 	@Min(0)
 	@Max(100)
 	@ColumnDefault("0")
-    private Double discount;
+    private Short discount;
 	
 	@Column(name = "is_stock", nullable = false)
     @ColumnDefault("false")

@@ -2,7 +2,6 @@ package com.spring.miniposbackend.controller.dashboard;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.model.SuccessResponse;
-import com.spring.miniposbackend.model.admin.UserRole;
 import com.spring.miniposbackend.service.dashboard.SaleDashboardService;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
@@ -39,19 +36,13 @@ public class SaleDashboardController {
 		cal.clear(Calendar.MINUTE);
 		cal.clear(Calendar.SECOND);
 		cal.clear(Calendar.MILLISECOND);
-		cal.setFirstDayOfWeek(Calendar.MONDAY);
-		// cal.set(Calendar.DAY_OF_MONTH, 15);
+//		cal.setFirstDayOfWeek(Calendar.MONDAY);
+//		cal.set(Calendar.DAY_OF_MONTH, day);
 		today = cal.getTime();
-		if (cal.get(Calendar.DAY_OF_MONTH) < 7) {
-			cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
-			startWeek = cal.getTime();
-			startMonth = cal.getTime();
-		} else {
-			cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-			startWeek = cal.getTime();
-			cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
-			startMonth = cal.getTime();
-		}
+		cal.add(Calendar.DATE, -6);
+		startWeek = cal.getTime();
+		cal.add(Calendar.DATE, -22);
+		startMonth = cal.getTime();
 	}
 
 	@GetMapping("/branch/summary")

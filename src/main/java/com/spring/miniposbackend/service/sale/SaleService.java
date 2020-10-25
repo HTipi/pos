@@ -196,6 +196,9 @@ public class SaleService {
 			sales.setReverseDate(new Date());
 			sales.setReverse(true);
 			saleDetailRepository.save(sales);
+			ItemBranch itemBr = itemRepository.findById(sales.getItemBranch().getId()).orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
+			itemBr.setStockOut(itemBr.getStockOut() - sales.getQuantity());
+			itemRepository.save(itemBr);
 		});
 		return saleRepository.save(sale);
 	}

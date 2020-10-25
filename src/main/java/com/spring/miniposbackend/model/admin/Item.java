@@ -77,4 +77,7 @@ public class Item extends AuditModel{
 	public int getItemType_Id() {
         return itemType.getId();
     }
+	public Long getItem_Id() {
+		return id;
+	}
 }

@@ -73,4 +73,12 @@ public class BranchCurrency extends AuditModel{
 		return currency.getSymbol();
 	}
 	
+	public Integer getDecimalPlace() {
+		return currency.getDecimalPlace();
+	}
+	
+	public Float getMinDenom() {
+		return currency.getMinDenom();
+	}
+	
 }

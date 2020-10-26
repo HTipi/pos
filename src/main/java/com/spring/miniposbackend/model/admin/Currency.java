@@ -40,6 +40,12 @@ public class Currency extends AuditModel{
 	@Column(name = "symbol", nullable = false,length = 1)
     private String symbol;
 	
+	@Column(name = "decimal_place", nullable = false)
+    private Integer decimalPlace;
+	
+	@Column(name = "min_denomination", nullable = false)
+    private Float MinDenom;
+	
 	@Column(name = "enable", nullable = false)
     @ColumnDefault("false")
     private boolean enable;

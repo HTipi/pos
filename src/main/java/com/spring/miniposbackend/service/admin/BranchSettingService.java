@@ -57,7 +57,7 @@ public class BranchSettingService {
 	}
 
 	public BranchSetting updateEnable(Integer branchId, Integer settingId, boolean enable) {
-		return settingBranchRepository.findFirstByBranchIdAndSettingId(branchId, settingId).map((branchSetting) -> {
+		return settingBranchRepository.findFirstByBranchIdAndId(branchId, settingId).map((branchSetting) -> {
 			if (branchSetting.getBranch().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
 				throw new UnauthorizedException("Branch is unauthorized");
 			}
@@ -67,7 +67,7 @@ public class BranchSettingService {
 	}
 
 	public BranchSetting updateSettingValue(Integer branchId, Integer settingId, boolean enable) {
-		return settingBranchRepository.findFirstByBranchIdAndSettingId(branchId, settingId).map((branchSetting) -> {
+		return settingBranchRepository.findFirstByBranchIdAndId(branchId, settingId).map((branchSetting) -> {
 			String settingVal = "false";
 			if (enable) {
 				settingVal = "true";

@@ -82,9 +82,9 @@ public class SaleTemporaryService {
 								throw new UnauthorizedException("Item is unauthorized");
 							}
 							if (item.isStock()) {
-								int itembalance = saleRepository.findItemBalanceByUserId(userId, item.getId())
-										.orElse(0);
-								if (item.getItemBalance() < (quantity + itembalance)) {
+								//int itembalance = saleRepository.findItemBalanceByUserId(userId, item.getId())
+										//.orElse(0);
+								if (item.getItemBalance() < quantity) {
 
 									throw new ConflictException("QTY is greater than StockBalance", "09");
 								}
@@ -125,9 +125,9 @@ public class SaleTemporaryService {
 									throw new UnauthorizedException("Item is unauthorized");
 								}
 								if (item.isStock()) {
-									int itembalance = saleRepository.findItemBalanceByUserId(userId, item.getId())
-											.orElse(0);
-									if (item.getItemBalance() < (quantity + itembalance)) {
+//									int itembalance = saleRepository.findItemBalanceByUserId(userId, item.getId())
+//											.orElse(0);
+									if (item.getItemBalance() < quantity) {
 
 										throw new ConflictException("QTY is greater than StockBalance", "09");
 									}

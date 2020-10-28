@@ -22,8 +22,10 @@ import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.model.admin.User;
 import com.spring.miniposbackend.model.admin.UserRole;
 import com.spring.miniposbackend.model.security.JwtRequest;
+import com.spring.miniposbackend.model.security.UserToken;
 import com.spring.miniposbackend.modelview.UserResponse;
 import com.spring.miniposbackend.service.admin.UserService;
+import com.spring.miniposbackend.service.security.UserTokenService;
 import com.spring.miniposbackend.util.ImageUtil;
 import com.spring.miniposbackend.util.JwtTokenUtil;
 
@@ -35,12 +37,14 @@ public class AuthenticationController {
 	private AuthenticationManager authenticationManager;
 
 	@Autowired
-	private JwtTokenUtil jwtTokenUtil;	
+	private JwtTokenUtil jwtTokenUtil;
 	@Autowired
-	private UserService userService; 
+	private UserService userService;
+	@Autowired
+	UserTokenService userTokenService;
 	@Autowired
 	private ImageUtil imageUtil;
-	
+
 	@Value("${file.path.image.branch}")
 	private String imagePath;
 
@@ -50,9 +54,11 @@ public class AuthenticationController {
 
 		authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
 		final String token = jwtTokenUtil.generateToken(authenticationRequest.getUsername());
-		User user = userService.setApiToken(authenticationRequest.getUsername(), token);
+		UserToken userToken = userTokenService.setApiToken(authenticationRequest.getClientAppName(),
+				authenticationRequest.getUsername(), token);
+		User user = userToken.getClientAppUserIdentity().getUser();
 		List<UserRole> userRoles = userService.getRoleByUserId(user.getId());
-		String fileLocation = String.format("%s/"+imagePath, System.getProperty("catalina.base"))+ "/"
+		String fileLocation = String.format("%s/" + imagePath, System.getProperty("catalina.base")) + "/"
 				+ user.getBranch().getLogo();
 		byte[] image;
 		try {
@@ -60,7 +66,7 @@ public class AuthenticationController {
 		} catch (IOException e) {
 			image = null;
 		}
-		return new SuccessResponse("00", "login Successfully",new UserResponse(user,userRoles,image));
+		return new SuccessResponse("00", "login Successfully", new UserResponse(user, userRoles,token,image));
 	}
 
 	private void authenticate(String username, String password) throws AuthenticationException {

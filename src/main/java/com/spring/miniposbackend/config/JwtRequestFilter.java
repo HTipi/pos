@@ -18,8 +18,9 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.spring.miniposbackend.service.admin.UserService;
+import com.spring.miniposbackend.model.security.UserToken;
 import com.spring.miniposbackend.service.security.JwtUserDetailsService;
+import com.spring.miniposbackend.service.security.UserTokenService;
 import com.spring.miniposbackend.util.JwtTokenUtil;
 
 import io.jsonwebtoken.ExpiredJwtException;
@@ -34,7 +35,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
 	@Autowired
-	UserService userService;
+	private UserTokenService userTokenService;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -50,8 +51,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 			if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
 				jwtToken = requestTokenHeader.substring(7);
 				try {
-					if (userService.showByApiToken(jwtToken) != null) {
+					UserToken userToken = userTokenService.showByApiToken(jwtToken);
+					if (userToken != null) {
 						username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+						if(!userToken.getClientAppUserIdentity().getUser().getUsername().contentEquals(username)) {
+							username = null;
+						}
 					} else {
 						username = null;
 					}

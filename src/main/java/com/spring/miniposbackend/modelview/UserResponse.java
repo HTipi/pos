@@ -14,9 +14,19 @@ public class UserResponse {
 	private Corporate corporate;
 	private byte[] image;
 	private List<UserRole> userRoles;
+	private String token;
 	
 	public UserResponse(User user, List<UserRole> userRoles, byte[] image) {
 		this.user = user;
+		branch = user.getBranch();
+		corporate = branch.getCorporate();
+		this.userRoles = userRoles;
+		this.image = image;
+	}
+	
+	public UserResponse(User user, List<UserRole> userRoles,String token, byte[] image) {
+		this.user = user;
+		this.token = token;
 		branch = user.getBranch();
 		corporate = branch.getCorporate();
 		this.userRoles = userRoles;
@@ -52,7 +62,7 @@ public class UserResponse {
 	}
 
 	public String getToken() {
-		return user.getApiToken();
+		return token;
 	}
 
 	public List<UserRole> getRoles() {

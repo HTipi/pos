@@ -67,6 +67,7 @@ public class SaleTemporaryService {
 			Long itemId = requestItem.get("itemId").longValue();
 			Short quantity = requestItem.get("quantity").shortValue();
 			Short discount = requestItem.get("discount").shortValue();
+			Double discountAmount = requestItem.get("discountAmount").doubleValue();
 			if (quantity < 1) {
 				throw new UnprocessableEntityException("Quantity must be greater than 0");
 			}
@@ -86,7 +87,7 @@ public class SaleTemporaryService {
 										//.orElse(0);
 								if (item.getItemBalance() < quantity) {
 
-									throw new ConflictException("QTY is greater than StockBalance", "09");
+									throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 								}
 							}
 
@@ -95,6 +96,7 @@ public class SaleTemporaryService {
 								saleTmp.setValueDate(new Date());
 								saleTmp.setQuantity(quantity);
 								saleTmp.setDiscount(discount);
+								saleTmp.setDiscountAmount(discountAmount);
 								return saleRepository.save(saleTmp);
 							}).orElse(null);
 							if (saleCheck == null) {
@@ -108,6 +110,7 @@ public class SaleTemporaryService {
 								saleCheck.setCancel(false);
 								saleCheck.setUser(user);
 								saleCheck.setUserEdit(user);
+								saleCheck.setDiscountAmount(discountAmount);
 								return saleRepository.save(saleCheck);
 							}
 							return saleCheck;
@@ -129,7 +132,7 @@ public class SaleTemporaryService {
 //											.orElse(0);
 									if (item.getItemBalance() < quantity) {
 
-										throw new ConflictException("QTY is greater than StockBalance", "09");
+										throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 									}
 								}
 								SaleTemporary sale = new SaleTemporary();
@@ -212,7 +215,7 @@ public class SaleTemporaryService {
 				// .orElse(0);
 				if (sale.getItemBranch().getItemBalance() < quantity) {
 
-					throw new ConflictException("QTY is greater than StockBalance", "09");
+					throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 				}
 			}
 			ItemBranch itemBranch = sale.getItemBranch();

@@ -67,7 +67,7 @@ public class StockEntryService {
 					stockEntry = stockEntryRepository.findByItemBranchId(itemBr.getId(), stockId).orElse(0);
 					int stockBalance = entries.getQuantity() + stockEntry;
 					if (itemBr.getItemBalance() < stockBalance) {
-						throw new ResourceNotFoundException("QTY is greater than StockBalance", "09");
+						throw new ResourceNotFoundException("មិនមានចំនួនស្តុកគ្រប់គ្រាន់", "09");
 					}
 				});
 			}

@@ -24,6 +24,12 @@ public interface SaleTemporaryRepository extends JpaRepository<SaleTemporary, Lo
 
 	@Query("select case when count(s)> 0 then true else false end from SaleTemporary s where s.itemBranch.id = ?1")
 	boolean existsByItemId(Long itemId);
+	
+	@Query("select case when count(s)> 0 then true else false end from SaleTemporary s where s.itemBranch.item.itemType.id = ?1")
+	boolean existsByItemTypeId(Integer itemTypeId);
+	
+	@Query("select case when count(s)> 0 then true else false end from SaleTemporary s where s.itemBranch.item.id = ?1")
+	boolean existsByMainItemId(Long itemId);
 
 	@Query(value = "select s from SaleTemporary s where s.seat.id = ?1 and s.isPrinted = ?2 and s.cancel = ?3")
 	List<SaleTemporary> findBySeatIdWithIsPrintedCancel(Integer seatId, boolean isPrinted, boolean cancel);

@@ -22,6 +22,8 @@ public class SaleTransaction{
 	
 
     private int discount;
+    
+    private Double discountAmount;
 
     private Double total;
 

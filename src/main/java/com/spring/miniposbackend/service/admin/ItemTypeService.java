@@ -20,6 +20,8 @@ import com.spring.miniposbackend.modelview.ImageResponse;
 import com.spring.miniposbackend.repository.admin.CorporateRepository;
 import com.spring.miniposbackend.repository.admin.ImageRepository;
 import com.spring.miniposbackend.repository.admin.ItemTypeRepository;
+import com.spring.miniposbackend.repository.sale.SaleRepository;
+import com.spring.miniposbackend.repository.sale.SaleTemporaryRepository;
 import com.spring.miniposbackend.util.ImageUtil;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
@@ -34,6 +36,8 @@ public class ItemTypeService {
 	private ImageUtil imageUtil;
 	@Autowired
 	private ImageRepository imageRepository;
+	@Autowired
+	private SaleTemporaryRepository saleTemporaryRepository;
 
 	@Value("${file.path.image.item-type}")
 	private String imagePath;
@@ -158,6 +162,7 @@ public class ItemTypeService {
 		});
 		return images;
 	}
+
 	public ItemType create(Integer corporateId, ItemType requestItemType) {
 		return corporateRepository.findById(corporateId).map((corporate) -> {
 			if (userProfile.getProfile().getCorporate().getId() != corporate.getId()) {
@@ -184,6 +189,10 @@ public class ItemTypeService {
 	}
 
 	public ItemType disable(Integer itemTypeId) {
+		boolean check = saleTemporaryRepository.existsByItemTypeId(itemTypeId);
+		if (check) {
+			throw new ConflictException("សូមបញ្ចប់ការបញ្ជាទិញប្រភេទផលិតផលនេះសិនមុននឹងលុប", "14");
+		}
 		return itemTypeRepository.findById(itemTypeId).map(itemType -> {
 			if (userProfile.getProfile().getCorporate().getId() != itemType.getCorporate().getId()) {
 				throw new UnauthorizedException("Corporate is unauthorized");

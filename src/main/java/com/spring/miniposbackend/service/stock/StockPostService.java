@@ -72,6 +72,7 @@ public class StockPostService {
 						stockPostTem.setValueDate(stock.getValueDate());
 						stockPostTem.setItemBranch(stockEntry.getItemBranch());
 						stockPostTem.setPrice(stockEntry.getPrice());
+						stockPostTem.setDiscountAmount(stockEntry.getDiscountAmount());
 						stockPostTem.setQuantity(stockEntry.getQuantity());
 						stockPostTem.setBranch(stock.getBranch());
 						stockPostTem.setUser(user);

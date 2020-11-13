@@ -95,6 +95,7 @@ public class StockEntryService {
 								stockEnt.setBranch(stock.getBranch());
 								stockEnt.setUser(user);
 								stockEnt.setDiscount(stockEntryRequest.getDiscount());
+								stockEnt.setDiscountAmount(stockEntryRequest.getDiscountAmount());
 								stockEnt.setTotal(stockEntryRequest.getTotal());
 								stockEnt.setStock(stock);
 								return stockEntryRepository.save(stockEnt);

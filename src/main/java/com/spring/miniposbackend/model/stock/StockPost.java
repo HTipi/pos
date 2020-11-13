@@ -29,57 +29,59 @@ import lombok.Setter;
 @Table(name = "stock_posts")
 @Setter
 @Getter
-public class StockPost extends AuditModel{
+public class StockPost extends AuditModel {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
-    private Long id;
-	
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name = "id", nullable = false)
+	private Long id;
+
 	@ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "stock_type_code", nullable = false)
-    @JsonIgnore
-    private StockType stockType;
-	
+	@JoinColumn(name = "stock_type_code", nullable = false)
+	@JsonIgnore
+	private StockType stockType;
+
 	@Column(name = "value_date", nullable = false, updatable = false)
-    private Date valueDate;
-	
+	private Date valueDate;
+
 	@ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_branch_id", nullable = false)
-    @JsonIgnore
-    private ItemBranch itemBranch;
-	
+	@JoinColumn(name = "item_branch_id", nullable = false)
+	@JsonIgnore
+	private ItemBranch itemBranch;
+
 	@Column(name = "price", nullable = false, precision = 10, scale = 2)
-    private BigDecimal price;
+	private BigDecimal price;
 
-    @Column(name = "quantity", nullable = false)
-    @ColumnDefault("1")
-    private Short quantity;
-    
-    @Column(name = "stock_balance", nullable = false)
-    private Long stockBalance;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "stock_id", nullable = false)
-    @JsonIgnore
-    private Stock stock;
+	@Column(name = "discount_amt", nullable = true, precision = 10, scale = 2)
+	private BigDecimal discountAmount;
+	@Column(name = "quantity", nullable = false)
+	@ColumnDefault("1")
+	private Short quantity;
+
+	@Column(name = "stock_balance", nullable = false)
+	private Long stockBalance;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "branch_id", nullable = false)
-    @JsonIgnore
-    private Branch branch;
-	
+	@JoinColumn(name = "stock_id", nullable = false)
+	@JsonIgnore
+	private Stock stock;
+
 	@ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    @JsonIgnore
-    private User user;
-	
+	@JoinColumn(name = "branch_id", nullable = false)
+	@JsonIgnore
+	private Branch branch;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id", nullable = false)
+	@JsonIgnore
+	private User user;
+
 	public String getItemCode() {
 		return itemBranch.getCode();
 	}
-	
+
 	public String getItemName() {
 		return itemBranch.getName();
 	}

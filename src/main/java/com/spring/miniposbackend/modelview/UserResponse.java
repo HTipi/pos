@@ -52,6 +52,10 @@ public class UserResponse {
 	public String getBranchName() {
 		return branch.getName();
 	}
+	
+	public String getBranchNameKh() {
+		return branch.getNameKh();
+	}
 
 	public byte[] getBranchLogo() {
 		return image;

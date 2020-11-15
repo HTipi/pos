@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.model.sale.SaleDetail;
+import com.spring.miniposbackend.modelview.dashboard.BranchSummaryChart;
 import com.spring.miniposbackend.modelview.dashboard.BranchSummaryDetail;
 import com.spring.miniposbackend.modelview.dashboard.ItemSummaryChart;
 import com.spring.miniposbackend.modelview.dashboard.ItemSummaryDetail;
@@ -91,7 +92,7 @@ public class SaleDashboardService {
 							rs.getDouble("weekly_sale_amount"), rs.getDouble("daily_sale_amount")));
 
 	}
-	public List<ItemSummaryChart> branchChartByCopId(Integer copId, Date startDate, Date endDate) {
+	public List<BranchSummaryChart> branchChartByCopId(Integer copId, Date startDate, Date endDate) {
 		if (userProfile.getProfile().getCorporate().getId() != copId) {
 			throw new UnauthorizedException("Corporate is unauthorized");
 		}
@@ -100,7 +101,7 @@ public class SaleDashboardService {
 		mapSqlParameterSource.addValue("endDate", endDate);
 		mapSqlParameterSource.addValue("copId", copId);
 		return jdbc.query("select * from branchChartByCopId(:copId,:startDate,:endDate)", mapSqlParameterSource,
-				(rs, rowNum) -> new ItemSummaryChart(rs.getLong("branchId"), rs.getString("branchName"),
+				(rs, rowNum) -> new BranchSummaryChart(rs.getLong("branchId"), rs.getString("branchName"),
 						rs.getString("branchKh"), rs.getDouble("saleAmt"), rs.getInt("saleItem")));
 	}
 

@@ -53,6 +53,9 @@ public class StockEntry extends AuditModel{
 	@Column(name = "price", nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 	
+	@Column(name = "discount_amt", nullable = true, precision = 10, scale = 2)
+    private BigDecimal discountAmount;
+	
 	@Column(name = "discount", nullable = false, precision = 10, scale = 2)
 	@ColumnDefault("0")
     private Short discount;
@@ -84,7 +87,7 @@ public class StockEntry extends AuditModel{
 	}
 	
 	public String getItemName() {
-		return itemBranch.getName();
+		return itemBranch.getNameKh();
 	}
 	public Long getStockBalance() {
 		return itemBranch.getItemBalance();

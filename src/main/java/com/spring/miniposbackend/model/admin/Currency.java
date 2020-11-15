@@ -44,7 +44,7 @@ public class Currency extends AuditModel{
     private Integer decimalPlace;
 	
 	@Column(name = "min_denomination", nullable = false)
-    private Float MinDenom;
+    private Float minDenom;
 	
 	@Column(name = "enable", nullable = false)
     @ColumnDefault("false")

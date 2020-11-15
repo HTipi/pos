@@ -48,6 +48,10 @@ public class SaleTemporary extends AuditModel {
 	@Column(name = "quantity", nullable = false)
 	@ColumnDefault("1")
 	private Short quantity;
+	
+	@Column(name = "discount_amt", nullable = false)
+	@ColumnDefault("0")
+	private Double discountAmount;
 
 	@Column(name = "discount", nullable = false, precision = 10, scale = 2)
 	@Min(0)
@@ -88,7 +92,7 @@ public class SaleTemporary extends AuditModel {
 	}
 
 	public String getItemName() {
-		return itemBranch.getName();
+		return itemBranch.getNameKh();
 	}
 
 	public Long getItemId() {
@@ -115,7 +119,7 @@ public class SaleTemporary extends AuditModel {
 		return userEdit.getId();
 	}
 
-	public double getDiscountAmount() {
+	private double getDiscountAmountT() {
 		return Math.round(price.doubleValue() * quantity * discount / 100 * 100) / 100.0;
 	}
 
@@ -124,6 +128,6 @@ public class SaleTemporary extends AuditModel {
 	}
 
 	public double getTotal() {
-		return getSubTotal() - getDiscountAmount();
+		return getSubTotal() - getDiscountAmountT() - discountAmount;
 	}
 }

@@ -117,6 +117,7 @@ public class SaleService {
 				saleDeail.setSale(saleResult);
 				saleDeail.setValueDate(new Date());
 				saleDeail.setDiscount(saleTemp.getDiscount());
+				saleDeail.setDiscountAmount(saleTemp.getDiscountAmount());
 				saleDeail.setPrice(saleTemp.getPrice());
 				saleDeail.setQuantity(saleTemp.getQuantity());
 				saleDeail.setTotal(saleTemp.getTotal());
@@ -149,7 +150,7 @@ public class SaleService {
 							.orElse(0);
 					if (item.getItemBalance() < itembalance) {
 
-						throw new ConflictException("QTY is greater than StockBalance", "09");
+						throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 					}
 				}
 				saleDeail.setItemBranch(item);
@@ -158,6 +159,7 @@ public class SaleService {
 				saleDeail.setSale(saleResult);
 				saleDeail.setValueDate(new Date());
 				saleDeail.setDiscount(saleTemp.getDiscount());
+				saleDeail.setDiscountAmount(saleTemp.getDiscountAmount());
 				saleDeail.setPrice(saleTemp.getPrice());
 				saleDeail.setQuantity(saleTemp.getQuantity());
 				saleDeail.setTotal(saleTemp.getTotal());
@@ -223,7 +225,8 @@ public class SaleService {
 				saleTransaction.setId(sale.getId());
 				saleTransaction.setBranchName(saleDetail.getBranch().getName());
 				saleTransaction.setDiscount(saleDetail.getDiscount());
-				saleTransaction.setItemName(saleDetail.getItemName());
+				saleTransaction.setDiscountAmount(saleDetail.getDiscountAmount());
+				saleTransaction.setItemName(saleDetail.getItemNameKh());
 				saleTransaction.setPrice(Double.parseDouble(saleDetail.getPrice().toString()));
 				saleTransaction.setQuantity(saleDetail.getQuantity());
 				saleTransaction.setSeatName(sale.getSeatName());

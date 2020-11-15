@@ -12,6 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicUpdate;
@@ -45,6 +47,7 @@ public class Expense extends AuditModel {
 	@JsonIgnore
 	private ExpenseType expenseType;
 
+	@Temporal(TemporalType.DATE)
 	@Column(name = "value_date", nullable = false)
     private Date valueDate;
 	

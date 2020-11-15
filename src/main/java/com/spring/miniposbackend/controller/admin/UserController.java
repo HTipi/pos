@@ -13,16 +13,26 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("user")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
-    @Autowired 
-    private UserProfileUtil userProfile;
-    
-    @GetMapping("me")
-    @PreAuthorize("hasAnyRole('OWNER','SALE')")
-    public SuccessResponse getProfile() {
-    	return new SuccessResponse("00", "fetch ME",new UserResponse(userService.showByUsername(userProfile.getProfile().getUsername()),userService.getRoleByUserId(userProfile.getProfile().getUser().getId()), null));
-    }
+	@Autowired
+	private UserService userService;
+	@Autowired
+	private UserProfileUtil userProfile;
+
+	@GetMapping("me")
+	@PreAuthorize("hasAnyRole('OWNER','SALE')")
+	public SuccessResponse getProfile() {
+		return new SuccessResponse("00", "fetch ME",
+				new UserResponse(userService.showByUsername(userProfile.getProfile().getUsername()),
+						userService.getRoleByUserId(userProfile.getProfile().getUser().getId()), null));
+	}
+
+	@PostMapping("reset-password")
+	@PreAuthorize("hasAnyRole('OWNER','SALE')")
+	public SuccessResponse resetPassword(@RequestParam("current-password") String currentPassword,
+			@RequestParam("new-password") String newPassword) {
+		return new SuccessResponse("00", "Password Changed",
+				userService.resetPassword(userProfile.getProfile().getUsername(), currentPassword, newPassword));
+	}
 
 //    @GetMapping
 //    public List<User> shows() {

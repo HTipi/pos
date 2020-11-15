@@ -1,5 +1,6 @@
 package com.spring.miniposbackend.controller.sale;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -34,6 +35,11 @@ public class SaleTemporaryController {
 	@Autowired
 	private BranchSettingRepository branchSettingRepository;
 
+	@GetMapping("test")
+	public Date test() {
+		return new Date();
+	}
+	
 	@GetMapping("by-seat")
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse getBySeatId(@RequestParam Integer seatId, @RequestParam Optional<Boolean> isPrinted,

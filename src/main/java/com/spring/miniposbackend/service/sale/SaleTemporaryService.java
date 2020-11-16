@@ -19,6 +19,7 @@ import com.spring.miniposbackend.exception.UnprocessableEntityException;
 import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.model.admin.Seat;
 import com.spring.miniposbackend.model.sale.SaleTemporary;
+import com.spring.miniposbackend.repository.admin.BranchSettingRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
 import com.spring.miniposbackend.repository.admin.SeatRepository;
 import com.spring.miniposbackend.repository.sale.SaleTemporaryRepository;
@@ -39,6 +40,8 @@ public class SaleTemporaryService {
 
 	@Autowired
 	private UserProfileUtil userProfile;
+	@Autowired
+	private BranchSettingRepository branchSettingRepository;
 
 	@Transactional
 	public List<SaleTemporary> addItem(List<Map<String, Integer>> requestItems, boolean OBU, Integer userId) {
@@ -86,7 +89,8 @@ public class SaleTemporaryService {
 								//int itembalance = saleRepository.findItemBalanceByUserId(userId, item.getId())
 										//.orElse(0);
 								if (item.getItemBalance() < quantity) {
-
+									String setting = branchSettingRepository.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(),"STN").orElse("");
+									if(setting !="true")
 									throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 								}
 							}
@@ -131,7 +135,8 @@ public class SaleTemporaryService {
 //									int itembalance = saleRepository.findItemBalanceByUserId(userId, item.getId())
 //											.orElse(0);
 									if (item.getItemBalance() < quantity) {
-
+										String setting = branchSettingRepository.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(),"STN").orElse("");
+										if(setting !="true")
 										throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 									}
 								}
@@ -214,7 +219,8 @@ public class SaleTemporaryService {
 				// sale.getItemBranch().getId())
 				// .orElse(0);
 				if (sale.getItemBranch().getItemBalance() < quantity) {
-
+					String setting = branchSettingRepository.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(),"STN").orElse("");
+					if(setting !="true")
 					throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 				}
 			}

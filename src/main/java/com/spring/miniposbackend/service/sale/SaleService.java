@@ -22,6 +22,7 @@ import com.spring.miniposbackend.model.sale.Sale;
 import com.spring.miniposbackend.model.sale.SaleDetail;
 import com.spring.miniposbackend.model.sale.SaleTemporary;
 import com.spring.miniposbackend.repository.admin.BranchRepository;
+import com.spring.miniposbackend.repository.admin.BranchSettingRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
 import com.spring.miniposbackend.repository.admin.SeatRepository;
 import com.spring.miniposbackend.repository.admin.UserRepository;
@@ -59,6 +60,8 @@ public class SaleService {
 
 	@Autowired
 	private UserProfileUtil userProfile;
+	@Autowired
+	private BranchSettingRepository branchSettingRepository;
 
 	public List<Sale> showSaleByUser(Integer userId, @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> date) {
 
@@ -74,7 +77,7 @@ public class SaleService {
 	}
 
 	@Transactional
-	public Sale create(Integer seatId, Integer branchId, Integer userId, boolean OBU) {
+	public List<SaleDetail> create(Integer seatId, Integer branchId, Integer userId, boolean OBU) {
 		User user = userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
 		Branch branch = branchRepository.findById(branchId)
@@ -150,6 +153,8 @@ public class SaleService {
 							.orElse(0);
 					if (item.getItemBalance() < itembalance) {
 
+						String setting = branchSettingRepository.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(),"STN").orElse("");
+						if(setting !="true")
 						throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 					}
 				}
@@ -177,7 +182,8 @@ public class SaleService {
 		saleResult.setTotal(sum);
 		String receiptNum = receiptService.getReceiptNumberByBranchId(branchId).toString();
 		sale.setReceiptNumber(receiptNum);
-		return saleRepository.save(saleResult);
+		saleRepository.save(saleResult);
+		return listsales;
 	}
 
 	@Transactional

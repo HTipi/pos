@@ -19,4 +19,7 @@ public interface BranchSettingRepository extends JpaRepository<BranchSetting, In
 	
 	@Query(value = "select bs.settingValue from BranchSetting bs where bs.branch.id = ?1 and bs.setting.code='OBU'")
     Optional<String> findByOBU(Integer branchId);
+	@Query(value = "select bs.settingValue from BranchSetting bs where bs.branch.id = ?1 and bs.setting.code=?2")    
+	Optional<String> findByBranchIdAndSettingCode(Integer branchId,String code);	
+	
 }

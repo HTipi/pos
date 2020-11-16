@@ -1,5 +1,6 @@
 package com.spring.miniposbackend.service.admin;
 
+import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.model.admin.User;
 import com.spring.miniposbackend.model.admin.UserRole;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -28,6 +30,21 @@ public class UserService {
     	}else {
     		throw new ResourceNotFoundException("User not found");
     	}
+    }
+    
+    public User resetPassword(String username,String currentPassword, String newPassword) {
+    	return userRepository.findFirstByUsername(username).map(user->{
+    		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    		if(encoder.matches(currentPassword, user.getPassword())) {
+    			user.setPassword(newPassword);
+    			user.setApiToken(null);
+    			user.setPassword(encoder.encode(newPassword));
+    			return userRepository.save(user);
+    		}else{
+    			throw new ConflictException("Passowrd mismatched");
+    		}
+    		
+    	}).orElseThrow(()-> new ResourceNotFoundException("User not found"));
     }
     
     public User setApiToken(String username, String token) {

@@ -46,11 +46,6 @@ public class Expense extends AuditModel {
 	@JoinColumn(name = "expense_type_id", nullable = false)
 	@JsonIgnore
 	private ExpenseType expenseType;
-<<<<<<< HEAD
-
-=======
-	
->>>>>>> f91375afda94cf63f47986782e9185ab7971d107
 	@Temporal(TemporalType.DATE)
 	@Column(name = "value_date", nullable = false)
     private Date valueDate;

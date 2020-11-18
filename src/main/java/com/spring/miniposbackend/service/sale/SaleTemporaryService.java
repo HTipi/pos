@@ -90,7 +90,7 @@ public class SaleTemporaryService {
 										//.orElse(0);
 								if (item.getItemBalance() < quantity) {
 									String setting = branchSettingRepository.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(),"STN").orElse("");
-									if(setting !="true")
+									if(!setting.contentEquals(setting))
 									throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 								}
 							}

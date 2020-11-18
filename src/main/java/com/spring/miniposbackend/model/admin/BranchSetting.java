@@ -53,5 +53,8 @@ public class BranchSetting extends AuditModel {
     public String getDefaultValue() {
     	return setting.getDefaultValue();
     }
+    public String getSettingType() {
+    	return setting.getType();
+    }
 
 }

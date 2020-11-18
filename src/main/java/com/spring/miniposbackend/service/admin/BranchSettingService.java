@@ -66,13 +66,10 @@ public class BranchSettingService {
 		}).orElseThrow(() -> new ResourceNotFoundException("Record does not exist", "01"));
 	}
 
-	public BranchSetting updateSettingValue(Integer branchId, Integer settingId, boolean enable) {
+	public BranchSetting updateSettingValue(Integer branchId, Integer settingId, String enable,String type) {
 		return settingBranchRepository.findFirstByBranchIdAndId(branchId, settingId).map((branchSetting) -> {
-			String settingVal = "false";
-			if (enable) {
-				settingVal = "true";
-			}
-			if (settingVal == branchSetting.getSettingValue()) {
+
+			if (enable == branchSetting.getSettingValue()) {
 
 				return branchSetting;
 			}
@@ -81,10 +78,15 @@ public class BranchSettingService {
 			if (saleTmp > 0) {
 				throw new ConflictException("Pending Ordered", "11");
 			}
-			String val = "true";
-			if (!enable)
-				val = "false";
-			branchSetting.setSettingValue(val);
+			if(type == "BOOL") {
+				String val = "true";
+				if (!Boolean.parseBoolean(enable))
+					val = "false";
+				branchSetting.setSettingValue(val);
+			}
+			else if(type == "RANGE") {
+				branchSetting.setSettingValue(enable);
+			}
 			return settingBranchRepository.save(branchSetting);
 		}).orElseThrow(() -> new ResourceNotFoundException("Record does not exist", "01"));
 	}

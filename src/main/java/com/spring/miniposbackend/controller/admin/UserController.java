@@ -6,7 +6,6 @@ import com.spring.miniposbackend.service.admin.UserService;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,7 +18,6 @@ public class UserController {
 	private UserProfileUtil userProfile;
 
 	@GetMapping("me")
-	@PreAuthorize("hasAnyRole('OWNER','SALE')")
 	public SuccessResponse getProfile() {
 		return new SuccessResponse("00", "fetch ME",
 				new UserResponse(userService.showByUsername(userProfile.getProfile().getUsername()),
@@ -27,10 +25,9 @@ public class UserController {
 	}
 
 	@PostMapping("reset-password")
-	@PreAuthorize("hasAnyRole('OWNER','SALE')")
 	public SuccessResponse resetPassword(@RequestParam("current-password") String currentPassword,
 			@RequestParam("new-password") String newPassword) {
-		return new SuccessResponse("00", "Password Changed",
+		return new SuccessResponse("00", "លេខសំងាត់ត្រូវបានប្តូរដោយជោគជ័យ",
 				userService.resetPassword(userProfile.getProfile().getUsername(), currentPassword, newPassword));
 	}
 

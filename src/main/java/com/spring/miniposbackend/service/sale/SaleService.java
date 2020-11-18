@@ -154,8 +154,8 @@ public class SaleService {
 					if (item.getItemBalance() < itembalance) {
 
 						String setting = branchSettingRepository.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(),"STN").orElse("");
-						if(setting !="true")
-						throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
+						if(!setting.contentEquals(setting))
+							throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 					}
 				}
 				saleDeail.setItemBranch(item);

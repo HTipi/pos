@@ -39,9 +39,9 @@ public class BranchSettingController {
 	@PatchMapping("{settingId}/set-value")
 	@PreAuthorize("hasAnyRole('BRANCH','OWNER')")
 	public SuccessResponse modifySettingValue(@PathVariable Integer settingId,
-			@RequestParam Boolean enable) {
+			@RequestParam String enable,@RequestParam String type) {
 		return new SuccessResponse("00", "Record is updated",
-				branchSettingService.updateSettingValue(userProfile.getProfile().getBranch().getId(), settingId, enable));
+				branchSettingService.updateSettingValue(userProfile.getProfile().getBranch().getId(), settingId, enable,type));
 	}
 }
 

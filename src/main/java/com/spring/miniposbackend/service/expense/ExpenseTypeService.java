@@ -36,13 +36,11 @@ public class ExpenseTypeService {
 		return userRepository.findById(userId).map((user) -> {
 			String name = requestItem.getName();
 			String nameKh = requestItem.getNameKh();
-			String code = requestItem.getCode();
 			ExpenseType expenseType = new ExpenseType();
 			expenseType.setBranch(user.getBranch());
 			expenseType.setUser(user);
 			expenseType.setName(name);
 			expenseType.setNameKh(nameKh);
-			expenseType.setCode(code);
 			expenseType.setEnable(true);
 			return expenseTypeRepository.save(expenseType);
 		}).orElseThrow(() -> new ResourceNotFoundException("user does not exist"));
@@ -60,7 +58,6 @@ public class ExpenseTypeService {
 				expenseType.setUser(user);
 				expenseType.setName(type.getName());
 				expenseType.setNameKh(type.getNameKh());
-				expenseType.setCode(type.getCode());
 				return expenseTypeRepository.save(expenseType);
 			}).orElseThrow(() -> new ResourceNotFoundException("User does not exist"));
 		}).orElseThrow(() -> new ResourceNotFoundException("ExpenseType does not exist"));

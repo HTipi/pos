@@ -1,7 +1,6 @@
 package com.spring.miniposbackend.model.admin;
 
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -42,7 +41,7 @@ public class ItemType extends AuditModel{
 	@Column(name = "image",length = 64)
     private String image;
 	
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "corporate_id",nullable = false)
     @JsonIgnore
     private Corporate corporate;

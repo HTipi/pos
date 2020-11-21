@@ -55,6 +55,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				// dont authenticate this particular request
 				.authorizeRequests()
 				.antMatchers("/authenticate").permitAll()
+				.antMatchers("/image/**").permitAll()
 //				.antMatchers("/item/**").hasAnyRole("USER","ADMIN")
 				//.antMatchers("/item-type/upload").permitAll()
 				//.antMatchers("/item/upload").permitAll()

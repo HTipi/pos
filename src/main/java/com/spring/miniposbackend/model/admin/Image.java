@@ -3,12 +3,17 @@ package com.spring.miniposbackend.model.admin;
 
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.AuditModel;
 
 import lombok.Getter;
@@ -31,11 +36,14 @@ public class Image extends AuditModel{
 	@Column(name="type", nullable = false)
 	private String type;
 	
+	@Column(name="image", nullable = true)
+	private String image;
+	
 	@Transient
 	private byte[] base64;
 	
-//	@ManyToOne(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "corporate_id")
-//    @JsonIgnore
-//    private Corporate corporate;
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "image_type_id",nullable = false)
+    @JsonIgnore
+    private ImageType imageType;
 }

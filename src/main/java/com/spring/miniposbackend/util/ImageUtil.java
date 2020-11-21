@@ -22,6 +22,7 @@ public class ImageUtil {
 		}
 		String fileName = file.getOriginalFilename();
 		String newFileName = newName + fileName.substring(fileName.lastIndexOf("."));
+		System.out.println(baseLocation + "/" + newFileName);
 		Path path = Paths.get(baseLocation + "/" + newFileName);
 		Files.write(path, file.getBytes());
 		return newFileName;

@@ -2,7 +2,6 @@ package com.spring.miniposbackend.model.admin;
 
 import java.math.BigDecimal;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -62,7 +61,7 @@ public class Item extends AuditModel{
     @ColumnDefault("false")
     private boolean stock;
 	
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_type_id", nullable = false)
     @JsonIgnore
     private ItemType itemType;

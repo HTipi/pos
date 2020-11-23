@@ -35,6 +35,7 @@ public class ImageController {
 	public ResponseEntity<byte[]> getImageAsResponseEntity(@PathVariable UUID imageId) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setCacheControl(CacheControl.noCache().getHeaderValue());
+		headers.add("Content-Type", "image/svg+xml");
 		ResponseEntity<byte[]> responseEntity = new ResponseEntity<>(imageService.getImage(imageId), headers,
 				HttpStatus.OK);
 		return responseEntity;

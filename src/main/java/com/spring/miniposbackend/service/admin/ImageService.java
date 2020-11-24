@@ -140,6 +140,16 @@ public class ImageService {
 		return images;
 	}
 	
+	public Page<Image> showByCategory(Integer categoryId, int page, int length) {
+		Pageable pageable = PageRequest.of(page, length);
+		Page<Image> images = imageRepository.findByCategory(categoryId, pageable);
+
+		images.getContent().forEach((content) -> {
+			content.setBase64(getImage(content.getType(), content.getName()));
+		});
+		return images;
+	}
+	
 	public Image uploadimage(UUID imageId, MultipartFile file) {
 		return imageRepository.findById(imageId).map((image)->{
 			if (file.isEmpty()) {

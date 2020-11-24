@@ -15,4 +15,6 @@ public interface ImageRepository extends JpaRepository<Image,UUID>{
 
 	@Query("select i from Image i where i.type = ?1")
 	Page<Image> findByType(String type, Pageable pageable);
+	@Query("select i from Image i where i.imageType.id = ?1")
+	Page<Image> findByCategory(Integer categoryId, Pageable pageable);
 }

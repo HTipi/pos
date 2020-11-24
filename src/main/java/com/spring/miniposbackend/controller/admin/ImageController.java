@@ -47,6 +47,13 @@ public class ImageController {
 			@RequestParam("length") int length) {
 		return new SuccessResponse("00", "fetch Images", imageService.getImages(type, page, length));
 	}
+	
+	@GetMapping
+	@PreAuthorize("hasAnyRole('OWNER')")
+	public SuccessResponse getImageByCategory(@RequestParam("category-id") Integer categoryId, @RequestParam("page") int page,
+			@RequestParam("length") int length) {
+		return new SuccessResponse("00", "fetch Images", imageService.showByCategory(categoryId, page, length));
+	}
 //
 //	@PostMapping
 //	@PreAuthorize("hasAnyRole('OWNER')")

@@ -19,7 +19,7 @@ public class ImageTypeController {
 	@GetMapping
 	@PreAuthorize("hasAnyRole('OWNER')")
 	public SuccessResponse getImageType() {
-		return new SuccessResponse("00", "Retrieve Success", imageTypeService);
+		return new SuccessResponse("00", "Retrieve Success", imageTypeService.showAll());
 	}
 
 }

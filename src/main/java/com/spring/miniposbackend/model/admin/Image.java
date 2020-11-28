@@ -46,4 +46,8 @@ public class Image extends AuditModel{
     @JoinColumn(name = "image_type_id",nullable = false)
     @JsonIgnore
     private ImageType imageType;
+	
+	public Integer getImageType_Id() {
+		return imageType.getId();
+	}
 }

@@ -48,7 +48,7 @@ public class ImageController {
 		return new SuccessResponse("00", "fetch Images", imageService.getImages(type, page, length));
 	}
 	
-	@GetMapping
+	@GetMapping("by-category")
 	@PreAuthorize("hasAnyRole('OWNER')")
 	public SuccessResponse getImageByCategory(@RequestParam("category-id") Integer categoryId, @RequestParam("page") int page,
 			@RequestParam("length") int length) {

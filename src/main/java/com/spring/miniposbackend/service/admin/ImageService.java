@@ -135,7 +135,7 @@ public class ImageService {
 		Page<Image> images = imageRepository.findByType(type, pageable);
 
 		images.getContent().forEach((content) -> {
-			content.setBase64(getImage(type, content.getName()));
+			content.setBase64(getImage(type, content.getImage()));
 		});
 		return images;
 	}
@@ -145,7 +145,7 @@ public class ImageService {
 		Page<Image> images = imageRepository.findByCategory(categoryId, pageable);
 
 		images.getContent().forEach((content) -> {
-			content.setBase64(getImage(content.getType(), content.getName()));
+			content.setBase64(getImage(content.getType(), content.getImage()));
 		});
 		return images;
 	}

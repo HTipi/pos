@@ -75,7 +75,7 @@ public class ItemService {
 				if (item.getItemType().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
 					throw new UnauthorizedException("Corporate is unauthorized");
 				}
-				item.setImage(image.getName());
+				item.setImage(image.getImage());
 				item.setVersion((short) (item.getVersion() + 1));
 				return itemRepository.save(item);
 			}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));

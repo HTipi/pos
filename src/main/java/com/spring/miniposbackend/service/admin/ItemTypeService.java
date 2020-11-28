@@ -78,7 +78,7 @@ public class ItemTypeService {
 	public ItemType updateImage(Integer itemTypeId, UUID imageId) {
 		return imageRepository.findById(imageId).map((image) -> {
 			return itemTypeRepository.findById(itemTypeId).map((itemType) -> {
-				itemType.setImage(image.getName());
+				itemType.setImage(image.getImage());
 				itemType.setVersion((short) (itemType.getVersion() + 1));
 				return itemTypeRepository.save(itemType);
 			}).orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));

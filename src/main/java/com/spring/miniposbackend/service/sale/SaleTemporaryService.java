@@ -150,6 +150,7 @@ public class SaleTemporaryService {
 								sale.setCancel(false);
 								sale.setUser(user);
 								sale.setUserEdit(user);
+								sale.setDiscountAmount(discountAmount);
 								return saleRepository.save(sale);
 							}).orElseThrow(() -> new ResourceNotFoundException("Record does not exist")))
 							.orElseThrow(() -> new ResourceNotFoundException("User does not exist"));

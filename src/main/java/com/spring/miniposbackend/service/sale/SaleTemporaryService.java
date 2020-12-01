@@ -135,23 +135,34 @@ public class SaleTemporaryService {
 //											.orElse(0);
 									if (item.getItemBalance() < quantity) {
 										String setting = branchSettingRepository.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(),"STN").orElse("");
-										if(setting !="true")
+										if(!setting.contentEquals(setting))
 										throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 									}
 								}
-								SaleTemporary sale = new SaleTemporary();
-								sale.setSeat(seat);
-								sale.setItemBranch(item);
-								sale.setValueDate(new Date());
-								sale.setQuantity(quantity);
-								sale.setPrice(item.getPrice());
-								sale.setDiscount(item.getDiscount());
-								sale.setPrinted(false);
-								sale.setCancel(false);
-								sale.setUser(user);
-								sale.setUserEdit(user);
-								sale.setDiscountAmount(discountAmount);
-								return saleRepository.save(sale);
+								SaleTemporary saleCheck = saleRepository.findById(saleTmpId).map(saleTmp -> {
+									
+									saleTmp.setValueDate(new Date());
+									saleTmp.setQuantity(quantity);
+									saleTmp.setDiscount(discount);
+									saleTmp.setDiscountAmount(discountAmount);
+									return saleRepository.save(saleTmp);
+								}).orElse(null);
+								if (saleCheck == null) {
+									saleCheck = new SaleTemporary();
+									saleCheck.setSeat(seat);
+									saleCheck.setItemBranch(item);
+									saleCheck.setValueDate(new Date());
+									saleCheck.setQuantity(quantity);
+									saleCheck.setPrice(item.getPrice());
+									saleCheck.setDiscount(discount);
+									saleCheck.setPrinted(false);
+									saleCheck.setCancel(false);
+									saleCheck.setUser(user);
+									saleCheck.setUserEdit(user);
+									saleCheck.setDiscountAmount(discountAmount);
+									return saleRepository.save(saleCheck);
+								}
+								return saleCheck;
 							}).orElseThrow(() -> new ResourceNotFoundException("Record does not exist")))
 							.orElseThrow(() -> new ResourceNotFoundException("User does not exist"));
 

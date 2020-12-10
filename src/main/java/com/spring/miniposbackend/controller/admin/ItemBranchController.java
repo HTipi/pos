@@ -23,7 +23,6 @@ import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.modelview.ImageRequest;
 import com.spring.miniposbackend.modelview.ItemBranchCheckList;
 import com.spring.miniposbackend.modelview.ItemBranchUpdate;
-import com.spring.miniposbackend.modelview.StockEntryRequest;
 import com.spring.miniposbackend.service.admin.ItemBranchService;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
@@ -115,6 +114,12 @@ public class ItemBranchController {
 	@PreAuthorize("hasAnyRole('OWNER')")
 	public ItemBranch update(@PathVariable Long itemBranchId, @RequestBody ItemBranchUpdate itemBranch) {
 		return itemBranchService.update(itemBranchId, itemBranch);
+	}
+	
+	@PutMapping("{itemBranchId}/update-add-on")
+	@PreAuthorize("hasAnyRole('OWNER')")
+	public ItemBranch updateAddOn(@PathVariable Long itemBranchId, @RequestBody List<Long> addOnItems) {
+		return itemBranchService.updateAddOn(itemBranchId, addOnItems);
 	}
 
 }

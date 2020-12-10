@@ -16,15 +16,18 @@ import javax.validation.constraints.Min;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.TypeDef;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.AuditModel;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Table(name = "items")
+@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 @Setter @Getter
 @DynamicUpdate
 public class Item extends AuditModel{
@@ -38,6 +41,9 @@ public class Item extends AuditModel{
 	
 	@Column(name = "code", nullable = false,length = 32)
     private String code;
+	
+	@Column(name = "type", nullable = true,length = 32)
+    private String type;
 	
 	@Column(name = "name", nullable = false,length = 128)
     private String name;

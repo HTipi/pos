@@ -1,6 +1,7 @@
 package com.spring.miniposbackend.model.admin;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -18,15 +19,19 @@ import javax.validation.constraints.Min;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.AuditModel;
+import com.vladmihalcea.hibernate.type.array.ListArrayType;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Table(name = "item_branches", uniqueConstraints = @UniqueConstraint(columnNames = { "item_id", "branch_id" }))
+@TypeDef(name = "list-array", typeClass = ListArrayType.class)
 @Setter
 @Getter
 @DynamicUpdate
@@ -73,9 +78,14 @@ public class ItemBranch extends AuditModel {
 	@ColumnDefault("0")
 	private Long stockOut;
 
+	@Type(type = "list-array")
+	@Column(name = "add_on", columnDefinition = "bigint[]")
+	private List<Long> addOnItems;
+
 	public Long getId() {
 		return id;
 	}
+
 	public Long getItem_Id() {
 		return item.getId();
 	}
@@ -92,6 +102,10 @@ public class ItemBranch extends AuditModel {
 
 	public String getCode() {
 		return item.getCode();
+	}
+
+	public String getType() {
+		return item.getType();
 	}
 
 	public String getName() {
@@ -152,4 +166,5 @@ public class ItemBranch extends AuditModel {
 	public String getBranchName() {
 		return branch.getNameKh();
 	}
+
 }

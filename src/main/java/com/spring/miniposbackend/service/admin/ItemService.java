@@ -168,6 +168,7 @@ public class ItemService {
 			}
 			Item item = new Item();
 			item.setCode(requestItem.getCode());
+			item.setType(requestItem.getType());
 			item.setName(requestItem.getName());
 			item.setNameKh(requestItem.getNameKh());
 			item.setPrice(requestItem.getPrice());
@@ -200,7 +201,6 @@ public class ItemService {
 //						itemBranchRepository.save(itemBranch.get());
 //						
 //					}
-
 			});
 			return item;
 		}).orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
@@ -229,6 +229,7 @@ public class ItemService {
 			});
 
 			item.setCode(requestItem.getCode());
+			item.setType(requestItem.getType());
 			item.setName(requestItem.getName());
 			item.setNameKh(requestItem.getNameKh());
 			item.setStock(requestItem.isStock());

@@ -197,6 +197,16 @@ public class ItemBranchService {
 			return itemBranchRepository.save(itemBranch);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
+	
+	public ItemBranch updateAddOn(Long itemBranchId, List<Long> addOnItems) {
+		return itemBranchRepository.findById(itemBranchId).map(itemBranch -> {
+			if (itemBranch.getBranch().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
+				throw new UnauthorizedException("Corporate is unauthorized");
+			}
+			itemBranch.setAddOnItems(addOnItems);
+			return itemBranchRepository.save(itemBranch);
+		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
+	}
 
 	public ItemBranch setPrice(Long itemBranchId, BigDecimal price, Short discount) {
 		return itemBranchRepository.findById(itemBranchId).map(itemBranch -> {

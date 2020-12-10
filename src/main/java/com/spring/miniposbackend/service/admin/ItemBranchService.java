@@ -210,7 +210,6 @@ public class ItemBranchService {
 
 	public ItemBranch setPrice(Long itemBranchId, BigDecimal price, Short discount) {
 		return itemBranchRepository.findById(itemBranchId).map(itemBranch -> {
-			System.out.print(price);
 			itemBranch.setPrice(price);
 			itemBranch.setDiscount(discount);
 			return itemBranchRepository.save(itemBranch);

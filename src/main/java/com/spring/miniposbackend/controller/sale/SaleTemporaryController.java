@@ -2,7 +2,6 @@ package com.spring.miniposbackend.controller.sale;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.InternalErrorException;
 import com.spring.miniposbackend.model.SuccessResponse;
+import com.spring.miniposbackend.modelview.SaleRequest;
 import com.spring.miniposbackend.repository.admin.BranchSettingRepository;
 import com.spring.miniposbackend.service.sale.SaleTemporaryService;
 import com.spring.miniposbackend.util.UserProfileUtil;
@@ -58,7 +58,7 @@ public class SaleTemporaryController {
 
 	@PostMapping
 	@PreAuthorize("hasAnyRole('SALE')")
-	public SuccessResponse create(@RequestBody List<Map<String, Integer>> requestItem, @RequestParam boolean OBU) {
+	public SuccessResponse create(@RequestBody List<SaleRequest> requestItem, @RequestParam boolean OBU) {
 
 		String val = "false";
 		if (OBU)

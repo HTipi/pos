@@ -3,7 +3,6 @@ package com.spring.miniposbackend.service.sale;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import com.spring.miniposbackend.repository.admin.UserRepository;
@@ -18,6 +17,7 @@ import com.spring.miniposbackend.exception.UnprocessableEntityException;
 import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.model.admin.Seat;
 import com.spring.miniposbackend.model.sale.SaleTemporary;
+import com.spring.miniposbackend.modelview.SaleRequest;
 import com.spring.miniposbackend.repository.admin.BranchSettingRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
 import com.spring.miniposbackend.repository.admin.SeatRepository;
@@ -43,133 +43,100 @@ public class SaleTemporaryService {
 	private BranchSettingRepository branchSettingRepository;
 
 	@Transactional
-	public List<SaleTemporary> addItem(List<Map<String, Integer>> requestItems, boolean OBU, Integer userId) {
+	public List<SaleTemporary> addItem(List<SaleRequest> requestItems, boolean OBU, Integer userId) {
 		List<SaleTemporary> list = new ArrayList<SaleTemporary>();
 		for (int i = 0; i < requestItems.size(); i++) {
 			for (int j = i + 1; j < requestItems.size(); j++) {
-				if (requestItems.get(i).get("itemId").equals(requestItems.get(j).get("itemId"))) {
+				if (requestItems.get(i).getItemId().equals(requestItems.get(j).getItemId())) {
 					throw new UnprocessableEntityException("itemId are duplicated");
 				}
 			}
 		}
+		Seat seat;
 		if (!OBU) {
-			Integer seatID = requestItems.get(0).get("seatId");
-			List<SaleTemporary> saletmp = saleRepository.findBySeatId(seatID);
-
+			Integer seatId = requestItems.get(0).getSeatId();
+			List<SaleTemporary> saletmp = saleRepository.findBySeatId(seatId);
+			seat = seatRepository.findById(seatId)
+					.orElseThrow(() -> new ResourceNotFoundException("Seat does not exist"));
 			if (saletmp.size() > 0) {
 				if (!saletmp.get(0).getUserEdit().getId().equals(userProfile.getProfile().getUser().getId())) {
-					saleRepository.updateUserEdit(userProfile.getProfile().getUser().getId(), seatID);
+					saleRepository.updateUserEdit(userProfile.getProfile().getUser().getId(), seatId);
 					return saletmp;
 				}
 			}
+		} else {
+			seat = null;
 		}
 		requestItems.forEach((requestItem) -> {
-			Long saleTmpId = requestItem.get("saleTmpId").longValue();
-			Integer seatId = requestItem.get("seatId");
-			Long itemId = requestItem.get("itemId").longValue();
-			Short quantity = requestItem.get("quantity").shortValue();
-			Short discount = requestItem.get("discount").shortValue();
-			Double discountAmount = requestItem.get("discountAmount").doubleValue();
+			Long saleTmpId = requestItem.getSaleTmpId();
+//			Integer seatId = requestItem.getSeatId();
+			Long itemId = requestItem.getItemId();
+			Short quantity = requestItem.getQuantity();
+			Short discount = requestItem.getDiscount();
+			Double discountAmount = requestItem.getDiscountAmount();
+			Long parentSaleId = requestItem.getParentSaleId();
 			if (quantity < 1) {
 				throw new UnprocessableEntityException("Quantity must be greater than 0");
 			}
-			SaleTemporary saleTemp;
-			if (OBU) {
-				saleTemp = userRepository.findById(userId)
-						.map(user -> itemBranchRepository.findById(itemId).map(item -> {
-							if (!item.isEnable()) {
-								throw new ConflictException("Item is disable");
-							}
-							if ((item.getBranch().getId() != userProfile.getProfile().getBranch().getId())
-									|| !item.isEnable()) {
-								throw new UnauthorizedException("Item is unauthorized");
-							}
-							if (item.isStock()) {
-								//int itembalance = saleRepository.findItemBalanceByUserId(userId, item.getId())
-										//.orElse(0);
-								if (item.getItemBalance() < quantity) {
-									String setting = branchSettingRepository.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(),"STN").orElse("");
-									if(!setting.contentEquals(setting))
+			SaleTemporary saleTemporary;
+			saleTemporary = itemBranchRepository.findById(itemId)
+					.map(item -> userRepository.findById(userId).map(user -> {
+						if (!item.isEnable()) {
+							throw new ConflictException("Item is disable");
+						}
+						if ((item.getBranch().getId() != userProfile.getProfile().getBranch().getId())
+								|| !item.isEnable()) {
+							throw new UnauthorizedException("Item is unauthorized");
+						}
+						if (item.isStock()) {
+							if (item.getItemBalance() < quantity) {
+								String setting = branchSettingRepository.findByBranchIdAndSettingCode(
+										userProfile.getProfile().getBranch().getId(), "STN").orElse("");
+								if (!setting.contentEquals(setting))
 									throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
-								}
 							}
+						}
+						SaleTemporary parentSale;
+						if (parentSaleId == null || parentSaleId == 0) {
+							parentSale = null;
+						} else {
+							parentSale = saleRepository.findById(parentSaleId).orElse(null);
+						}
+						return saleRepository.findById(saleTmpId).map(saleTmp -> {
 
-							SaleTemporary saleCheck = saleRepository.findById(saleTmpId).map(saleTmp -> {
-
-								saleTmp.setValueDate(new Date());
-								saleTmp.setQuantity(quantity);
-								saleTmp.setDiscount(discount);
-								saleTmp.setDiscountAmount(discountAmount);
-								return saleRepository.save(saleTmp);
-							}).orElse(null);
-							if (saleCheck == null) {
-								saleCheck = new SaleTemporary();
-								saleCheck.setItemBranch(item);
-								saleCheck.setValueDate(new Date());
-								saleCheck.setQuantity(quantity);
-								saleCheck.setPrice(item.getPrice());
-								saleCheck.setDiscount(discount);
-								saleCheck.setPrinted(false);
-								saleCheck.setCancel(false);
-								saleCheck.setUser(user);
-								saleCheck.setUserEdit(user);
-								saleCheck.setDiscountAmount(discountAmount);
-								return saleRepository.save(saleCheck);
+							saleTmp.setValueDate(new Date());
+							saleTmp.setQuantity(quantity);
+							saleTmp.setDiscount(discount);
+							saleTmp.setDiscountAmount(discountAmount);
+							if (parentSale != null && item.getType().contentEquals("SUBITEM")) {
+								saleTmp.setParentSaleTemporary(parentSale);
 							}
-							return saleCheck;
-						}).orElseThrow(() -> new ResourceNotFoundException("Record does not exist")))
-						.orElseThrow(() -> new ResourceNotFoundException("User does not exist"));
-			} else {
-				saleTemp = seatRepository.findById(seatId).map(seat -> {
-					return userRepository.findById(userId)
-							.map(user -> itemBranchRepository.findById(itemId).map(item -> {
-								if (!item.isEnable()) {
-									throw new ConflictException("Item is disable");
-								}
-								if ((item.getBranch().getId() != userProfile.getProfile().getBranch().getId())
-										|| !item.isEnable()) {
-									throw new UnauthorizedException("Item is unauthorized");
-								}
-								if (item.isStock()) {
-//									int itembalance = saleRepository.findItemBalanceByUserId(userId, item.getId())
-//											.orElse(0);
-									if (item.getItemBalance() < quantity) {
-										String setting = branchSettingRepository.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(),"STN").orElse("");
-										if(!setting.contentEquals(setting))
-										throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
-									}
-								}
-								SaleTemporary saleCheck = saleRepository.findById(saleTmpId).map(saleTmp -> {
-									
-									saleTmp.setValueDate(new Date());
-									saleTmp.setQuantity(quantity);
-									saleTmp.setDiscount(discount);
-									saleTmp.setDiscountAmount(discountAmount);
-									return saleRepository.save(saleTmp);
-								}).orElse(null);
-								if (saleCheck == null) {
-									saleCheck = new SaleTemporary();
-									saleCheck.setSeat(seat);
-									saleCheck.setItemBranch(item);
-									saleCheck.setValueDate(new Date());
-									saleCheck.setQuantity(quantity);
-									saleCheck.setPrice(item.getPrice());
-									saleCheck.setDiscount(discount);
-									saleCheck.setPrinted(false);
-									saleCheck.setCancel(false);
-									saleCheck.setUser(user);
-									saleCheck.setUserEdit(user);
-									saleCheck.setDiscountAmount(discountAmount);
-									return saleRepository.save(saleCheck);
-								}
-								return saleCheck;
-							}).orElseThrow(() -> new ResourceNotFoundException("Record does not exist")))
-							.orElseThrow(() -> new ResourceNotFoundException("User does not exist"));
-
-				}).orElseThrow(() -> new ResourceNotFoundException("Seat does not exist"));
+							return saleRepository.save(saleTmp);
+						}).orElseGet(() -> {
+							SaleTemporary saleTmp = new SaleTemporary();
+							saleTmp.setItemBranch(item);
+							saleTmp.setValueDate(new Date());
+							saleTmp.setQuantity(quantity);
+							saleTmp.setPrice(item.getPrice());
+							saleTmp.setDiscount(discount);
+							saleTmp.setPrinted(false);
+							saleTmp.setCancel(false);
+							saleTmp.setUser(user);
+							saleTmp.setUserEdit(user);
+							saleTmp.setDiscountAmount(discountAmount);
+							if (parentSale != null && item.getType().contentEquals("SUBITEM")) {
+								saleTmp.setParentSaleTemporary(parentSale);
+							}
+							if (!OBU) {
+								saleTmp.setSeat(seat);
+							}
+							return saleRepository.save(saleTmp);
+						});
+					}).orElseThrow(() -> new ResourceNotFoundException("User does not exist")))
+					.orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
+			if (saleTemporary.getParentSaleTemporary() == null) {
+				list.add(saleTemporary);
 			}
-
-			list.add(saleTemp);
 		});
 		return list;
 	}
@@ -230,9 +197,11 @@ public class SaleTemporaryService {
 				// sale.getItemBranch().getId())
 				// .orElse(0);
 				if (sale.getItemBranch().getItemBalance() < quantity) {
-					String setting = branchSettingRepository.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(),"STN").orElse("");
-					if(setting !="true")
-					throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
+					String setting = branchSettingRepository
+							.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN")
+							.orElse("");
+					if (setting != "true")
+						throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 				}
 			}
 			ItemBranch itemBranch = sale.getItemBranch();
@@ -307,13 +276,5 @@ public class SaleTemporaryService {
 		}
 
 	}
-//	
-//	public void cancelBySeatId(Long seatId) {
-//		
-//	}
-//	
-//	public void changeSeatId(Long seatIdFrom, Long seatIdTo) {
-//		
-//	}
 
 }

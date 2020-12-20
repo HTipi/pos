@@ -2,6 +2,7 @@ package com.spring.miniposbackend.model.sale;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -12,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -86,6 +88,15 @@ public class SaleTemporary extends AuditModel {
 	@JoinColumn(name = "item_branch_id", nullable = false)
 	@JsonIgnore
 	private ItemBranch itemBranch;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "parent_sale_id", nullable = true)
+	@JsonIgnore
+	private SaleTemporary parentSaleTemporary;
+	
+	@OneToMany(fetch = FetchType.LAZY)
+	@JoinColumn(name = "parent_sale_id", nullable = true)
+	private List<SaleTemporary> addOns;
 
 	public String getItemCode() {
 		return itemBranch.getCode();

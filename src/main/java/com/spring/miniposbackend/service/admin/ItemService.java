@@ -189,6 +189,7 @@ public class ItemService {
 				} else {
 					itemBr.setEnable(false);
 				}
+				itemBr.setAddOnItems(new ArrayList<Long>());
 				itemBr.setStockIn(0L);
 				itemBr.setStockOut(0L);
 				itemBr.setPrice(item.getPrice());

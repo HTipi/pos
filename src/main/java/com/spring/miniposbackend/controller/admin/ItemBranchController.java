@@ -116,10 +116,11 @@ public class ItemBranchController {
 		return itemBranchService.update(itemBranchId, itemBranch);
 	}
 	
-	@PutMapping("{itemBranchId}/update-add-on")
+	@PatchMapping("{itemBranchId}/update-add-on")
 	@PreAuthorize("hasAnyRole('OWNER')")
-	public ItemBranch updateAddOn(@PathVariable Long itemBranchId, @RequestBody List<Long> addOnItems) {
-		return itemBranchService.updateAddOn(itemBranchId, addOnItems);
+	public SuccessResponse updateAddOn(@PathVariable Long itemBranchId, @RequestBody List<Long> addOnItems) {
+		return new SuccessResponse("00", "update Sub Item",
+				itemBranchService.updateAddOn(itemBranchId, addOnItems));
 	}
 
 }

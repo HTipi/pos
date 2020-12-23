@@ -10,17 +10,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.model.admin.Branch;
+import com.spring.miniposbackend.model.admin.BranchCurrency;
 import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.model.admin.Seat;
 import com.spring.miniposbackend.model.admin.User;
 import com.spring.miniposbackend.model.sale.Sale;
 import com.spring.miniposbackend.model.sale.SaleDetail;
 import com.spring.miniposbackend.model.sale.SaleTemporary;
+import com.spring.miniposbackend.repository.admin.BranchCurrencyRepository;
 import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.admin.BranchSettingRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
@@ -62,6 +63,8 @@ public class SaleService {
 	private UserProfileUtil userProfile;
 	@Autowired
 	private BranchSettingRepository branchSettingRepository;
+	@Autowired
+	private BranchCurrencyRepository branchCurrencyRepository;
 
 	public List<Sale> showSaleByUser(Integer userId, @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> date) {
 
@@ -77,7 +80,8 @@ public class SaleService {
 	}
 
 	@Transactional
-	public List<SaleDetail> create(Integer seatId, Integer branchId, Integer userId, boolean OBU) {
+	public List<SaleDetail> create(Integer seatId, Integer branchId, Integer userId, boolean OBU, Double discount,
+			Double cashIn, Double change, Integer currencyId) {
 		User user = userRepository.findById(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
 		Branch branch = branchRepository.findById(branchId)
@@ -87,6 +91,8 @@ public class SaleService {
 		List<SaleDetail> listsales;
 		Sale saleResult;
 		Sale sale;
+		BranchCurrency branchCurrency = branchCurrencyRepository.findById(currencyId)
+				.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
 		if (!OBU) {
 			seat = seatRepository.findById(seatId)
 					.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
@@ -108,6 +114,10 @@ public class SaleService {
 			sale.setTotal(0.00);
 			sale.setReceiptNumber("0");
 			sale.setValueDate(new Date());
+			sale.setDiscountTotal(discount);
+			sale.setCashIn(cashIn);
+			sale.setChange(change);
+			sale.setBranchCurrency(branchCurrency);
 			saleResult = saleRepository.save(sale);
 			saleTemps.forEach((saleTemp) -> {
 
@@ -141,7 +151,11 @@ public class SaleService {
 			sale.setSeatName(seatName);
 			sale.setTotal(0.00);
 			sale.setReceiptNumber("0");
+			sale.setDiscountTotal(discount);
 			sale.setValueDate(new Date());
+			sale.setCashIn(cashIn);
+			sale.setChange(change);
+			sale.setBranchCurrency(branchCurrency);
 			saleResult = saleRepository.save(sale);
 			saleTemps.forEach((saleTemp) -> {
 
@@ -149,12 +163,13 @@ public class SaleService {
 				ItemBranch item = itemRepository.findById(saleTemp.getItemId())
 						.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
 				if (item.isStock()) {
-					int itembalance = saleTemporaryRepository.findItemBalanceByUserId(userId, item.getId())
-							.orElse(0);
+					int itembalance = saleTemporaryRepository.findItemBalanceByUserId(userId, item.getId()).orElse(0);
 					if (item.getItemBalance() < itembalance) {
 
-						String setting = branchSettingRepository.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(),"STN").orElse("");
-						if(!setting.contentEquals(setting))
+						String setting = branchSettingRepository
+								.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN")
+								.orElse("");
+						if (!setting.contentEquals(setting))
 							throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 					}
 				}
@@ -170,7 +185,7 @@ public class SaleService {
 				saleDeail.setTotal(saleTemp.getTotal());
 
 				listsales.add(saleDetailRepository.save(saleDeail));
-				item.setStockOut(item.getStockOut()+saleTemp.getQuantity());
+				item.setStockOut(item.getStockOut() + saleTemp.getQuantity());
 				itemRepository.save(item);
 			});
 			saleTemporaryRepository.deleteByUserId(userId);
@@ -204,7 +219,8 @@ public class SaleService {
 			sales.setReverseDate(new Date());
 			sales.setReverse(true);
 			saleDetailRepository.save(sales);
-			ItemBranch itemBr = itemRepository.findById(sales.getItemBranch().getId()).orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
+			ItemBranch itemBr = itemRepository.findById(sales.getItemBranch().getId())
+					.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
 			itemBr.setStockOut(itemBr.getStockOut() - sales.getQuantity());
 			itemRepository.save(itemBr);
 		});

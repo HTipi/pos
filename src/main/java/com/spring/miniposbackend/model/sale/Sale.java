@@ -19,6 +19,8 @@ import org.hibernate.annotations.DynamicUpdate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.AuditModel;
 import com.spring.miniposbackend.model.admin.Branch;
+import com.spring.miniposbackend.model.admin.BranchCurrency;
+import com.spring.miniposbackend.model.admin.Currency;
 import com.spring.miniposbackend.model.admin.User;
 
 import lombok.Getter;
@@ -66,5 +68,26 @@ public class Sale extends AuditModel{
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
     private User user;
+	
+	@Column(name = "cash_in", nullable = true, length = 10, precision = 2)
+	@ColumnDefault("0")
+    private Double cashIn;
+	
+	@Column(name = "discount_total", nullable = true, length = 10, precision = 2)
+	@ColumnDefault("0")
+    private Double discountTotal;
+	
+	@Column(name = "change", nullable = true, length = 10, precision = 2)
+	@ColumnDefault("0")
+    private Double change;
+	
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "cur_id", nullable = true)
+    @JsonIgnore
+    private BranchCurrency branchCurrency;
+	
+	
+	
+	
 	
 }

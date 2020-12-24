@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.spring.miniposbackend.model.sale.SaleTemporary;
@@ -37,19 +36,22 @@ public interface SaleTemporaryRepository extends JpaRepository<SaleTemporary, Lo
 	@Query(value = "select * from Sales_temp where seat_id=(select seat_id from Sales_temp where user_id=?1 and is_printed=false order by value_date desc limit 1)", nativeQuery = true)
 	List<SaleTemporary> findBySeatUserId(Integer userId);
 
-	@Query(value = "select s from SaleTemporary s where s.user.id=?1")
+	@Query(value = "select s from SaleTemporary s where s.user.id=?1 and s.parentSaleTemporary is null")
 	List<SaleTemporary> findByUserId(Integer userId);
+	
+	@Query(value = "select s from SaleTemporary s where s.user.id=?1 and s.seat.id=?2 and s.parentSaleTemporary is null")
+	List<SaleTemporary> findByUserId(Integer userId, Integer seatId);
 
-	@Query(value = "select * from Sales_temp where seat_id=(select seat_id from Sales_temp where user_id=?1 and is_printed=?2 and cancel=?3 order by value_date desc limit 1)", nativeQuery = true)
+	@Query(value = "select * from Sales_temp where seat_id=(select seat_id from Sales_temp where user_id=?1 and is_printed=?2 and cancel=?3 and parent_sale_id is null order by value_date desc limit 1)", nativeQuery = true)
 	List<SaleTemporary> findByUserIdSeatWithIsPrintedCancel(Integer userId, boolean isPrinted, boolean cancel);
 
-	@Query(value = "select s from SaleTemporary s where s.user.id = ?1 and s.isPrinted=?2 and s.cancel=?3")
+	@Query(value = "select s from SaleTemporary s where s.user.id = ?1 and s.isPrinted=?2 and s.cancel=?3 and s.parentSaleTemporary is null")
 	List<SaleTemporary> findByUserIdWithIsPrintedCancel(Integer userId, boolean isPrinted, boolean cancel);
 
-	@Query(value = "select * from Sales_temp where seat_id=(select seat_id from Sales_temp where user_id=?1 and is_printed=?2  order by value_date desc limit 1)", nativeQuery = true)
+	@Query(value = "select * from Sales_temp where seat_id=(select seat_id from Sales_temp where user_id=?1 and is_printed=?2 and parent_sale_id is null  order by value_date desc limit 1)", nativeQuery = true)
 	List<SaleTemporary> findByUserIdSeatWithisPrinted(Integer userId, boolean isPrinted);
 
-	@Query(value = "select s from SaleTemporary s where s.user.id = ?1 and s.isPrinted=?2")
+	@Query(value = "select s from SaleTemporary s where s.user.id = ?1 and s.isPrinted=?2 and s.parentSaleTemporary is null")
 	List<SaleTemporary> findByUserIdWithisPrinted(Integer userId, boolean isPrinted);
 
 	@Modifying

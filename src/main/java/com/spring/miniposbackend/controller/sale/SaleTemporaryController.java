@@ -66,7 +66,7 @@ public class SaleTemporaryController {
 		String setting = branchSettingRepository.findByOBU(userProfile.getProfile().getBranch().getId()).orElse("");
 		if (val.equalsIgnoreCase(setting))
 			return new SuccessResponse("00", "add SaleTmp",
-					saleService.addItem(requestItem, OBU, userProfile.getProfile().getUser().getId()));
+					saleService.addItems(requestItem, OBU, userProfile.getProfile().getUser().getId()));
 		else
 			throw new ConflictException("Setting was updated, Please restart!", "12");
 	}

@@ -1,5 +1,7 @@
 package com.spring.miniposbackend.modelview;
 
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,6 +14,6 @@ public class SaleRequest {
 	Short quantity;
 	Short discount;
 	Double discountAmount;
-	Long parentSaleId;
+	List<SaleRequest> addOns;
 
 }

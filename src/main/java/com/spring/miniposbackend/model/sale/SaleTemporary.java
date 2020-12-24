@@ -94,7 +94,7 @@ public class SaleTemporary extends AuditModel {
 	@JsonIgnore
 	private SaleTemporary parentSaleTemporary;
 	
-	@OneToMany(fetch = FetchType.LAZY)
+	@OneToMany(fetch = FetchType.EAGER)
 	@JoinColumn(name = "parent_sale_id", nullable = true)
 	private List<SaleTemporary> addOns;
 

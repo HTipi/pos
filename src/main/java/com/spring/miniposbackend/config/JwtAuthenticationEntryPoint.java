@@ -1,7 +1,6 @@
 package com.spring.miniposbackend.config;
 
 import java.io.IOException;
-import java.io.Serializable;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -11,9 +10,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 @Component
-public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint, Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint{
 
 	@Override
 	public void commence(HttpServletRequest request, HttpServletResponse response,
@@ -21,4 +18,5 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint, Se
 		//response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized: "+ authException.getMessage());
 		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "ព័ត៌មានអ្នកមិនត្រឹមត្រូវទេ");
 	}
+	
 }

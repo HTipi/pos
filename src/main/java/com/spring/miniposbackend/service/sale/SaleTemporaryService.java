@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityManager;
+
 import com.spring.miniposbackend.repository.admin.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,9 @@ public class SaleTemporaryService {
 
 	@Autowired
 	private ItemBranchRepository itemBranchRepository;
+	
+	@Autowired
+	private EntityManager entityManager;
 
 	@Autowired
 	private SeatRepository seatRepository;
@@ -45,6 +50,7 @@ public class SaleTemporaryService {
 
 	@Transactional
 	public List<SaleTemporary> addItems(List<SaleRequest> requestItems, boolean OBU, Integer userId) {
+		entityManager.clear();
 //		List<SaleTemporary> list = new ArrayList<SaleTemporary>();
 		for (int i = 0; i < requestItems.size(); i++) {
 			for (int j = i + 1; j < requestItems.size(); j++) {
@@ -78,6 +84,8 @@ public class SaleTemporaryService {
 				addItem(subItem, user, seat, Optional.of(saleTemporary));
 			});
 		});
+		entityManager.flush();
+		entityManager.clear();
 		if (!OBU) {
 			return saleRepository.findByUserId(userId,seat.get().getId());
 		}else {

@@ -12,8 +12,13 @@ import com.spring.miniposbackend.model.sale.SaleDetail;
 
 @Repository
 public interface SaleDetailRepository extends JpaRepository<SaleDetail, Long> {
+	
 	List<SaleDetail> findBySaleId(Long saleId);
-
+	
+	@Query("select s from SaleDetail s where s.id= ?1 and s.parentSaleDetail is null")
+	List<SaleDetail> findMainBySaleId(Long saleId);
+	
+	@Query("select s from SaleDetail s where s.user.id= ?1 and s.parentSaleDetail is null")
 	List<SaleDetail> findByUserId(Integer userId);
 
 	@Query("select s from SaleDetail s where s.branch.corporate.id= ?1 and date_trunc('day',s.valueDate) between ?2 and ?3")

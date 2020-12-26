@@ -13,6 +13,7 @@ import com.spring.miniposbackend.model.sale.SaleTemporary;
 @Repository
 public interface SaleTemporaryRepository extends JpaRepository<SaleTemporary, Long> {
 
+	@Query(value = "select s from SaleTemporary s where s.seat.id=?1 and s.parentSaleTemporary is null")
 	List<SaleTemporary> findBySeatId(Integer seatId);
 
 	@Query(value = "select s from SaleTemporary s where s.itemBranch.id = ?1")

@@ -2,6 +2,7 @@ package com.spring.miniposbackend.model.sale;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -12,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.ColumnDefault;
@@ -84,6 +86,15 @@ public class SaleDetail extends AuditModel {
 	@JoinColumn(name = "item_branch_id", nullable = false)
 	@JsonIgnore
 	private ItemBranch itemBranch;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "parent_sale_id", nullable = true)
+	@JsonIgnore
+	private SaleDetail parentSaleDetail;
+	
+	@OneToMany(fetch = FetchType.EAGER)
+	@JoinColumn(name = "parent_sale_id", nullable = true)
+	private List<SaleDetail> addOns;
 
 	public String getItemTypeName() {
 		return itemBranch.getItemTypeName();

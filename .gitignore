@@ -5,5 +5,5 @@
 .project
 postgres.iml
 mini-pos-backend.iml
-src/main/resources
+src/main/resources/*
 /bin/

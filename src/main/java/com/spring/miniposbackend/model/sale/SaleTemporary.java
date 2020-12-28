@@ -19,7 +19,11 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import com.spring.miniposbackend.model.AuditModel;
 import com.spring.miniposbackend.model.admin.User;
+
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.admin.ItemBranch;
@@ -50,7 +54,7 @@ public class SaleTemporary extends AuditModel {
 	@Column(name = "quantity", nullable = false)
 	@ColumnDefault("1")
 	private Short quantity;
-	
+
 	@Column(name = "discount_amt", nullable = false)
 	@ColumnDefault("0")
 	private Double discountAmount;
@@ -69,36 +73,38 @@ public class SaleTemporary extends AuditModel {
 	@ColumnDefault("false")
 	private boolean cancel;
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "seat_id", nullable = true)
 	@JsonIgnore
 	private Seat seat;
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
 	@JsonIgnore
 	private User user;
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "useredit_id", nullable = false)
 	@JsonIgnore
 	private User userEdit;
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "item_branch_id", nullable = false)
 	@JsonIgnore
 	private ItemBranch itemBranch;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "parent_sale_id", nullable = true)
 	@JsonIgnore
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	private SaleTemporary parentSaleTemporary;
-	
-	@OneToMany(fetch = FetchType.EAGER)
+
+	@OneToMany(fetch = FetchType.LAZY)
 	@JoinColumn(name = "parent_sale_id", nullable = true)
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	private List<SaleTemporary> addOns;
-	
-	public List<Long> getAddOnItems(){
+
+	public List<Long> getAddOnItems() {
 		return itemBranch.getAddOnItems();
 	}
 

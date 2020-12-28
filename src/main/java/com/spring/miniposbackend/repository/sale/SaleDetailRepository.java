@@ -15,7 +15,7 @@ public interface SaleDetailRepository extends JpaRepository<SaleDetail, Long> {
 	
 	List<SaleDetail> findBySaleId(Long saleId);
 	
-	@Query("select s from SaleDetail s where s.id= ?1 and s.parentSaleDetail is null")
+	@Query("select s from SaleDetail s where s.sale.id= ?1 and s.parentSaleDetail is null")
 	List<SaleDetail> findMainBySaleId(Long saleId);
 	
 	@Query("select s from SaleDetail s where s.user.id= ?1 and s.parentSaleDetail is null")

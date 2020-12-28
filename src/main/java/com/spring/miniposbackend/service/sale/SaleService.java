@@ -154,7 +154,6 @@ public class SaleService {
 		saleRepository.save(saleResult);
 		entityManager.flush();
 		entityManager.clear();
-		System.out.print(saleDetailRepository.findMainBySaleId(sale.getId()).toString());
 		return saleDetailRepository.findMainBySaleId(sale.getId());
 	}
 

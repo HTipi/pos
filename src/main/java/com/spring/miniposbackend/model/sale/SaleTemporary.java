@@ -97,6 +97,10 @@ public class SaleTemporary extends AuditModel {
 	@OneToMany(fetch = FetchType.EAGER)
 	@JoinColumn(name = "parent_sale_id", nullable = true)
 	private List<SaleTemporary> addOns;
+	
+	public List<Long> getAddOnItems(){
+		return itemBranch.getAddOnItems();
+	}
 
 	public String getItemCode() {
 		return itemBranch.getCode();

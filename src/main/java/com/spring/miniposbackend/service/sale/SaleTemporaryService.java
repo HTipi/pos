@@ -1,6 +1,5 @@
 package com.spring.miniposbackend.service.sale;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -33,7 +32,7 @@ public class SaleTemporaryService {
 
 	@Autowired
 	private ItemBranchRepository itemBranchRepository;
-	
+
 	@Autowired
 	private EntityManager entityManager;
 
@@ -80,19 +79,24 @@ public class SaleTemporaryService {
 		requestItems.forEach((requestItem) -> {
 			SaleTemporary saleTemporary = addItem(requestItem, user, seat, Optional.empty());
 //			list.add(saleTemporary);
-			List<SaleRequest> subItems = requestItem.getAddOns() == null ? new ArrayList<SaleRequest>():requestItem.getAddOns();
+			List<SaleRequest> subItems = requestItem.getAddOns() == null ? new ArrayList<SaleRequest>()
+					: requestItem.getAddOns();
 			subItems.forEach((subItem) -> {
-				addItem(subItem, user, seat, Optional.of(saleTemporary));
+				SaleTemporary addOnItem = addItem(subItem, user, seat, Optional.of(saleTemporary));
+				saleTemporary.setPrice(saleTemporary.getPrice().add(addOnItem.getPrice()));
 			});
+			if (requestItem.getAddOns() != null) {
+				saleRepository.save(saleTemporary);
+			}
 		});
 		entityManager.flush();
 		entityManager.clear();
 		if (!OBU) {
-			return saleRepository.findByUserId(userId,seat.get().getId());
-		}else {
+			return saleRepository.findByUserId(userId, seat.get().getId());
+		} else {
 			return saleRepository.findByUserId(userId);
 		}
-			
+
 	}
 
 	@Transactional
@@ -237,7 +241,6 @@ public class SaleTemporaryService {
 		Long itemId = requestItem.getItemId();
 		Short quantity = requestItem.getQuantity();
 		Short discount = requestItem.getDiscount();
-		BigDecimal price = requestItem.getPrice();
 		Double discountAmount = requestItem.getDiscountAmount();
 		if (quantity < 1) {
 			throw new UnprocessableEntityException("Quantity must be greater than 0");
@@ -262,7 +265,7 @@ public class SaleTemporaryService {
 				saleTmp.setValueDate(new Date());
 				saleTmp.setQuantity(quantity);
 				saleTmp.setDiscount(discount);
-				saleTmp.setPrice(price);
+				saleTmp.setPrice(item.getPrice());
 				saleTmp.setDiscountAmount(discountAmount);
 				if (parentSale.isPresent() && item.getType().contentEquals("SUBITEM")) {
 					saleTmp.setParentSaleTemporary(parentSale.get());
@@ -273,7 +276,7 @@ public class SaleTemporaryService {
 				saleTmp.setItemBranch(item);
 				saleTmp.setValueDate(new Date());
 				saleTmp.setQuantity(quantity);
-				saleTmp.setPrice(price);
+				saleTmp.setPrice(item.getPrice());
 				saleTmp.setDiscount(discount);
 				saleTmp.setPrinted(false);
 				saleTmp.setCancel(false);

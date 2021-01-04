@@ -7,7 +7,6 @@ import java.util.Optional;
 
 import javax.persistence.EntityManager;
 
-import com.spring.miniposbackend.modelview.SaleTransaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
@@ -142,7 +141,7 @@ public class SaleService {
 		} else {
 			saleTemporaryRepository.deleteByUserId(userId);
 		}
-		List<SaleDetail> saleDetails = saleDetailRepository.findBySaleId(sale.getId());
+		List<SaleDetail> saleDetails = saleDetailRepository.findMainBySaleId(sale.getId());
 
 		double sum = 0.00;
 		for (int i = 0; i < saleDetails.size(); i++) {

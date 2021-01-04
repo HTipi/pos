@@ -53,10 +53,10 @@ public class SaleDetail extends AuditModel {
 
 	@Column(name = "discount", nullable = false, length = 10, precision = 2)
 	private Short discount;
-	
+
 	@Column(name = "discount_amt", nullable = false, length = 10, precision = 2)
 	private Double discountAmount;
-	
+
 	@Column(name = "total", nullable = false, length = 10, precision = 2)
 	private Double total;
 
@@ -86,12 +86,12 @@ public class SaleDetail extends AuditModel {
 	@JoinColumn(name = "item_branch_id", nullable = false)
 	@JsonIgnore
 	private ItemBranch itemBranch;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "parent_sale_id", nullable = true)
 	@JsonIgnore
 	private SaleDetail parentSaleDetail;
-	
+
 	@OneToMany(fetch = FetchType.EAGER)
 	@JoinColumn(name = "parent_sale_id", nullable = true)
 	private List<SaleDetail> addOns;
@@ -99,7 +99,7 @@ public class SaleDetail extends AuditModel {
 	public String getItemTypeName() {
 		return itemBranch.getItemTypeName();
 	}
-	
+
 	public Long getItemId() {
 		return itemBranch.getId();
 	}
@@ -118,5 +118,51 @@ public class SaleDetail extends AuditModel {
 
 	public String getItemNameKh() {
 		return itemBranch.getNameKh();
+	}
+
+	public String getReceiptNumber() {
+		return sale.getReceiptNumber();
+	}
+
+	public boolean getReverse() {
+		return sale.isReverse();
+	}
+
+	public Date getReverseDate() {
+		return sale.getReverseDate();
+	}
+
+	public String getSeatName() {
+		return sale.getSeatName();
+	}
+
+	public String getBranchName() {
+		return branch.getNameKh();
+	}
+
+	public String getUserName() {
+		return user.getUsername();
+	}
+
+	public Double getCashIn() {
+		return sale.getCashIn();
+	}
+
+	public Double getDiscountTotal() {
+		return sale.getDiscountTotal();
+	}
+
+	public Double getChange() {
+		return sale.getChange();
+	}
+
+	public BigDecimal getRate() {
+		return sale.getBranchCurrency().getRate();
+	}
+	public String getCurrencyCode() {
+		return sale.getBranchCurrency().getCode();
+	}
+	public Double getGrandTotal() {
+		return sale.getTotal();
 	}
 }

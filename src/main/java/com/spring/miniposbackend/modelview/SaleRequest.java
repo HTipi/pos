@@ -1,5 +1,6 @@
 package com.spring.miniposbackend.modelview;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import lombok.Getter;
@@ -11,6 +12,7 @@ public class SaleRequest {
 	Long saleTmpId;
 	Integer seatId;
 	Long itemId;
+	BigDecimal price;
 	Short quantity;
 	Short discount;
 	Double discountAmount;

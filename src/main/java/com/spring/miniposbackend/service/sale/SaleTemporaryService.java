@@ -1,5 +1,6 @@
 package com.spring.miniposbackend.service.sale;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -52,13 +53,13 @@ public class SaleTemporaryService {
 	public List<SaleTemporary> addItems(List<SaleRequest> requestItems, boolean OBU, Integer userId) {
 		entityManager.clear();
 //		List<SaleTemporary> list = new ArrayList<SaleTemporary>();
-		for (int i = 0; i < requestItems.size(); i++) {
-			for (int j = i + 1; j < requestItems.size(); j++) {
-				if (requestItems.get(i).getItemId().equals(requestItems.get(j).getItemId())) {
-					throw new UnprocessableEntityException("itemId are duplicated");
-				}
-			}
-		}
+//		for (int i = 0; i < requestItems.size(); i++) {
+//			for (int j = i + 1; j < requestItems.size(); j++) {
+//				if (requestItems.get(i).getItemId().equals(requestItems.get(j).getItemId())) {
+//					throw new UnprocessableEntityException("itemId are duplicated");
+//				}
+//			}
+//		}
 		Optional<Seat> seat;
 		if (!OBU) {
 			Integer seatId = requestItems.get(0).getSeatId();
@@ -236,6 +237,7 @@ public class SaleTemporaryService {
 		Long itemId = requestItem.getItemId();
 		Short quantity = requestItem.getQuantity();
 		Short discount = requestItem.getDiscount();
+		BigDecimal price = requestItem.getPrice();
 		Double discountAmount = requestItem.getDiscountAmount();
 		if (quantity < 1) {
 			throw new UnprocessableEntityException("Quantity must be greater than 0");
@@ -260,6 +262,7 @@ public class SaleTemporaryService {
 				saleTmp.setValueDate(new Date());
 				saleTmp.setQuantity(quantity);
 				saleTmp.setDiscount(discount);
+				saleTmp.setPrice(price);
 				saleTmp.setDiscountAmount(discountAmount);
 				if (parentSale.isPresent() && item.getType().contentEquals("SUBITEM")) {
 					saleTmp.setParentSaleTemporary(parentSale.get());
@@ -270,7 +273,7 @@ public class SaleTemporaryService {
 				saleTmp.setItemBranch(item);
 				saleTmp.setValueDate(new Date());
 				saleTmp.setQuantity(quantity);
-				saleTmp.setPrice(item.getPrice());
+				saleTmp.setPrice(price);
 				saleTmp.setDiscount(discount);
 				saleTmp.setPrinted(false);
 				saleTmp.setCancel(false);

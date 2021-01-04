@@ -184,42 +184,43 @@ public class SaleService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<SaleTransaction> showSaleTranByUser(Integer userId, Optional<Long> saleId) {
-		List<SaleTransaction> saleTransactions = new ArrayList<>();
-		List<Sale> saleList = new ArrayList<>();
-		if (saleId.isPresent())
-			saleList = saleRepository.findByIdWithUserId(userId, saleId.get());
-		else
-			saleList = saleRepository.findByUserId(userId);
-
-		if (saleList.size() == 0) {
-			throw new ResourceNotFoundException("Record does not exist");
-		}
-
-		saleList.forEach((sale) -> {
-			List<SaleDetail> saleDetails = saleDetailRepository.findBySaleId(sale.getId());
-			saleDetails.forEach((saleDetail) -> {
-				SaleTransaction saleTransaction = new SaleTransaction();
-				saleTransaction.setId(sale.getId());
-				saleTransaction.setBranchName(saleDetail.getBranch().getName());
-				saleTransaction.setDiscount(saleDetail.getDiscount());
-				saleTransaction.setDiscountAmount(saleDetail.getDiscountAmount());
-				saleTransaction.setItemName(saleDetail.getItemNameKh());
-				saleTransaction.setPrice(Double.parseDouble(saleDetail.getPrice().toString()));
-				saleTransaction.setQuantity(saleDetail.getQuantity());
-				saleTransaction.setSeatName(sale.getSeatName());
-				saleTransaction.setReceiptNumber(sale.getReceiptNumber());
-				saleTransaction.setTotal(saleDetail.getTotal());
-				saleTransaction.setReverse(sale.isReverse());
-				saleTransaction.setReverseDate(saleDetail.getReverseDate());
-				saleTransaction.setValueDate(sale.getValueDate());
-				saleTransaction.setUserName(sale.getUser().getFullName());
-				saleTransaction.setItemId(saleDetail.getItemBranch().getId());
-				saleTransactions.add(saleTransaction);
-			});
-		});
-
-		return saleTransactions;
+	public List<SaleDetail> showSaleTranByUser(Integer userId, Optional<Long> saleId) {
+//		List<SaleTransaction> saleTransactions = new ArrayList<>();
+//		List<Sale> saleList = new ArrayList<>();
+//		if (saleId.isPresent())
+//			saleList = saleRepository.findByIdWithUserId(userId, saleId.get());
+//		else
+//			saleList = saleRepository.findByUserId(userId);
+//
+//		if (saleList.size() == 0) {
+//			throw new ResourceNotFoundException("Record does not exist");
+//		}
+//
+//		saleList.forEach((sale) -> {
+//			List<SaleDetail> saleDetails = saleDetailRepository.findBySaleId(sale.getId());
+//			saleDetails.forEach((saleDetail) -> {
+//				SaleTransaction saleTransaction = new SaleTransaction();
+//				saleTransaction.setId(sale.getId());
+//				saleTransaction.setBranchName(saleDetail.getBranch().getName());
+//				saleTransaction.setDiscount(saleDetail.getDiscount());
+//				saleTransaction.setDiscountAmount(saleDetail.getDiscountAmount());
+//				saleTransaction.setItemName(saleDetail.getItemNameKh());
+//				saleTransaction.setPrice(Double.parseDouble(saleDetail.getPrice().toString()));
+//				saleTransaction.setQuantity(saleDetail.getQuantity());
+//				saleTransaction.setSeatName(sale.getSeatName());
+//				saleTransaction.setReceiptNumber(sale.getReceiptNumber());
+//				saleTransaction.setTotal(saleDetail.getTotal());
+//				saleTransaction.setReverse(sale.isReverse());
+//				saleTransaction.setReverseDate(saleDetail.getReverseDate());
+//				saleTransaction.setValueDate(sale.getValueDate());
+//				saleTransaction.setUserName(sale.getUser().getFullName());
+//				saleTransaction.setItemId(saleDetail.getItemBranch().getId());
+//				saleTransactions.add(saleTransaction);
+//			});
+//		});
+//
+//		return saleTransactions;
+		return saleDetailRepository.findMainBySaleId(saleId.get());
 
 	}
 

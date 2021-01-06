@@ -12,7 +12,7 @@ public class SaleRequest {
 	Integer seatId;
 	Long itemId;
 	Short quantity;
-	Short discount;
+	Short discountPercentage;
 	Double discountAmount;
 	List<SaleRequest> addOns;
 

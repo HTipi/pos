@@ -1,5 +1,6 @@
 package com.spring.miniposbackend.service.sale;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -120,10 +121,10 @@ public class SaleService {
 		sale.setBranch(branch);
 		sale.setUser(user);
 		sale.setSeatName(seatName);
-		sale.setTotal(0.00);
+		sale.setSubTotal(BigDecimal.valueOf(0.00));
+		sale.setDiscountTotal(BigDecimal.valueOf(0.00));
 		sale.setReceiptNumber("0");
 		sale.setValueDate(new Date());
-		sale.setDiscountTotal(discount);
 		sale.setCashIn(cashIn);
 		sale.setChange(change);
 		sale.setBranchCurrency(branchCurrency);
@@ -143,11 +144,14 @@ public class SaleService {
 		}
 		List<SaleDetail> saleDetails = saleDetailRepository.findMainBySaleId(sale.getId());
 
-		double sum = 0.00;
-		for (int i = 0; i < saleDetails.size(); i++) {
-			sum += saleDetails.get(i).getTotal();
+		double subTotal = 0.00;
+		double discountAmount = 0.00;
+		for(int i=0;i<saleDetails.size();i++) {
+			subTotal += saleDetails.get(i).getSubTotal();
+			discountAmount += saleDetails.get(i).getGrandDiscountTotal();
 		}
-		saleResult.setTotal(sum);
+		saleResult.setSubTotal(BigDecimal.valueOf(subTotal));
+		saleResult.setDiscountTotal(BigDecimal.valueOf(discountAmount));
 		String receiptNum = receiptService.getReceiptNumberByBranchId(branchId).toString();
 		saleResult.setReceiptNumber(receiptNum);
 		saleRepository.save(saleResult);
@@ -242,11 +246,10 @@ public class SaleService {
 		saleDeail.setUser(user);
 		saleDeail.setSale(sale);
 		saleDeail.setValueDate(new Date());
-		saleDeail.setDiscount(saleTemporary.getDiscount());
+		saleDeail.setDiscountPercentage(saleTemporary.getDiscountPercentage());
 		saleDeail.setDiscountAmount(saleTemporary.getDiscountAmount());
 		saleDeail.setPrice(saleTemporary.getPrice());
 		saleDeail.setQuantity(saleTemporary.getQuantity());
-		saleDeail.setTotal(saleTemporary.getTotal());
 		if(parentSaleDetail.isPresent()) {
 			saleDeail.setParentSaleDetail(parentSaleDetail.get());
 		}

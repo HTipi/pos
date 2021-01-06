@@ -1,5 +1,6 @@
 package com.spring.miniposbackend.service.sale;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -240,7 +241,7 @@ public class SaleTemporaryService {
 		Long saleTmpId = requestItem.getSaleTmpId();
 		Long itemId = requestItem.getItemId();
 		Short quantity = requestItem.getQuantity();
-		Short discount = requestItem.getDiscount();
+		Short discountPercentage = requestItem.getDiscountPercentage();
 		Double discountAmount = requestItem.getDiscountAmount();
 		if (quantity < 1) {
 			throw new UnprocessableEntityException("Quantity must be greater than 0");
@@ -264,9 +265,10 @@ public class SaleTemporaryService {
 			return saleRepository.findById(saleTmpId).map(saleTmp -> {
 				saleTmp.setValueDate(new Date());
 				saleTmp.setQuantity(quantity);
-				saleTmp.setDiscount(discount);
+				saleTmp.setDiscountPercentage(discountPercentage);
+				saleTmp.setDiscountAmount(BigDecimal.valueOf(discountAmount));
 				saleTmp.setPrice(item.getPrice());
-				saleTmp.setDiscountAmount(discountAmount);
+				saleTmp.setUserEdit(user);
 				if (parentSale.isPresent() && item.getType().contentEquals("SUBITEM")) {
 					saleTmp.setParentSaleTemporary(parentSale.get());
 				}
@@ -277,12 +279,12 @@ public class SaleTemporaryService {
 				saleTmp.setValueDate(new Date());
 				saleTmp.setQuantity(quantity);
 				saleTmp.setPrice(item.getPrice());
-				saleTmp.setDiscount(discount);
+				saleTmp.setDiscountPercentage(discountPercentage);
+				saleTmp.setDiscountAmount(BigDecimal.valueOf(discountAmount));
 				saleTmp.setPrinted(false);
 				saleTmp.setCancel(false);
 				saleTmp.setUser(user);
 				saleTmp.setUserEdit(user);
-				saleTmp.setDiscountAmount(discountAmount);
 				if (parentSale.isPresent() && item.getType().contentEquals("SUBITEM")) {
 					saleTmp.setParentSaleTemporary(parentSale.get());
 				}

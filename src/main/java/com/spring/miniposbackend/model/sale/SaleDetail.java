@@ -15,6 +15,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicUpdate;
@@ -51,14 +53,15 @@ public class SaleDetail extends AuditModel {
 	@Column(name = "quantity", nullable = false)
 	private Short quantity;
 
-	@Column(name = "discount", nullable = false, length = 10, precision = 2)
-	private Short discount;
+	@Column(name = "discount_amount", nullable = false,  precision = 10, scale = 2)
+	@ColumnDefault("0")
+	private BigDecimal discountAmount;
 
-	@Column(name = "discount_amt", nullable = false, length = 10, precision = 2)
-	private Double discountAmount;
-
-	@Column(name = "total", nullable = false, length = 10, precision = 2)
-	private Double total;
+	@Column(name = "discount_percentage", nullable = false, precision = 10, scale = 2)
+	@Min(0)
+	@Max(100)
+	@ColumnDefault("0")
+	private Short discountPercentage;
 
 	@Column(name = "reverse", nullable = false)
 	@ColumnDefault("false")
@@ -144,15 +147,28 @@ public class SaleDetail extends AuditModel {
 		return user.getUsername();
 	}
 
-	public Double getCashIn() {
+	
+	public double getDiscountTotal() {
+		return (Math.round(price.doubleValue() * quantity * discountPercentage / 100 * 100) / 100.0) - discountAmount.doubleValue();
+	}
+
+	public double getSubTotal() {
+		return Math.round(price.doubleValue() * quantity * 100) / 100.0;
+	}
+
+	public double getTotal() {
+		return getSubTotal() - getDiscountTotal();
+	}
+	
+	public double getCashIn() {
 		return sale.getCashIn();
 	}
 
-	public Double getDiscountTotal() {
-		return sale.getDiscountTotal();
+	public double getGrandDiscountTotal() {
+		return sale.getDiscountTotal().doubleValue();
 	}
 
-	public Double getChange() {
+	public double getChange() {
 		return sale.getChange();
 	}
 
@@ -162,7 +178,8 @@ public class SaleDetail extends AuditModel {
 	public String getCurrencyCode() {
 		return sale.getBranchCurrency().getCode();
 	}
-	public Double getGrandTotal() {
+	
+	public double getGrandTotal() {
 		return sale.getTotal();
 	}
 }

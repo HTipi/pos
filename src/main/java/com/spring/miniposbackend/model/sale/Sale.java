@@ -56,11 +56,11 @@ public class Sale extends AuditModel {
 	@Column(name = "reverse_date", nullable = true)
 	private Date reverseDate;
 
-	@Column(name = "sub_total", nullable = true, length = 10, precision = 2)
+	@Column(name = "sub_total", nullable = false, length = 10, precision = 2)
 	@ColumnDefault("0")
 	private BigDecimal subTotal;
 
-	@Column(name = "discount_total", nullable = true, length = 10, precision = 2)
+	@Column(name = "discount_total", nullable = false, length = 10, precision = 2)
 	@ColumnDefault("0")
 	private BigDecimal discountTotal;
 

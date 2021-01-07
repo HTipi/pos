@@ -149,7 +149,7 @@ public class SaleDetail extends AuditModel {
 
 	
 	public double getDiscountTotal() {
-		return (Math.round(price.doubleValue() * quantity * discountPercentage / 100 * 100) / 100.0) - discountAmount.doubleValue();
+		return (Math.round(price.doubleValue() * quantity * discountPercentage / 100 * 100) / 100.0) + discountAmount.doubleValue();
 	}
 
 	public double getSubTotal() {

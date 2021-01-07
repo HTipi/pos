@@ -139,7 +139,8 @@ public class SaleTemporary extends AuditModel {
 	}
 
 	private Double getDiscountTotal() {
-		return (Math.round(price.doubleValue() * quantity * discountPercentage / 100 * 100) / 100.0) - discountAmount.doubleValue();
+		
+		return (Math.round(price.doubleValue() * quantity * discountPercentage / 100 * 100) / 100.0) + discountAmount.doubleValue();
 	}
 
 	public Double getSubTotal() {

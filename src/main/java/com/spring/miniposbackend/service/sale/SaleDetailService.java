@@ -40,12 +40,15 @@ public class SaleDetailService {
 		SaleDetailSummary summary = jdbc.queryForObject(
 				"select count(case when sale.reverse = true then 1 else null end) as void_invoice, "
 						+ "count(case when sale.reverse = false then 1 else null end) as paid_invoice, "
-						+ "sum(case when sale.reverse = false then sub_total else 0 end) as sub_total, "
-						+ "sum(case when sale.reverse = false then discount_total else 0 end) as discount_total "
-						+ "where sale.branch_id = :branchId "
+						+ "sum(case when sale.reverse = false then sale.sub_total else 0 end) as sub_total, "
+						+ "sum(case when sale.reverse = false then sale.discount_amount else 0 end) as discount_amount, "
+						+ "sum(case when sale.reverse = false then sale.discount_sale_detail else 0 end) as discount_sale_detail "
+						+ "from sales sale " + "where sale.branch_id = :branchId "
 						+ "and date_trunc('day',sale.value_date) between :startDate and :endDate",
-				mapSqlParameterSource, (rs, rowNum) -> new SaleDetailSummary(rs.getInt(""), rs.getInt(""),
-						rs.getDouble(""), rs.getDouble("")));
+				mapSqlParameterSource,
+				(rs, rowNum) -> new SaleDetailSummary(rs.getInt("void_invoice"), rs.getInt("paid_invoice"),
+						rs.getDouble("sub_total"), rs.getDouble("discount_amount"),
+						rs.getDouble("discount_sale_detail")));
 		List<SaleDetailTransaction> details = jdbc.query("select ib.id as item_id, " + "max(i.name) as item_name, "
 				+ "sum(sale.quantity) as quantity, " + "sum(ROUND(sale.quantity*sale.price::numeric,2)) as sub_total, "
 				+ "sum(ROUND((sale.quantity*sale.price*sale.discount_percentage/100)::numeric,2)-sale.discount_amount) as discount_total "

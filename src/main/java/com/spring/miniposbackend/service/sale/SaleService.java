@@ -122,7 +122,8 @@ public class SaleService {
 		sale.setUser(user);
 		sale.setSeatName(seatName);
 		sale.setSubTotal(BigDecimal.valueOf(0.00));
-		sale.setDiscountTotal(BigDecimal.valueOf(0.00));
+		sale.setDiscountSaleDetail(BigDecimal.valueOf(0.00));
+		sale.setDiscountAmount(BigDecimal.valueOf(discount));
 		sale.setReceiptNumber("0");
 		sale.setValueDate(new Date());
 		sale.setCashIn(cashIn);
@@ -148,10 +149,10 @@ public class SaleService {
 		double discountAmount = 0.00;
 		for(int i=0;i<saleDetails.size();i++) {
 			subTotal += saleDetails.get(i).getSubTotal();
-			discountAmount += saleDetails.get(i).getGrandDiscountTotal();
+			discountAmount += saleDetails.get(i).getDiscountTotal();
 		}
 		saleResult.setSubTotal(BigDecimal.valueOf(subTotal));
-		saleResult.setDiscountTotal(BigDecimal.valueOf(discountAmount));
+		saleResult.setDiscountSaleDetail(BigDecimal.valueOf(discountAmount));
 		String receiptNum = receiptService.getReceiptNumberByBranchId(branchId).toString();
 		saleResult.setReceiptNumber(receiptNum);
 		saleRepository.save(saleResult);

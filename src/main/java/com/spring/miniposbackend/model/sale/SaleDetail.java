@@ -164,10 +164,6 @@ public class SaleDetail extends AuditModel {
 		return sale.getCashIn();
 	}
 
-	public double getGrandDiscountTotal() {
-		return sale.getDiscountTotal().doubleValue();
-	}
-
 	public double getChange() {
 		return sale.getChange();
 	}
@@ -179,7 +175,16 @@ public class SaleDetail extends AuditModel {
 		return sale.getBranchCurrency().getCode();
 	}
 	
+	public double getGrandDiscountAmount() {
+		return sale.getDiscountAmount().doubleValue();
+	}
+	
+	public double getGrandDiscountTotal() {
+		return sale.getDiscountTotal().doubleValue();
+	}
+	
 	public double getGrandTotal() {
 		return sale.getTotal();
 	}
+	
 }

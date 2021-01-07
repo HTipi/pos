@@ -59,13 +59,21 @@ public class Sale extends AuditModel {
 	@Column(name = "sub_total", nullable = false, length = 10, precision = 2)
 	@ColumnDefault("0")
 	private BigDecimal subTotal;
-
-	@Column(name = "discount_total", nullable = false, length = 10, precision = 2)
+	
+	@Column(name = "discount_amount", nullable = false,  precision = 10, scale = 2)
 	@ColumnDefault("0")
-	private BigDecimal discountTotal;
+	private BigDecimal discountAmount;
+
+	@Column(name = "discount_sale_detail", nullable = false, length = 10, precision = 2)
+	@ColumnDefault("0")
+	private BigDecimal discountSaleDetail;
+	
+	public Double getDiscountTotal() {
+		return discountSaleDetail.doubleValue() + discountAmount.doubleValue();
+	}
 
 	public Double getTotal() {
-		return subTotal.doubleValue() - discountTotal.doubleValue();
+		return subTotal.doubleValue() - getDiscountTotal();
 	}
 
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

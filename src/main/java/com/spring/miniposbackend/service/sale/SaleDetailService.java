@@ -51,12 +51,12 @@ public class SaleDetailService {
 						rs.getDouble("discount_sale_detail")));
 		List<SaleDetailTransaction> details = jdbc.query("select ib.id as item_id, " + "max(i.name) as item_name, "
 				+ "sum(sale.quantity) as quantity, " + "sum(ROUND(sale.quantity*sale.price::numeric,2)) as sub_total, "
-				+ "sum(ROUND((sale.quantity*sale.price*sale.discount_percentage/100)::numeric,2)-sale.discount_amount) as discount_total "
+				+ "sum(ROUND((sale.quantity*sale.price*sale.discount_percentage/100)::numeric,2)+sale.discount_amount) as discount_total "
 				+ "from sale_details sale " + "inner join item_branches ib on sale.item_branch_id = ib.id "
 				+ "inner join items i on ib.item_id=i.id "
 //				+ "inner join branches branch on sale.branch_id = branch.id "
 //				+ "inner join corporates corporate on branch.corporate_id = corporate.id "
-				+ "where sale.branch_id = :branchId " + "and sale.reverse = false "
+				+ "where sale.branch_id = :branchId " + "and sale.reverse = false and i.type='MAINITEM'"
 				+ "and date_trunc('day',sale.value_date) between :startDate and :endDate " + "group by ib.id",
 				mapSqlParameterSource,
 				(rs, rowNum) -> new SaleDetailTransaction(rs.getLong("item_id"), rs.getString("item_name"),

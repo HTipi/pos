@@ -5,16 +5,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
-
 import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.model.sale.SaleDetail;
 import com.spring.miniposbackend.modelview.SaleDetailSummary;
 import com.spring.miniposbackend.modelview.SaleDetailTransaction;
 import com.spring.miniposbackend.util.UserProfileUtil;
+
 
 @Service
 public class SaleDetailService {
@@ -36,7 +38,6 @@ public class SaleDetailService {
 		if (userProfile.getProfile().getBranch().getId() != branchId) {
 			throw new UnauthorizedException("Branch is unauthorized");
 		}
-		Map<String, Object> response = new HashMap<String, Object>();
 		SaleDetailSummary summary = jdbc.queryForObject(
 				"select count(case when sale.reverse = true then 1 else null end) as void_invoice, "
 						+ "count(case when sale.reverse = false then 1 else null end) as paid_invoice, "
@@ -61,9 +62,12 @@ public class SaleDetailService {
 				mapSqlParameterSource,
 				(rs, rowNum) -> new SaleDetailTransaction(rs.getLong("item_id"), rs.getString("item_name"),
 						rs.getInt("quantity"), rs.getDouble("sub_total"), rs.getDouble("discount_total")));
-		response.put("summary", summary);
-		response.put("details", details);
-		return response;
+		JSONObject ojb = new JSONObject(summary);
+		JSONArray ojbArray = new JSONArray(details);
+		ojb.put("details", ojbArray);
+		//response.put("summary", summary);
+		//response.put("details", details);
+		return ojb.toMap();
 
 	}
 

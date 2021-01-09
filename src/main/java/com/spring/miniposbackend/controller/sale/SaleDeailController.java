@@ -20,14 +20,12 @@ public class SaleDeailController {
 
 	@Autowired
 	private SaleDetailService saleDetailService;
-	@Autowired
-	private UserProfileUtil userProfile;
 
 	@GetMapping("by-item")
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse showTransactionSummary(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
-			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to) {
+			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,@RequestParam boolean byUser) {
 		return new SuccessResponse("00", "fetch transaction",
-				saleDetailService.getTransactionSummary(userProfile.getProfile().getBranch().getId(), from, to));
+				saleDetailService.getTransactionSummary(from, to,byUser));
 	}
 }

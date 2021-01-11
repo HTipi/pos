@@ -10,7 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -44,12 +44,12 @@ public class BranchCurrency extends AuditModel{
     @ColumnDefault("false")
     private boolean enable;
 	
-	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "branch_id")
     @JsonIgnore
     private Branch branch;
 	
-	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "currency_id")
     @JsonIgnore
     private Currency currency;

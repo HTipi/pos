@@ -148,8 +148,8 @@ public class SaleService {
 		double subTotal = 0.00;
 		double discountAmount = 0.00;
 		for(int i=0;i<saleDetails.size();i++) {
-			subTotal += saleDetails.get(i).getSubTotal();
-			discountAmount += saleDetails.get(i).getDiscountTotal();
+			subTotal += saleDetails.get(i).getSubTotal().doubleValue();
+			discountAmount += saleDetails.get(i).getDiscountTotal().doubleValue();
 		}
 		saleResult.setSubTotal(BigDecimal.valueOf(subTotal));
 		saleResult.setDiscountSaleDetail(BigDecimal.valueOf(discountAmount));
@@ -251,6 +251,8 @@ public class SaleService {
 		saleDeail.setDiscountAmount(saleTemporary.getDiscountAmount());
 		saleDeail.setPrice(saleTemporary.getPrice());
 		saleDeail.setQuantity(saleTemporary.getQuantity());
+		saleDeail.setSubTotal(BigDecimal.valueOf(saleTemporary.getSubTotal()));
+		saleDeail.setDiscountTotal(BigDecimal.valueOf(saleTemporary.getDiscountTotal()));
 		if(parentSaleDetail.isPresent()) {
 			saleDeail.setParentSaleDetail(parentSaleDetail.get());
 		}

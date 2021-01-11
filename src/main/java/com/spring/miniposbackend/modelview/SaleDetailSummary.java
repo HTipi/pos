@@ -1,6 +1,6 @@
 package com.spring.miniposbackend.modelview;
 
-import java.sql.Date;
+import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +16,8 @@ public class SaleDetailSummary {
 	private Double subTotal;
 	private Double discountAmount;
 	private Double discountSaleDetail;
+	
+	private List<SaleDetailTransaction> details;
 
 	public SaleDetailSummary(Integer voidInvoice, Integer paidInvoice, String startDate,String endDate, Double subTotal, Double discountAmount,
 			Double discountSaleDetail) {

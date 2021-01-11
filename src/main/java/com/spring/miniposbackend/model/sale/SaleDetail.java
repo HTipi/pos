@@ -57,7 +57,7 @@ public class SaleDetail extends AuditModel {
 	@ColumnDefault("0")
 	private BigDecimal discountAmount;
 
-	@Column(name = "discount_percentage", nullable = false, precision = 10, scale = 2)
+	@Column(name = "discount_percentage", nullable = false)
 	@Min(0)
 	@Max(100)
 	@ColumnDefault("0")
@@ -69,6 +69,14 @@ public class SaleDetail extends AuditModel {
 
 	@Column(name = "reverse_date")
 	private Date reverseDate;
+	
+	@Column(name = "discount_total", nullable = false,  precision = 10, scale = 2)
+	@ColumnDefault("0")
+	private BigDecimal discountTotal;
+	
+	@Column(name = "sub_total", nullable = false,  precision = 10, scale = 2)
+	@ColumnDefault("0")
+	private BigDecimal subTotal;
 
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "sale_id", nullable = false)
@@ -147,17 +155,8 @@ public class SaleDetail extends AuditModel {
 		return user.getUsername();
 	}
 
-	
-	public double getDiscountTotal() {
-		return (Math.round(price.doubleValue() * quantity * discountPercentage / 100 * 100) / 100.0) + discountAmount.doubleValue();
-	}
-
-	public double getSubTotal() {
-		return Math.round(price.doubleValue() * quantity * 100) / 100.0;
-	}
-
 	public double getTotal() {
-		return getSubTotal() - getDiscountTotal();
+		return subTotal.doubleValue() - discountTotal.doubleValue();
 	}
 	
 	public double getCashIn() {

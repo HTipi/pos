@@ -59,7 +59,7 @@ public class SaleTemporary extends AuditModel {
 	@ColumnDefault("0")
 	private BigDecimal discountAmount;
 
-	@Column(name = "discount_percentage", nullable = false, precision = 10, scale = 2)
+	@Column(name = "discount_percentage", nullable = false)
 	@Min(0)
 	@Max(100)
 	@ColumnDefault("0")
@@ -151,8 +151,8 @@ public class SaleTemporary extends AuditModel {
 	}
 
 	public Double getDiscountTotal() {
-		return (Math.round(price.doubleValue() * quantity * discountPercentage / 100 * getDecimalPlace())
-				/ Math.pow(10, getDecimalPlace())) + discountAmount.doubleValue();
+		return Math.round(price.doubleValue() * quantity * discountPercentage / 100 * Math.pow(10, getDecimalPlace()))
+				/ Math.pow(10, getDecimalPlace()) + discountAmount.doubleValue();
 	}
 
 	public Double getSubTotal() {

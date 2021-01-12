@@ -47,13 +47,13 @@ public class SaleDetail extends AuditModel {
 	@Column(name = "value_date", nullable = false)
 	private Date valueDate;
 
-	@Column(name = "price", nullable = false, length = 10, precision = 2)
+	@Column(name = "price", nullable = false, precision = 10, scale = 2)
 	private BigDecimal price;
 
 	@Column(name = "quantity", nullable = false)
 	private Short quantity;
 
-	@Column(name = "discount_amount", nullable = false,  precision = 10, scale = 2)
+	@Column(name = "discount_amount", nullable = false, precision = 10, scale = 2)
 	@ColumnDefault("0")
 	private BigDecimal discountAmount;
 
@@ -69,12 +69,12 @@ public class SaleDetail extends AuditModel {
 
 	@Column(name = "reverse_date")
 	private Date reverseDate;
-	
-	@Column(name = "discount_total", nullable = false,  precision = 10, scale = 2)
+
+	@Column(name = "discount_total", nullable = false, precision = 10, scale = 2)
 	@ColumnDefault("0")
 	private BigDecimal discountTotal;
-	
-	@Column(name = "sub_total", nullable = false,  precision = 10, scale = 2)
+
+	@Column(name = "sub_total", nullable = false, precision = 10, scale = 2)
 	@ColumnDefault("0")
 	private BigDecimal subTotal;
 
@@ -158,7 +158,7 @@ public class SaleDetail extends AuditModel {
 	public double getTotal() {
 		return subTotal.doubleValue() - discountTotal.doubleValue();
 	}
-	
+
 	public double getCashIn() {
 		return sale.getCashIn();
 	}
@@ -170,20 +170,21 @@ public class SaleDetail extends AuditModel {
 	public BigDecimal getRate() {
 		return sale.getBranchCurrency().getRate();
 	}
+
 	public String getCurrencyCode() {
 		return sale.getBranchCurrency().getCode();
 	}
-	
+
 	public double getGrandDiscountAmount() {
 		return sale.getDiscountAmount().doubleValue();
 	}
-	
+
 	public double getGrandDiscountTotal() {
 		return sale.getDiscountTotal().doubleValue();
 	}
-	
+
 	public double getGrandTotal() {
 		return sale.getTotal();
 	}
-	
+
 }

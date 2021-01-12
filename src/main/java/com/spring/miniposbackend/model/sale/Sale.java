@@ -56,7 +56,7 @@ public class Sale extends AuditModel {
 	@Column(name = "reverse_date", nullable = true)
 	private Date reverseDate;
 
-	@Column(name = "sub_total", nullable = false, length = 10, precision = 2)
+	@Column(name = "sub_total", nullable = false, precision = 10, scale = 2)
 	@ColumnDefault("0")
 	private BigDecimal subTotal;
 	
@@ -64,7 +64,7 @@ public class Sale extends AuditModel {
 	@ColumnDefault("0")
 	private BigDecimal discountAmount;
 
-	@Column(name = "discount_sale_detail", nullable = false, length = 10, precision = 2)
+	@Column(name = "discount_sale_detail", nullable = false, precision = 10, scale = 2)
 	@ColumnDefault("0")
 	private BigDecimal discountSaleDetail;
 	
@@ -86,16 +86,16 @@ public class Sale extends AuditModel {
 	@JsonIgnore
 	private User user;
 
-	@Column(name = "cash_in", nullable = true, length = 10, precision = 2)
+	@Column(name = "cash_in", nullable = false,  precision = 10, scale = 2)
 	@ColumnDefault("0")
 	private Double cashIn;
 
-	@Column(name = "change", nullable = true, length = 10, precision = 2)
+	@Column(name = "change", nullable = false,  precision = 10, scale = 2)
 	@ColumnDefault("0")
 	private Double change;
 
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name = "cur_id", nullable = true)
+	@JoinColumn(name = "cur_id", nullable = false)
 	@JsonIgnore
 	private BranchCurrency branchCurrency;
 

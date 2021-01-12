@@ -46,9 +46,10 @@ public class Branch extends AuditModel {
 	@JsonIgnore
 	private Address address;
 
-	@OneToOne(mappedBy = "branch", fetch = FetchType.LAZY, optional = false)
+	@OneToMany(fetch = FetchType.LAZY)
+	@JoinColumn(name = "branch_id", nullable = true)
 	@JsonIgnore
-	private BranchCurrency branchCurrency;
+	private List<BranchCurrency> branchCurrencies;
 
 	@ManyToOne
 	@JoinColumn(name = "corporate_id", nullable = false)

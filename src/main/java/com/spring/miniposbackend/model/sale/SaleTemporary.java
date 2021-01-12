@@ -3,6 +3,7 @@ package com.spring.miniposbackend.model.sale;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,6 +25,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.spring.miniposbackend.model.admin.BranchCurrency;
 import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.model.admin.Seat;
 
@@ -139,7 +141,13 @@ public class SaleTemporary extends AuditModel {
 	}
 
 	private Integer getDecimalPlace() {
-		return itemBranch.getBranch().getBranchCurrency().getCurrency().getDecimalPlace();
+		Optional<BranchCurrency> branchCurrency = itemBranch.getBranch().getBranchCurrencies().stream()
+				.filter(x -> x.isHome()).findFirst();
+		if (branchCurrency.isPresent()) {
+			return branchCurrency.get().getDecimalPlace();
+		} else {
+			return 0;
+		}
 	}
 
 	public Double getDiscountTotal() {

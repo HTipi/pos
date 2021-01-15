@@ -16,6 +16,10 @@ public class ItemSummaryDetail {
 	private Double monthlySaleAmount;
 	private Double weeklySaleAmount;
 	private Double dailySaleAmount;
+	
+	private Double monthlyDiscountAmount;
+	private Double weeklyDiscountAmount;
+	private Double dailyDiscountAmount;
 
 	public ItemSummaryDetail() {
 		itemId = null;
@@ -27,10 +31,14 @@ public class ItemSummaryDetail {
 		monthlySaleAmount = null;
 		weeklySaleAmount = null;
 		dailySaleAmount = null;
+		monthlyDiscountAmount = null;
+		weeklyDiscountAmount = null;
+		dailyDiscountAmount = null;
 	}
 
 	public ItemSummaryDetail(Long itemId, String itemName, String itemNamekh, Integer monthlySale, Integer weeklySale,
-			Integer dailySale, Double monthlySaleAmount, Double weeklySaleAmount, Double dailySaleAmout) {
+			Integer dailySale, Double monthlySaleAmount, Double weeklySaleAmount, Double dailySaleAmout,Double monthlyDiscountAmount, Double weeklyDiscountAmount,
+			Double dailyDiscountAmount) {
 		this.itemId = itemId;
 		this.itemName = itemName;
 		this.itemNameKh = itemNamekh;
@@ -40,5 +48,8 @@ public class ItemSummaryDetail {
 		this.monthlySaleAmount = monthlySaleAmount;
 		this.weeklySaleAmount = weeklySaleAmount;
 		this.dailySaleAmount = dailySaleAmout;
+		this.monthlyDiscountAmount = monthlyDiscountAmount;
+		this.weeklyDiscountAmount = weeklyDiscountAmount;
+		this.dailyDiscountAmount = dailyDiscountAmount;
 	}
 }

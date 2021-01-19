@@ -29,7 +29,10 @@ public class SeatController {
 	public SuccessResponse getAll() {
 		return new SuccessResponse("00", "fetch Seat", seatService.showByBranchId(userProfile.getProfile().getBranch().getId()));
 	}
-
+	@GetMapping("seat-status")
+	public SuccessResponse getSeatStatus() {
+		return new SuccessResponse("00", "fetch Seat", seatService.showByBranchId(userProfile.getProfile().getBranch().getId()));
+	}
 	@PostMapping
 	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
 	public SuccessResponse create(@RequestBody Seat requestItem) {

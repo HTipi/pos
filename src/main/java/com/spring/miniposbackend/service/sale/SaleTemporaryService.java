@@ -209,6 +209,11 @@ public class SaleTemporaryService {
 			return saleRepository.findBySeatId(seatId);
 		}
 	}
+	public List<Integer> showStatusSeatByBranchId(Integer branchId) {
+		
+		return saleRepository.findStatusSeatByBranchId(branchId);
+		
+	}
 
 	public List<SaleTemporary> showByUserId(Integer userId, Optional<Boolean> isPrinted, Optional<Boolean> cancel,
 			boolean OBU) {

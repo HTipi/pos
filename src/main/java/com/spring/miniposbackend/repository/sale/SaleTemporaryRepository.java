@@ -77,4 +77,7 @@ public interface SaleTemporaryRepository extends JpaRepository<SaleTemporary, Lo
 	Optional<Integer> findItemBalanceByUserId(Integer userId,Long itemBranchId);
 	@Query(value = "select sum(s.quantity) from SaleTemporary s where s.seat.id = ?1 and s.itemBranch.id=?2")
 	Optional<Integer> findItemBalanceBySeatId(Integer seatId,Long itemBranchId);
+	
+	@Query(value = "select s.seat.id from SaleTemporary s where s.user.branch.id = ?1")
+	List<Integer> findStatusSeatByBranchId(Integer branchId);
 }

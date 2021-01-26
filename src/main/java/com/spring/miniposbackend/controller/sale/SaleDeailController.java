@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.service.sale.SaleDetailService;
-import com.spring.miniposbackend.util.UserProfileUtil;
 
 @RestController
 @RequestMapping("sale-detail")

@@ -18,6 +18,10 @@ public class BranchSummaryDetail {
 	private Double weeklySaleAmount;
 	private Double dailySaleAmount;
 
+	private Double monthlyDiscountAmount;
+	private Double weeklyDiscountAmount;
+	private Double dailyDiscountAmount;
+
 	public BranchSummaryDetail() {
 		branchId = null;
 		monthlySale = null;
@@ -26,11 +30,15 @@ public class BranchSummaryDetail {
 		monthlySaleAmount = null;
 		weeklySaleAmount = null;
 		dailySaleAmount = null;
+		monthlyDiscountAmount = null;
+		weeklyDiscountAmount = null;
+		dailyDiscountAmount = null;
 	}
 
 	public BranchSummaryDetail(Integer branchId, String branchName, String branchNameKh, Integer monthlySale,
 			Integer weeklySale, Integer dailySale, Double monthlySaleAmount, Double weeklySaleAmount,
-			Double dailySaleAmout) {
+			Double dailySaleAmout, Double monthlyDiscountAmount, Double weeklyDiscountAmount,
+			Double dailyDiscountAmount) {
 		this.branchId = branchId;
 		this.branchName = branchName;
 		this.branchNameKh = branchNameKh;
@@ -40,6 +48,10 @@ public class BranchSummaryDetail {
 		this.monthlySaleAmount = monthlySaleAmount;
 		this.weeklySaleAmount = weeklySaleAmount;
 		this.dailySaleAmount = dailySaleAmout;
+		this.monthlyDiscountAmount = monthlyDiscountAmount;
+		this.weeklyDiscountAmount = weeklyDiscountAmount;
+		this.dailyDiscountAmount = dailyDiscountAmount;
+
 	}
 
 }

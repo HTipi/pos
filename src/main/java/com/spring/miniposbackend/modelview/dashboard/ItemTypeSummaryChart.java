@@ -11,6 +11,7 @@ public class ItemTypeSummaryChart {
 	private String itemTypeName;
 	private String itemTypeKh;
 	private Double saleAmt;
+	private Double disAmt;
 	private Integer saleItem;
 
 	public ItemTypeSummaryChart() {
@@ -18,14 +19,16 @@ public class ItemTypeSummaryChart {
 		this.itemTypeName=null;
 		this.itemTypeKh=null;
 		this.saleAmt=null;
+		this.disAmt= null;
 		this.saleItem=null;
 	}
 	
-	public ItemTypeSummaryChart(Integer itemTypeId, String itemTypeName, String itemTypeKh,Double saleAmt,Integer saleItem) {
+	public ItemTypeSummaryChart(Integer itemTypeId, String itemTypeName, String itemTypeKh,Double saleAmt,Double disAmt,Integer saleItem) {
 		this.itemTypeId = itemTypeId;
 		this.itemTypeName = itemTypeName;
 		this.itemTypeKh = itemTypeKh;
 		this.saleAmt = saleAmt;
+		this.disAmt = disAmt;
 		this.saleItem = saleItem;
 	}
 }

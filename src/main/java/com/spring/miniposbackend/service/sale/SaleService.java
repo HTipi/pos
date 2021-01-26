@@ -71,12 +71,14 @@ public class SaleService {
 	@Autowired
 	private BranchCurrencyRepository branchCurrencyRepository;
 
-	public List<Sale> showSaleByUser(Integer userId, @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> date) {
-
+	public List<Sale> showSaleByUser(@DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> date,boolean byUser) {
 		if (date.isPresent()) {
-			return saleRepository.findByIdWithValueDate(userId, date.get());
+			if(byUser)
+			return saleRepository.findByIdWithValueDate(userProfile.getProfile().getUser().getId(), date.get());
+			else 
+				return saleRepository.findByBranchIdWithValueDate(userProfile.getProfile().getBranch().getId(), date.get());	
 		}
-		return saleRepository.findByUserId(userId);
+		return saleRepository.findByUserId(userProfile.getProfile().getUser().getId());
 
 	}
 

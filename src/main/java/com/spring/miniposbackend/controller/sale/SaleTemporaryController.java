@@ -46,6 +46,11 @@ public class SaleTemporaryController {
 			@RequestParam Optional<Boolean> cancel) {
 		return new SuccessResponse("00", "fetch Sale Tmp by Seat", saleService.showBySeatId(seatId, isPrinted, cancel));
 	}
+	@GetMapping("status-seat")
+	@PreAuthorize("hasAnyRole('SALE')")
+	public SuccessResponse getStatusSeat() {
+		return new SuccessResponse("00", "fetch status seat", saleService.showStatusSeatByBranchId(userProfile.getProfile().getBranch().getId()));
+	}
 
 	@GetMapping("by-user")
 	@PreAuthorize("hasAnyRole('SALE')")
@@ -105,7 +110,6 @@ public class SaleTemporaryController {
 		try {
 			return new SuccessResponse("00", "do Print", saleService.printBySeat(seatId));
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw new InternalErrorException("print SaleTmp Failed", "04");
 		}
 

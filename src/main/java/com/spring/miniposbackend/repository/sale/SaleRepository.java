@@ -22,5 +22,8 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
 	 @Query(value = "select s from Sale s where s.user.id = ?1 and  date_trunc('day',value_date)=?2")
 	    List<Sale> findByIdWithValueDate(Integer userId, @DateTimeFormat(pattern = "yyyy-MM-dd") Date date);
 	 
+	 @Query(value = "select s from Sale s where s.branch.id = ?1 and  date_trunc('day',value_date)=?2")
+	    List<Sale> findByBranchIdWithValueDate(Integer userId, @DateTimeFormat(pattern = "yyyy-MM-dd") Date date);
+	 
 
 }

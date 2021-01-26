@@ -21,7 +21,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "receipt")
+@Table(name = "receipts")
 @Setter @Getter
 @DynamicUpdate
 public class Receipt extends AuditModel{

@@ -16,4 +16,7 @@ public interface StockEntryRepository extends JpaRepository<StockEntry, Long>{
 	
 	@Query(value = "select sum(s.quantity) from StockEntry s where s.itemBranch.id=?1 and s.stock.id = ?2 and s.stock.posted =false")
 	Optional<Integer> findByItemBranchId(Long itemBranchId,Long stockId);
+	
+	@Query("select case when count(s)> 0 then true else false end from StockEntry s where s.stock.id = ?1")
+	boolean existsByStockId(Long stockId);
 }

@@ -14,6 +14,7 @@ import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.admin.CorporateRepository;
 import com.spring.miniposbackend.repository.admin.StockTypeRepository;
 import com.spring.miniposbackend.repository.admin.UserRepository;
+import com.spring.miniposbackend.repository.stock.StockEntryRepository;
 import com.spring.miniposbackend.repository.stock.StockRepository;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
@@ -32,6 +33,8 @@ public class StockService {
 	private UserRepository userRepository;
 	@Autowired
 	private UserProfileUtil userProfile;
+	@Autowired
+	private StockEntryRepository stockEntryRepository;
 
 	public List<Stock> showStockInByBranchId(Integer branchId, Optional<Boolean> posted) {
 		return userRepository.findById(userProfile.getProfile().getUser().getId()).map((user) -> {
@@ -132,6 +135,9 @@ public class StockService {
 			if (stock.isPosted()) {
 				throw new ConflictException("Stock transaction is already posted");
 			}
+			boolean entriesExist = stockEntryRepository.existsByStockId(stockId);
+			if (entriesExist)
+				throw new ConflictException("Please remove stock item first");
 			stockRepository.deleteById(stockId);
 			return stock;
 		}).orElseThrow(() -> new ResourceNotFoundException("Stock does not exist"));

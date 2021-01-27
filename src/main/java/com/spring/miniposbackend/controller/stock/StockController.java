@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.model.stock.Stock;
+import com.spring.miniposbackend.repository.stock.StockEntryRepository;
 import com.spring.miniposbackend.service.stock.StockService;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
@@ -27,6 +28,8 @@ public class StockController {
 	private StockService stockService;
 	@Autowired
 	private UserProfileUtil userProfile;
+	@Autowired
+	private StockEntryRepository stockEntryRepository;
 
 	@GetMapping("stock-in")
 	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")

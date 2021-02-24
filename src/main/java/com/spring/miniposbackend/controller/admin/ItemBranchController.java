@@ -76,7 +76,7 @@ public class ItemBranchController {
 	}
 
 	@PatchMapping("{itemBranchId}/set-price")
-	@PreAuthorize("hasAnyRole('BRANCH')")
+	@PreAuthorize("hasAnyRole('BRANCH','OWNER')")
 	public SuccessResponse setPrice(@PathVariable Long itemBranchId, @RequestParam BigDecimal price,
 			@RequestParam Short discount) {
 		return new SuccessResponse("00", "update Price Discount",
@@ -84,7 +84,7 @@ public class ItemBranchController {
 	}
 
 	@PatchMapping("{itemBranchId}/set-discount")
-	@PreAuthorize("hasAnyRole('BRANCH')")
+	@PreAuthorize("hasAnyRole('BRANCH','OWNER')")
 	public ItemBranch setDiscount(@PathVariable Long itemBranchId, @RequestParam Short discount) {
 		return itemBranchService.setDiscount(itemBranchId, discount);
 	}

@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.service.admin.BranchCurrencyService;
 import com.spring.miniposbackend.util.UserProfileUtil;
+import java.math.BigDecimal;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("currency")
@@ -23,5 +27,10 @@ public class BranchCurrencyController {
 	public SuccessResponse getByBranch(){ // will get from user
 		return new SuccessResponse("00", "fetch Currency", branchCurrencyServie.showByBranchId(userProfile.getProfile().getBranch().getId(), true, true));
 	} 
+        
+        @PatchMapping("{currencyId}/set-rate")
+        public SuccessResponse changeRate(@PathVariable Integer currencyId, @RequestParam BigDecimal rate){
+            return new SuccessResponse("00", "fetch Currency", branchCurrencyServie.changeRate(currencyId, rate));
+        }
 
 }

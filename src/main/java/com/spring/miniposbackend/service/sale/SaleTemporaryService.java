@@ -64,7 +64,7 @@ public class SaleTemporaryService {
 				throw new ResourceNotFoundException("Invoice does not exit");
 			}
 			saletmps = saleRepository.findByInvoiceId(invoiceId.get());
-			if (!saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
+			if (saletmps.size()>0 && !saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
 				saleRepository.updateUserEditInvoice(user.getId(), invoiceId.get());
 				return saletmps;
 			}
@@ -74,7 +74,7 @@ public class SaleTemporaryService {
 				throw new ResourceNotFoundException("Seat does not exist");
 			}
 			saletmps = saleRepository.findBySeatId(seatId.get());
-			if (!saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
+			if (saletmps.size()>0 && !saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
 				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
 				return saletmps;
 			}
@@ -116,7 +116,7 @@ public class SaleTemporaryService {
 				throw new ResourceNotFoundException("Invoice does not exit");
 			}
 			saletmps = saleRepository.findByInvoiceId(invoiceId.get());
-			if (!saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
+			if (saletmps.size()>0 &&  !saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
 				saleRepository.updateUserEditInvoice(user.getId(), invoiceId.get());
 				return saletmps;
 			}
@@ -126,7 +126,7 @@ public class SaleTemporaryService {
 				throw new ResourceNotFoundException("Seat does not exist");
 			}
 			saletmps = saleRepository.findBySeatId(seatId.get());
-			if (!saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
+			if (saletmps.size()>0 &&  !saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
 				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
 				return saletmps;
 			}
@@ -162,7 +162,7 @@ public class SaleTemporaryService {
 				throw new ResourceNotFoundException("Invoice does not exit");
 			}
 			saletmps = saleRepository.findByInvoiceId(invoiceId.get());
-			if (!saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
+			if (saletmps.size()>0 &&  !saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
 				saleRepository.updateUserEditInvoice(user.getId(), invoiceId.get());
 				return saletmps;
 			}
@@ -172,7 +172,7 @@ public class SaleTemporaryService {
 				throw new ResourceNotFoundException("Seat does not exist");
 			}
 			saletmps = saleRepository.findBySeatId(seatId.get());
-			if (!saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
+			if (saletmps.size()>0 &&  !saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
 				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
 				return saletmps;
 			}

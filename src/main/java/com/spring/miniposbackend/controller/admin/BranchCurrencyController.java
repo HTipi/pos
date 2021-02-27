@@ -22,12 +22,12 @@ public class BranchCurrencyController {
 	private BranchCurrencyService branchCurrencyServie;
 	@Autowired
 	private UserProfileUtil userProfile;
-	
+	@PreAuthorize("hasAnyRole('OWNER','SALE','BRANCH')")
 	@GetMapping("by-branch")
 	public SuccessResponse getByBranch(){ // will get from user
 		return new SuccessResponse("00", "fetch Currency", branchCurrencyServie.showByBranchId(userProfile.getProfile().getBranch().getId(), true, true));
 	} 
-        
+        @PreAuthorize("hasAnyRole('OWNER','BRANCH')")
         @PatchMapping("{currencyId}/set-rate")
         public SuccessResponse changeRate(@PathVariable Integer currencyId, @RequestParam BigDecimal rate){
             return new SuccessResponse("00", "fetch Currency", branchCurrencyServie.changeRate(currencyId, rate));

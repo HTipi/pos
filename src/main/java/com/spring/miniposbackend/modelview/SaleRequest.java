@@ -9,7 +9,6 @@ import lombok.Setter;
 public class SaleRequest {
 	
 	Long saleTmpId;
-	Integer seatId;
 	Long itemId;
 	Short quantity;
 	Short discountPercentage;

@@ -13,14 +13,28 @@ import com.spring.miniposbackend.model.sale.SaleTemporary;
 @Repository
 public interface SaleTemporaryRepository extends JpaRepository<SaleTemporary, Long> {
 
-	@Query(value = "select s from SaleTemporary s where s.seat.id=?1 and s.parentSaleTemporary is null")
+	@Query(value = "select s from SaleTemporary s where s.invoice.id=?1 and s.parentSaleTemporary is null")
+	List<SaleTemporary> findByInvoiceId(Long invoiceId);
+	
+	@Query(value = "select s from SaleTemporary s where s.invoice.id = ?1 and s.isPrinted = ?2 and s.parentSaleTemporary is null")//update
+	List<SaleTemporary> findByInvoiceIdWithisPrinted(Long invoiceId, boolean isPrinted); 
+	
+	@Query(value = "select s from SaleTemporary s where s.invoice.id = ?1 and s.isPrinted = ?2 and s.cancel = ?3 and s.parentSaleTemporary is null") //update
+	List<SaleTemporary> findByInvoiceIdWithIsPrintedCancel(Long invoiceId, boolean isPrinted, boolean cancel);
+	
+	@Query(value = "select s from SaleTemporary s where s.seat.id=?1 and s.parentSaleTemporary is null and s.invoice is null") // update
 	List<SaleTemporary> findBySeatId(Integer seatId);
-
+	
+	@Query(value = "select s from SaleTemporary s where s.seat.id = ?1 and s.isPrinted = ?2 s.invoice is null and s.parentSaleTemporary is null")//update
+	List<SaleTemporary> findBySeatIdWithisPrinted(Integer seatId, boolean isPrinted); 
+	
+	@Query(value = "select s from SaleTemporary s where s.seat.id = ?1 and s.isPrinted = ?2 and s.cancel = ?3 and s.invoice is null and s.parentSaleTemporary is null") //update
+	List<SaleTemporary> findBySeatIdWithIsPrintedCancel(Integer seatId, boolean isPrinted, boolean cancel);
+	
 	@Query(value = "select s from SaleTemporary s where s.itemBranch.id = ?1")
 	Optional<SaleTemporary> findByItemId(Long itemId);
 
-	@Query(value = "select s from SaleTemporary s where s.seat.id = ?1 and s.isPrinted = ?2")
-	List<SaleTemporary> findBySeatIdWithisPrinted(Integer seatId, boolean isPrinted);
+	
 
 	@Query("select case when count(s)> 0 then true else false end from SaleTemporary s where s.itemBranch.id = ?1")
 	boolean existsByItemId(Long itemId);
@@ -31,17 +45,16 @@ public interface SaleTemporaryRepository extends JpaRepository<SaleTemporary, Lo
 	@Query("select case when count(s)> 0 then true else false end from SaleTemporary s where s.itemBranch.item.id = ?1")
 	boolean existsByMainItemId(Long itemId);
 
-	@Query(value = "select s from SaleTemporary s where s.seat.id = ?1 and s.isPrinted = ?2 and s.cancel = ?3")
-	List<SaleTemporary> findBySeatIdWithIsPrintedCancel(Integer seatId, boolean isPrinted, boolean cancel);
+	
 
 	@Query(value = "select * from Sales_temp where parent_sale_id is null and  seat_id=(select seat_id from Sales_temp where user_id=?1 and is_printed=false and parent_sale_id is null order by value_date desc limit 1)", nativeQuery = true)
 	List<SaleTemporary> findBySeatUserId(Integer userId);
 
-	@Query(value = "select s from SaleTemporary s where s.user.id=?1 and s.parentSaleTemporary is null")
+	@Query(value = "select s from SaleTemporary s where s.user.id=?1 and s.parentSaleTemporary is null and s.invoice is null") // already update
 	List<SaleTemporary> findByUserId(Integer userId);
 	
-	@Query(value = "select s from SaleTemporary s where s.user.id=?1 and s.seat.id=?2 and s.parentSaleTemporary is null")
-	List<SaleTemporary> findByUserId(Integer userId, Integer seatId);
+//	@Query(value = "select s from SaleTemporary s where s.user.id=?1 and s.seat.id=?2 and s.parentSaleTemporary is null")
+//	List<SaleTemporary> findByUserId(Integer userId, Integer seatId);
 
 	@Query(value = "select * from Sales_temp where parent_sale_id is null and seat_id=(select seat_id from Sales_temp where user_id=?1 and is_printed=?2 and cancel=?3 and parent_sale_id is null order by value_date desc limit 1)", nativeQuery = true)
 	List<SaleTemporary> findByUserIdSeatWithIsPrintedCancel(Integer userId, boolean isPrinted, boolean cancel);
@@ -68,7 +81,11 @@ public interface SaleTemporaryRepository extends JpaRepository<SaleTemporary, Lo
 
 	@Modifying
 	@Query(value = "update Sales_temp set useredit_id=?1 where seat_id=?2", nativeQuery = true)
-	void updateUserEdit(Integer userId, Integer seatId);
+	void updateUserEditSeat(Integer userId, Integer seatId);
+	
+	@Modifying
+	@Query(value = "update Sales_temp set useredit_id=?1 where invoice_id=?2", nativeQuery = true)
+	void updateUserEditInvoice(Integer userId, Long invoiceId);
 
 	@Query(value = "select count(s) from SaleTemporary s where s.user.branch.id = ?1")
 	Optional<Integer> findByBranchId(Integer branchId);

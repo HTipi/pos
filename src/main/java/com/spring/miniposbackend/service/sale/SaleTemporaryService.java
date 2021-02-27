@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import javax.persistence.EntityManager;
 
-import com.spring.miniposbackend.repository.admin.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,11 +19,13 @@ import com.spring.miniposbackend.exception.UnprocessableEntityException;
 import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.model.admin.Seat;
 import com.spring.miniposbackend.model.admin.User;
+import com.spring.miniposbackend.model.sale.Invoice;
 import com.spring.miniposbackend.model.sale.SaleTemporary;
 import com.spring.miniposbackend.modelview.SaleRequest;
 import com.spring.miniposbackend.repository.admin.BranchSettingRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
 import com.spring.miniposbackend.repository.admin.SeatRepository;
+import com.spring.miniposbackend.repository.sale.InvoiceRepository;
 import com.spring.miniposbackend.repository.sale.SaleTemporaryRepository;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
@@ -38,11 +39,11 @@ public class SaleTemporaryService {
 	private EntityManager entityManager;
 
 	@Autowired
+	private InvoiceRepository invoiceRepository;
+	@Autowired
 	private SeatRepository seatRepository;
 	@Autowired
 	private SaleTemporaryRepository saleRepository;
-	@Autowired
-	private UserRepository userRepository;
 
 	@Autowired
 	private UserProfileUtil userProfile;
@@ -50,40 +51,43 @@ public class SaleTemporaryService {
 	private BranchSettingRepository branchSettingRepository;
 
 	@Transactional
-	public List<SaleTemporary> addItems(List<SaleRequest> requestItems, boolean OBU, Integer userId) {
+	public List<SaleTemporary> addItems(List<SaleRequest> requestItems, Optional<Integer> seatId,
+			Optional<Long> invoiceId) {
 		entityManager.clear();
-//		List<SaleTemporary> list = new ArrayList<SaleTemporary>();
-//		for (int i = 0; i < requestItems.size(); i++) {
-//			for (int j = i + 1; j < requestItems.size(); j++) {
-//				if (requestItems.get(i).getItemId().equals(requestItems.get(j).getItemId())) {
-//					throw new UnprocessableEntityException("itemId are duplicated");
-//				}
-//			}
-//		}
-		Optional<Seat> seat;
-		if (!OBU) {
-			Integer seatId = requestItems.get(0).getSeatId();
-			List<SaleTemporary> saletmp = saleRepository.findBySeatId(seatId);
-			seat = Optional.of(seatRepository.findById(seatId)
-					.orElseThrow(() -> new ResourceNotFoundException("Seat does not exist")));
-			if (saletmp.size() > 0) {
-				if (!saletmp.get(0).getUserEdit().getId().equals(userProfile.getProfile().getUser().getId())) {
-					saleRepository.updateUserEdit(userProfile.getProfile().getUser().getId(), seatId);
-					return saletmp;
-				}
+		Optional<Seat> seat = Optional.empty();
+		Optional<Invoice> invoice = Optional.empty();
+		List<SaleTemporary> saletmps = new ArrayList<SaleTemporary>();
+		User user = userProfile.getProfile().getUser();
+		if (invoiceId.isPresent()) {
+			invoice = invoiceRepository.findById(invoiceId.get());
+			if (invoice.isEmpty()) {
+				throw new ResourceNotFoundException("Invoice does not exit");
 			}
-		} else {
-			seat = Optional.empty();
+			saletmps = saleRepository.findByInvoiceId(invoiceId.get());
+			if (!saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
+				saleRepository.updateUserEditInvoice(user.getId(), invoiceId.get());
+				return saletmps;
+			}
+		} else if (seatId.isPresent()) {
+			seat = seatRepository.findById(seatId.get());
+			if (seat.isEmpty()) {
+				throw new ResourceNotFoundException("Seat does not exist");
+			}
+			saletmps = saleRepository.findBySeatId(seatId.get());
+			if (!saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
+				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
+				return saletmps;
+			}
 		}
-		User user = userRepository.findById(userId)
-				.orElseThrow(() -> new ResourceNotFoundException("User does not exist"));
+		Optional<Seat> finSeat = seat;
+		Optional<Invoice> finInvoice = invoice;
+
 		requestItems.forEach((requestItem) -> {
-			SaleTemporary saleTemporary = addItem(requestItem, user, seat, Optional.empty());
-//			list.add(saleTemporary);
+			SaleTemporary saleTemporary = addItem(requestItem, user, finSeat, finInvoice, Optional.empty());
 			List<SaleRequest> subItems = requestItem.getAddOns() == null ? new ArrayList<SaleRequest>()
 					: requestItem.getAddOns();
 			subItems.forEach((subItem) -> {
-				SaleTemporary addOnItem = addItem(subItem, user, seat, Optional.of(saleTemporary));
+				SaleTemporary addOnItem = addItem(subItem, user, finSeat, finInvoice, Optional.of(saleTemporary));
 				saleTemporary.setPrice(saleTemporary.getPrice().add(addOnItem.getPrice()));
 			});
 			if (requestItem.getAddOns() != null) {
@@ -92,23 +96,39 @@ public class SaleTemporaryService {
 		});
 		entityManager.flush();
 		entityManager.clear();
-		if (!OBU) {
-			return saleRepository.findByUserId(userId, seat.get().getId());
+		if (invoiceId.isPresent()) {
+			return saleRepository.findByInvoiceId(invoiceId.get());
+		} else if (seatId.isPresent()) {
+			return saleRepository.findBySeatId(seatId.get());
 		} else {
-			return saleRepository.findByUserId(userId);
+			return saleRepository.findByUserId(user.getId());
 		}
-
 	}
 
 	@Transactional
-	public List<SaleTemporary> removeItem(Long saleTempId, Integer seatId, boolean OBU) {
+	public List<SaleTemporary> removeItem(Long saleTempId, Optional<Integer> seatId, Optional<Long> invoiceId) {
 		List<SaleTemporary> list = new ArrayList<SaleTemporary>();
-		if (!OBU) {
-			List<SaleTemporary> saletmp = saleRepository.findBySeatId(seatId);
-			if (!saletmp.get(0).getUserEdit().getId().equals(userProfile.getProfile().getUser().getId())) {
-				saleRepository.updateUserEdit(userProfile.getProfile().getUser().getId(), seatId);
-				return saletmp;
-
+		List<SaleTemporary> saletmps = new ArrayList<SaleTemporary>();
+		User user = userProfile.getProfile().getUser();
+		if (invoiceId.isPresent()) {
+			Optional<Invoice> invoice = invoiceRepository.findById(invoiceId.get());
+			if (invoice.isEmpty()) {
+				throw new ResourceNotFoundException("Invoice does not exit");
+			}
+			saletmps = saleRepository.findByInvoiceId(invoiceId.get());
+			if (!saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
+				saleRepository.updateUserEditInvoice(user.getId(), invoiceId.get());
+				return saletmps;
+			}
+		} else if (seatId.isPresent()) {
+			Optional<Seat> seat = seatRepository.findById(seatId.get());
+			if (seat.isEmpty()) {
+				throw new ResourceNotFoundException("Seat does not exist");
+			}
+			saletmps = saleRepository.findBySeatId(seatId.get());
+			if (!saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
+				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
+				return saletmps;
 			}
 		}
 		SaleTemporary saletemp = saleRepository.findById(saleTempId).map(sale -> {
@@ -120,27 +140,41 @@ public class SaleTemporaryService {
 					|| !itemBranch.isEnable()) {
 				throw new UnauthorizedException("Item is unauthorized");
 			}
-			// sale.setCancel(true);
 			saleRepository.deleteBySaleTempId(saleTempId);
 			return sale;
 		}).orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
+
 		list.add(saletemp);
-		if (!OBU)
-			saleRepository.updateUserEdit(userProfile.getProfile().getUser().getId(), seatId);
 
 		return list;
 
 	}
 
 	@Transactional
-	public List<SaleTemporary> setQuantity(Long saleTempId, Short quantity, Integer seatId, Integer userId,
-			boolean OBU) {
+	public List<SaleTemporary> setQuantity(Long saleTempId, Short quantity, Optional<Integer> seatId,
+			Optional<Long> invoiceId) {
 		List<SaleTemporary> list = new ArrayList<SaleTemporary>();
-		if (!OBU) {
-			List<SaleTemporary> saletmp = saleRepository.findBySeatId(seatId);
-			if (!saletmp.get(0).getUserEdit().getId().equals(userProfile.getProfile().getUser().getId())) {
-				saleRepository.updateUserEdit(userProfile.getProfile().getUser().getId(), seatId);
-				return saletmp;
+		User user = userProfile.getProfile().getUser();
+		List<SaleTemporary> saletmps = new ArrayList<SaleTemporary>();
+		if (invoiceId.isPresent()) {
+			Optional<Invoice> invoice = invoiceRepository.findById(invoiceId.get());
+			if (invoice.isEmpty()) {
+				throw new ResourceNotFoundException("Invoice does not exit");
+			}
+			saletmps = saleRepository.findByInvoiceId(invoiceId.get());
+			if (!saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
+				saleRepository.updateUserEditInvoice(user.getId(), invoiceId.get());
+				return saletmps;
+			}
+		} else if (seatId.isPresent()) {
+			Optional<Seat> seat = seatRepository.findById(seatId.get());
+			if (seat.isEmpty()) {
+				throw new ResourceNotFoundException("Seat does not exist");
+			}
+			saletmps = saleRepository.findBySeatId(seatId.get());
+			if (!saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
+				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
+				return saletmps;
 			}
 		}
 		SaleTemporary saletemp = saleRepository.findById(saleTempId).map(sale -> {
@@ -171,8 +205,8 @@ public class SaleTemporaryService {
 
 			sale.setQuantity(quantity);
 			sale.setValueDate(new Date());
-			sale.setUser(userProfile.getProfile().getUser());
-			sale.setUserEdit(userProfile.getProfile().getUser());
+			sale.setUser(user);
+			sale.setUserEdit(user);
 			return saleRepository.save(sale);
 		}).orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
 		list.add(saletemp);
@@ -193,6 +227,23 @@ public class SaleTemporaryService {
 		}
 	}
 
+	public List<SaleTemporary> showByInvoiceId(Long invoiceId, Optional<Boolean> isPrinted, Optional<Boolean> cancel) {
+		Invoice invoice = invoiceRepository.findById(invoiceId)
+				.orElseThrow(() -> new ResourceNotFoundException("Invoice does not exist"));
+		if (invoice.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
+			throw new UnauthorizedException("Transaction is unauthorized");
+		}
+		if (isPrinted.isPresent()) {
+			if (cancel.isPresent()) {
+				return saleRepository.findByInvoiceIdWithIsPrintedCancel(invoiceId, isPrinted.get(), cancel.get());
+			} else {
+				return saleRepository.findByInvoiceIdWithisPrinted(invoiceId, isPrinted.get());
+			}
+		} else {
+			return saleRepository.findByInvoiceId(invoiceId);
+		}
+	}
+
 	public List<SaleTemporary> showBySeatId(Integer seatId, Optional<Boolean> isPrinted, Optional<Boolean> cancel) {
 		Seat seat = seatRepository.findById(seatId)
 				.orElseThrow(() -> new ResourceNotFoundException("Seat does not exist"));
@@ -209,10 +260,11 @@ public class SaleTemporaryService {
 			return saleRepository.findBySeatId(seatId);
 		}
 	}
+
 	public List<Integer> showStatusSeatByBranchId(Integer branchId) {
-		
+
 		return saleRepository.findStatusSeatByBranchId(branchId);
-		
+
 	}
 
 	public List<SaleTemporary> showByUserId(Integer userId, Optional<Boolean> isPrinted, Optional<Boolean> cancel,
@@ -241,7 +293,7 @@ public class SaleTemporaryService {
 
 	}
 
-	private SaleTemporary addItem(SaleRequest requestItem, User user, Optional<Seat> seat,
+	private SaleTemporary addItem(SaleRequest requestItem, User user, Optional<Seat> seat, Optional<Invoice> invoice,
 			Optional<SaleTemporary> parentSale) {
 		Long saleTmpId = requestItem.getSaleTmpId();
 		Long itemId = requestItem.getItemId();
@@ -274,6 +326,11 @@ public class SaleTemporaryService {
 				saleTmp.setDiscountAmount(BigDecimal.valueOf(discountAmount));
 				saleTmp.setPrice(item.getPrice());
 				saleTmp.setUserEdit(user);
+				if (invoice.isPresent()) {
+					saleTmp.setInvoice(invoice.get());
+				} else if (seat.isPresent()) {
+					saleTmp.setSeat(seat.get());
+				}
 				if (parentSale.isPresent() && item.getType().contentEquals("SUBITEM")) {
 					saleTmp.setParentSaleTemporary(parentSale.get());
 				}
@@ -290,11 +347,13 @@ public class SaleTemporaryService {
 				saleTmp.setCancel(false);
 				saleTmp.setUser(user);
 				saleTmp.setUserEdit(user);
+				if (invoice.isPresent()) {
+					saleTmp.setInvoice(invoice.get());
+				} else if (seat.isPresent()) {
+					saleTmp.setSeat(seat.get());
+				}
 				if (parentSale.isPresent() && item.getType().contentEquals("SUBITEM")) {
 					saleTmp.setParentSaleTemporary(parentSale.get());
-				}
-				if (seat.isPresent()) {
-					saleTmp.setSeat(seat.get());
 				}
 				return saleRepository.save(saleTmp);
 			});

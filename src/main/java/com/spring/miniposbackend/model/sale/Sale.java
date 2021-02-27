@@ -3,7 +3,6 @@ package com.spring.miniposbackend.model.sale;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -76,12 +75,12 @@ public class Sale extends AuditModel {
 		return subTotal.doubleValue() - getDiscountTotal();
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "branch_id", nullable = false)
 	@JsonIgnore
 	private Branch branch;
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
 	@JsonIgnore
 	private User user;
@@ -94,7 +93,7 @@ public class Sale extends AuditModel {
 	@ColumnDefault("0")
 	private Double change;
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "cur_id", nullable = false)
 	@JsonIgnore
 	private BranchCurrency branchCurrency;

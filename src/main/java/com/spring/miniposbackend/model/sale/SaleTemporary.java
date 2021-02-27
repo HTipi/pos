@@ -72,7 +72,7 @@ public class SaleTemporary extends AuditModel {
 	@Column(name = "cancel", nullable = false)
 	@ColumnDefault("false")
 	private boolean cancel;
-
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "seat_id", nullable = true)
 	@JsonIgnore
@@ -92,6 +92,12 @@ public class SaleTemporary extends AuditModel {
 	@JoinColumn(name = "item_branch_id", nullable = false)
 	@JsonIgnore
 	private ItemBranch itemBranch;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "invoice_id", nullable = true)
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	@JsonIgnore
+	private Invoice invoice;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "parent_sale_id", nullable = true)

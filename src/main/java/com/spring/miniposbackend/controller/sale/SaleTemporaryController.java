@@ -1,6 +1,5 @@
 package com.spring.miniposbackend.controller.sale;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,21 +34,25 @@ public class SaleTemporaryController {
 	@Autowired
 	private BranchSettingRepository branchSettingRepository;
 
-	@GetMapping("test")
-	public Date test() {
-		return new Date();
-	}
-	
 	@GetMapping("by-seat")
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse getBySeatId(@RequestParam Integer seatId, @RequestParam Optional<Boolean> isPrinted,
 			@RequestParam Optional<Boolean> cancel) {
 		return new SuccessResponse("00", "fetch Sale Tmp by Seat", saleService.showBySeatId(seatId, isPrinted, cancel));
 	}
+
+	@GetMapping("by-invoice")
+	@PreAuthorize("hasAnyRole('SALE')")
+	public SuccessResponse getByInvoiceId(@RequestParam Integer invoiceId, @RequestParam Optional<Boolean> isPrinted,
+			@RequestParam Optional<Boolean> cancel) {
+		return null;
+	}
+
 	@GetMapping("status-seat")
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse getStatusSeat() {
-		return new SuccessResponse("00", "fetch status seat", saleService.showStatusSeatByBranchId(userProfile.getProfile().getBranch().getId()));
+		return new SuccessResponse("00", "fetch status seat",
+				saleService.showStatusSeatByBranchId(userProfile.getProfile().getBranch().getId()));
 	}
 
 	@GetMapping("by-user")
@@ -63,28 +66,33 @@ public class SaleTemporaryController {
 
 	@PostMapping
 	@PreAuthorize("hasAnyRole('SALE')")
-	public SuccessResponse create(@RequestBody List<SaleRequest> requestItem, @RequestParam boolean OBU) {
+	public SuccessResponse create(@RequestBody List<SaleRequest> requestItem,
+			@RequestParam(name = "invoice-id") Optional<Long> invoiceId,
+			@RequestParam(name = "seat-id") Optional<Integer> seatId) {
 
 		String val = "false";
-		if (OBU)
+		if (seatId.isEmpty()) {
 			val = "true";
+		}
 		String setting = branchSettingRepository.findByOBU(userProfile.getProfile().getBranch().getId()).orElse("");
 		if (val.equalsIgnoreCase(setting))
-			return new SuccessResponse("00", "add SaleTmp",
-					saleService.addItems(requestItem, OBU, userProfile.getProfile().getUser().getId()));
+			return new SuccessResponse("00", "add SaleTmp", saleService.addItems(requestItem, seatId, invoiceId));
 		else
 			throw new ConflictException("Setting was updated, Please restart!", "12");
 	}
 
 	@DeleteMapping("item/{saleTempId}")
 	@PreAuthorize("hasAnyRole('SALE')")
-	public SuccessResponse remove(@PathVariable Long saleTempId, @RequestParam(value = "seatId") Integer seatId,@RequestParam boolean OBU) {
+	public SuccessResponse remove(@PathVariable Long saleTempId,
+			@RequestParam(name = "invoice-id") Optional<Long> invoiceId,
+			@RequestParam(name = "seat-id") Optional<Integer> seatId) {
 		String val = "false";
-		if (OBU)
+		if (seatId.isEmpty()) {
 			val = "true";
+		}
 		String setting = branchSettingRepository.findByOBU(userProfile.getProfile().getBranch().getId()).orElse("");
 		if (val.equalsIgnoreCase(setting))
-		return new SuccessResponse("00", "remove SaleTmp", saleService.removeItem(saleTempId, seatId,OBU));
+			return new SuccessResponse("00", "remove SaleTmp", saleService.removeItem(saleTempId, seatId, invoiceId));
 		else
 			throw new ConflictException("Setting was updated, Please restart!", "12");
 	}
@@ -92,14 +100,17 @@ public class SaleTemporaryController {
 	@PatchMapping("qty/{saleTempId}")
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse updateQuantity(@PathVariable Long saleTempId,
-			@RequestParam(value = "quantity") Short quantity, @RequestParam(value = "seatId") Integer seatId,@RequestParam boolean OBU) {
+			@RequestParam(value = "quantity") Short quantity,
+			@RequestParam(name = "invoice-id") Optional<Long> invoiceId,
+			@RequestParam(name = "seat-id") Optional<Integer> seatId) {
 		String val = "false";
-		if (OBU)
+		if (seatId.isEmpty()) {
 			val = "true";
+		}
 		String setting = branchSettingRepository.findByOBU(userProfile.getProfile().getBranch().getId()).orElse("");
 		if (val.equalsIgnoreCase(setting))
-		return new SuccessResponse("00", "update QTY",
-				saleService.setQuantity(saleTempId, quantity, seatId, userProfile.getProfile().getUser().getId(),OBU));
+			return new SuccessResponse("00", "update QTY",
+					saleService.setQuantity(saleTempId, quantity, seatId, invoiceId));
 		else
 			throw new ConflictException("Setting was updated, Please restart!", "12");
 	}

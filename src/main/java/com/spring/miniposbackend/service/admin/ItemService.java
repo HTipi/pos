@@ -69,7 +69,7 @@ public class ItemService {
 
 	}
 
-	public Item updateImage(Long itemId, UUID imageId) {
+	public ImageResponse updateImage(Long itemId, UUID imageId) {
 		return imageRepository.findById(imageId).map((image) -> {
 			return itemRepository.findById(itemId).map((item) -> {
 				if (item.getItemType().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
@@ -77,7 +77,8 @@ public class ItemService {
 				}
 				item.setImage(image.getImage());
 				item.setVersion((short) (item.getVersion() + 1));
-				return itemRepository.save(item);
+				itemRepository.save(item);
+				return getImage(itemId);
 			}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 		}).orElseThrow(() -> new ResourceNotFoundException("Image does not exist"));
 	}

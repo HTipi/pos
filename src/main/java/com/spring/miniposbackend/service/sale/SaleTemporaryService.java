@@ -60,7 +60,7 @@ public class SaleTemporaryService {
 		User user = userProfile.getProfile().getUser();
 		if (invoiceId.isPresent()) {
 			invoice = invoiceRepository.findById(invoiceId.get());
-			if (invoice.isEmpty()) {
+			if (!invoice.isPresent()) {
 				throw new ResourceNotFoundException("Invoice does not exit");
 			}
 			saletmps = saleRepository.findByInvoiceId(invoiceId.get());
@@ -70,7 +70,7 @@ public class SaleTemporaryService {
 			}
 		} else if (seatId.isPresent()) {
 			seat = seatRepository.findById(seatId.get());
-			if (seat.isEmpty()) {
+			if (!seat.isPresent()) {
 				throw new ResourceNotFoundException("Seat does not exist");
 			}
 			saletmps = saleRepository.findBySeatId(seatId.get());
@@ -112,7 +112,7 @@ public class SaleTemporaryService {
 		User user = userProfile.getProfile().getUser();
 		if (invoiceId.isPresent()) {
 			Optional<Invoice> invoice = invoiceRepository.findById(invoiceId.get());
-			if (invoice.isEmpty()) {
+			if (!invoice.isPresent()) {
 				throw new ResourceNotFoundException("Invoice does not exit");
 			}
 			saletmps = saleRepository.findByInvoiceId(invoiceId.get());
@@ -122,7 +122,7 @@ public class SaleTemporaryService {
 			}
 		} else if (seatId.isPresent()) {
 			Optional<Seat> seat = seatRepository.findById(seatId.get());
-			if (seat.isEmpty()) {
+			if (!seat.isPresent()) {
 				throw new ResourceNotFoundException("Seat does not exist");
 			}
 			saletmps = saleRepository.findBySeatId(seatId.get());
@@ -158,7 +158,7 @@ public class SaleTemporaryService {
 		List<SaleTemporary> saletmps = new ArrayList<SaleTemporary>();
 		if (invoiceId.isPresent()) {
 			Optional<Invoice> invoice = invoiceRepository.findById(invoiceId.get());
-			if (invoice.isEmpty()) {
+			if (!invoice.isPresent()) {
 				throw new ResourceNotFoundException("Invoice does not exit");
 			}
 			saletmps = saleRepository.findByInvoiceId(invoiceId.get());
@@ -168,7 +168,7 @@ public class SaleTemporaryService {
 			}
 		} else if (seatId.isPresent()) {
 			Optional<Seat> seat = seatRepository.findById(seatId.get());
-			if (seat.isEmpty()) {
+			if (!seat.isPresent()) {
 				throw new ResourceNotFoundException("Seat does not exist");
 			}
 			saletmps = saleRepository.findBySeatId(seatId.get());

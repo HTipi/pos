@@ -71,7 +71,7 @@ public class SaleTemporaryController {
 			@RequestParam(name = "seat-id") Optional<Integer> seatId) {
 
 		String val = "false";
-		if (seatId.isEmpty()) {
+		if (!seatId.isPresent()) {
 			val = "true";
 		}
 		String setting = branchSettingRepository.findByOBU(userProfile.getProfile().getBranch().getId()).orElse("");
@@ -87,7 +87,7 @@ public class SaleTemporaryController {
 			@RequestParam(name = "invoice-id") Optional<Long> invoiceId,
 			@RequestParam(name = "seat-id") Optional<Integer> seatId) {
 		String val = "false";
-		if (seatId.isEmpty()) {
+		if (!seatId.isPresent()) {
 			val = "true";
 		}
 		String setting = branchSettingRepository.findByOBU(userProfile.getProfile().getBranch().getId()).orElse("");
@@ -104,7 +104,7 @@ public class SaleTemporaryController {
 			@RequestParam(name = "invoice-id") Optional<Long> invoiceId,
 			@RequestParam(name = "seat-id") Optional<Integer> seatId) {
 		String val = "false";
-		if (seatId.isEmpty()) {
+		if (!seatId.isPresent()) {
 			val = "true";
 		}
 		String setting = branchSettingRepository.findByOBU(userProfile.getProfile().getBranch().getId()).orElse("");

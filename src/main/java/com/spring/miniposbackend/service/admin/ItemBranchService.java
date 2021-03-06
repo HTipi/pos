@@ -106,10 +106,10 @@ public class ItemBranchService {
 		try {
 			String fileLocation = imagePath + "/" + itemBranch.getImage();
 			byte[] bArray = imageUtil.getImage(fileLocation);
-			return new ImageResponse(itemBranch.getId(), bArray, itemBranch.getVersion());
+			return new ImageResponse(itemBranch.getItem_Id(), bArray, itemBranch.getVersion());
 
 		} catch (Exception e) {
-			return new ImageResponse(itemBranch.getId(), null, itemBranch.getVersion());
+			return new ImageResponse(itemBranch.getItem_Id(), null, itemBranch.getVersion());
 		}
 	}
 

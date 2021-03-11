@@ -64,7 +64,7 @@ public class SaleTemporaryService {
 				throw new ResourceNotFoundException("Invoice does not exit");
 			}
 			saletmps = saleRepository.findByInvoiceId(invoiceId.get());
-			if (saletmps.size()>0 && !saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
+			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
 				saleRepository.updateUserEditInvoice(user.getId(), invoiceId.get());
 				return saletmps;
 			}
@@ -74,7 +74,7 @@ public class SaleTemporaryService {
 				throw new ResourceNotFoundException("Seat does not exist");
 			}
 			saletmps = saleRepository.findBySeatId(seatId.get());
-			if (saletmps.size()>0 && !saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
+			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
 				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
 				return saletmps;
 			}
@@ -116,7 +116,7 @@ public class SaleTemporaryService {
 				throw new ResourceNotFoundException("Invoice does not exit");
 			}
 			saletmps = saleRepository.findByInvoiceId(invoiceId.get());
-			if (saletmps.size()>0 &&  !saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
+			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
 				saleRepository.updateUserEditInvoice(user.getId(), invoiceId.get());
 				return saletmps;
 			}
@@ -126,7 +126,7 @@ public class SaleTemporaryService {
 				throw new ResourceNotFoundException("Seat does not exist");
 			}
 			saletmps = saleRepository.findBySeatId(seatId.get());
-			if (saletmps.size()>0 &&  !saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
+			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
 				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
 				return saletmps;
 			}
@@ -162,7 +162,7 @@ public class SaleTemporaryService {
 				throw new ResourceNotFoundException("Invoice does not exit");
 			}
 			saletmps = saleRepository.findByInvoiceId(invoiceId.get());
-			if (saletmps.size()>0 &&  !saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
+			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
 				saleRepository.updateUserEditInvoice(user.getId(), invoiceId.get());
 				return saletmps;
 			}
@@ -172,7 +172,7 @@ public class SaleTemporaryService {
 				throw new ResourceNotFoundException("Seat does not exist");
 			}
 			saletmps = saleRepository.findBySeatId(seatId.get());
-			if (saletmps.size()>0 &&  !saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
+			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
 				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
 				return saletmps;
 			}
@@ -267,29 +267,32 @@ public class SaleTemporaryService {
 
 	}
 
-	public List<SaleTemporary> showByUserId(Integer userId, Optional<Boolean> isPrinted, Optional<Boolean> cancel,
-			boolean OBU) {
-		if (!OBU) {
-			if (isPrinted.isPresent()) {
-				if (cancel.isPresent()) {
-					return saleRepository.findByUserIdSeatWithIsPrintedCancel(userId, isPrinted.get(), cancel.get());
-				} else {
-					return saleRepository.findByUserIdSeatWithisPrinted(userId, isPrinted.get());
-				}
+	public List<SaleTemporary> showByUserId(Integer userId, Optional<Boolean> isPrinted, Optional<Boolean> cancel) {
+		List<SaleTemporary> saleTmps = new ArrayList<SaleTemporary>();
+		if (isPrinted.isPresent()) {
+			if (cancel.isPresent()) {
+				saleTmps = saleRepository.findByUserIdWithIsPrintedCancel(userId, isPrinted.get(), cancel.get());
 			} else {
-				return saleRepository.findBySeatUserId(userId);
+				saleTmps = saleRepository.findByUserIdWithisPrinted(userId, isPrinted.get());
 			}
 		} else {
+			saleTmps = saleRepository.findByUserId(userId);
+		}
+
+		if (saleTmps.size() == 0) {
 			if (isPrinted.isPresent()) {
 				if (cancel.isPresent()) {
-					return saleRepository.findByUserIdWithIsPrintedCancel(userId, isPrinted.get(), cancel.get());
+					saleTmps = saleRepository.findByUserIdSeatWithIsPrintedCancel(userId, isPrinted.get(),
+							cancel.get());
 				} else {
-					return saleRepository.findByUserIdWithisPrinted(userId, isPrinted.get());
+					saleTmps = saleRepository.findByUserIdSeatWithisPrinted(userId, isPrinted.get());
 				}
 			} else {
-				return saleRepository.findByUserId(userId);
+				saleTmps = saleRepository.findBySeatUserId(userId);
 			}
 		}
+
+		return saleTmps;
 
 	}
 

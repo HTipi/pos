@@ -58,10 +58,9 @@ public class SaleTemporaryController {
 	@GetMapping("by-user")
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse getByUserId(@RequestParam Optional<Boolean> isPrinted,
-			@RequestParam Optional<Boolean> cancel, @RequestParam boolean OBU) {
-
+			@RequestParam Optional<Boolean> cancel) {
 		return new SuccessResponse("00", "fetch Sale Tmp by User",
-				saleService.showByUserId(userProfile.getProfile().getUser().getId(), isPrinted, cancel, OBU));
+				saleService.showByUserId(userProfile.getProfile().getUser().getId(), isPrinted, cancel));
 	}
 
 	@PostMapping

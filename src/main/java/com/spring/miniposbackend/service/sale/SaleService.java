@@ -242,6 +242,8 @@ public class SaleService {
 				if (!setting.contentEquals(setting))
 					throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 			}
+			itemBranch.setStockOut(itemBranch.getStockOut() + saleTemporary.getQuantity());
+			itemRepository.save(itemBranch);
 		}
 		SaleDetail saleDeail = new SaleDetail();
 		saleDeail.setItemBranch(itemBranch);

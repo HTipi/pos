@@ -74,6 +74,9 @@ public class Sale extends AuditModel {
 	public Double getTotal() {
 		return subTotal.doubleValue() - getDiscountTotal();
 	}
+	public String getFullName() {
+		return user.getFullName();
+	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "branch_id", nullable = false)

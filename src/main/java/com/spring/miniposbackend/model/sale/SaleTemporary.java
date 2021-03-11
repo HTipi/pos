@@ -125,6 +125,10 @@ public class SaleTemporary extends AuditModel {
 	public Long getItemId() {
 		return itemBranch.getId();
 	}
+	
+	public Long getItemCorpId() {
+		return itemBranch.getItem_Id();
+	}
 
 	public Integer getSeat_id() {
 		if (seat == null)

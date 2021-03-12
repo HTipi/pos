@@ -87,29 +87,29 @@ public class SaleService {
 	}
 
 	@Transactional
-	public List<SaleDetail> create(Integer seatId, Integer branchId, Integer userId, boolean OBU, Double discount,
+	public List<SaleDetail> create(Optional<Integer> seatId, Integer branchId, Integer userId, Double discount,
 			Double cashIn, Double change, Integer currencyId) {
 		entityManager.clear();
 		User user = userRepository.findById(userId)
-				.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
+				.orElseThrow(() -> new ResourceNotFoundException("User does not exist"));
 		Branch branch = branchRepository.findById(branchId)
-				.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
+				.orElseThrow(() -> new ResourceNotFoundException("Branch does not exist"));
 		Seat seat = null;
 		String seatName = "";
 		List<SaleTemporary> saleTemps;
 		Sale sale;
 		BranchCurrency branchCurrency = branchCurrencyRepository.findById(currencyId)
-				.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
+				.orElseThrow(() -> new ResourceNotFoundException("Currency does not exist"));
 
-		if (!OBU) {
-			seat = seatRepository.findById(seatId)
-					.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
+		if (seatId.isPresent()) {
+			seat = seatRepository.findById(seatId.get())
+					.orElseThrow(() -> new ResourceNotFoundException("Seat does not exist"));
 
 			if (seat.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
 				throw new UnauthorizedException("Transaction is unauthorized");
 			}
 			seatName = seat.getName();
-			saleTemps = saleTemporaryRepository.findBySeatId(seatId);
+			saleTemps = saleTemporaryRepository.findBySeatId(seatId.get());
 			if (saleTemps.size() == 0) {
 				throw new ResourceNotFoundException("Seat not found");
 			}
@@ -140,8 +140,8 @@ public class SaleService {
 				addItem(branch, user, saleResult, subItem, Optional.of(saleDetail));
 			});
 		});
-		if (!OBU) {
-			saleTemporaryRepository.deleteBySeatId(seatId);
+		if (seatId.isPresent()) {
+			saleTemporaryRepository.deleteBySeatId(seatId.get());
 		} else {
 			saleTemporaryRepository.deleteByUserId(userId);
 		}

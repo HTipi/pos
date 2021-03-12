@@ -69,15 +69,7 @@ public class SaleTemporaryController {
 			@RequestParam(name = "invoice-id") Optional<Long> invoiceId,
 			@RequestParam(name = "seat-id") Optional<Integer> seatId) {
 
-		String val = "false";
-		if (!seatId.isPresent()) {
-			val = "true";
-		}
-		String setting = branchSettingRepository.findByOBU(userProfile.getProfile().getBranch().getId()).orElse("");
-		if (val.equalsIgnoreCase(setting))
-			return new SuccessResponse("00", "add SaleTmp", saleService.addItems(requestItem, seatId, invoiceId));
-		else
-			throw new ConflictException("Setting was updated, Please restart!", "12");
+		return new SuccessResponse("00", "add SaleTmp", saleService.addItems(requestItem, seatId, invoiceId));
 	}
 
 	@DeleteMapping("item/{saleTempId}")
@@ -85,15 +77,7 @@ public class SaleTemporaryController {
 	public SuccessResponse remove(@PathVariable Long saleTempId,
 			@RequestParam(name = "invoice-id") Optional<Long> invoiceId,
 			@RequestParam(name = "seat-id") Optional<Integer> seatId) {
-		String val = "false";
-		if (!seatId.isPresent()) {
-			val = "true";
-		}
-		String setting = branchSettingRepository.findByOBU(userProfile.getProfile().getBranch().getId()).orElse("");
-		if (val.equalsIgnoreCase(setting))
-			return new SuccessResponse("00", "remove SaleTmp", saleService.removeItem(saleTempId, seatId, invoiceId));
-		else
-			throw new ConflictException("Setting was updated, Please restart!", "12");
+		return new SuccessResponse("00", "remove SaleTmp", saleService.removeItem(saleTempId, seatId, invoiceId));
 	}
 
 	@PatchMapping("qty/{saleTempId}")
@@ -102,16 +86,9 @@ public class SaleTemporaryController {
 			@RequestParam(value = "quantity") Short quantity,
 			@RequestParam(name = "invoice-id") Optional<Long> invoiceId,
 			@RequestParam(name = "seat-id") Optional<Integer> seatId) {
-		String val = "false";
-		if (!seatId.isPresent()) {
-			val = "true";
-		}
-		String setting = branchSettingRepository.findByOBU(userProfile.getProfile().getBranch().getId()).orElse("");
-		if (val.equalsIgnoreCase(setting))
-			return new SuccessResponse("00", "update QTY",
-					saleService.setQuantity(saleTempId, quantity, seatId, invoiceId));
-		else
-			throw new ConflictException("Setting was updated, Please restart!", "12");
+
+		return new SuccessResponse("00", "update QTY",
+				saleService.setQuantity(saleTempId, quantity, seatId, invoiceId));
 	}
 
 	@PatchMapping("{seatId}")

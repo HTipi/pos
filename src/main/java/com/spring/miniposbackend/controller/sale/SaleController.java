@@ -47,18 +47,12 @@ public class SaleController {
 
 	@PostMapping
 	@PreAuthorize("hasAnyRole('SALE')")
-	public SuccessResponse create(@RequestParam Optional<Integer> seatId, @RequestParam boolean OBU,
+	public SuccessResponse create(@RequestParam Optional<Integer> seatId,
 			@RequestParam Double discount, @RequestParam Double cashIn, @RequestParam Double change,@RequestParam Integer currencyId) {
-		String val = "false";
-		if (OBU)
-			val = "true";
-		String setting = branchSettingRepository.findByOBU(userProfile.getProfile().getBranch().getId()).orElse("");
-		if (val.equalsIgnoreCase(setting))
-			return new SuccessResponse("00", "make Payment",
-					saleService.create(seatId.get(), userProfile.getProfile().getBranch().getId(),
-							userProfile.getProfile().getUser().getId(), OBU, discount, cashIn, change,currencyId));
-		else
-			throw new InternalErrorException("Setting was updated, Please restart!", "12");
+		
+		return new SuccessResponse("00", "make Payment",
+				saleService.create(seatId, userProfile.getProfile().getBranch().getId(),
+						userProfile.getProfile().getUser().getId(), discount, cashIn, change,currencyId));
 	}
 
 	@PatchMapping("reverse/{saleId}")

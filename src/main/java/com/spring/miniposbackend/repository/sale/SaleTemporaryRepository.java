@@ -72,7 +72,7 @@ public interface SaleTemporaryRepository extends JpaRepository<SaleTemporary, Lo
 	@Query(value = "delete from Sales_temp where seat_id=?1", nativeQuery = true)
 	void deleteBySeatId(Integer seatId);
 	@Modifying
-	@Query(value = "delete from Sales_temp where user_id=?1", nativeQuery = true)
+	@Query(value = "delete from Sales_temp where user_id=?1 and seat_id is null", nativeQuery = true)
 	void deleteByUserId(Integer userId);
 
 	@Modifying

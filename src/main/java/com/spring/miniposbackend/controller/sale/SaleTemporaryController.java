@@ -15,11 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.InternalErrorException;
 import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.modelview.SaleRequest;
-import com.spring.miniposbackend.repository.admin.BranchSettingRepository;
 import com.spring.miniposbackend.service.sale.SaleTemporaryService;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
@@ -31,8 +29,6 @@ public class SaleTemporaryController {
 	private SaleTemporaryService saleService;
 	@Autowired
 	private UserProfileUtil userProfile;
-	@Autowired
-	private BranchSettingRepository branchSettingRepository;
 
 	@GetMapping("by-seat")
 	@PreAuthorize("hasAnyRole('SALE')")
@@ -91,6 +87,14 @@ public class SaleTemporaryController {
 				saleService.setQuantity(saleTempId, quantity, seatId, invoiceId));
 	}
 
+	@PostMapping("move-to-pending")
+	@PreAuthorize("hasAnyRole('SALE')")
+	public SuccessResponse moveToPending(@RequestParam(name = "seatId") Optional<Integer> seatId,
+			@RequestParam String remark) {
+		return new SuccessResponse("00", "Sale has been move to pending",
+				saleService.moveToPendingOrder(seatId, remark));
+	}
+
 	@PatchMapping("{seatId}")
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse printBySeat(@PathVariable Integer seatId) {
@@ -99,7 +103,6 @@ public class SaleTemporaryController {
 		} catch (Exception e) {
 			throw new InternalErrorException("print SaleTmp Failed", "04");
 		}
-
 	}
 
 }

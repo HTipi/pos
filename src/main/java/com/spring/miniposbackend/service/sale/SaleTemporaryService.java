@@ -296,6 +296,26 @@ public class SaleTemporaryService {
 
 	}
 
+	@Transactional
+	public Invoice moveToPendingOrder(Optional<Integer> seatId, String remark) {
+		Invoice invoice = new Invoice();
+		invoice.setRemark(remark);
+		invoice.setUser(userProfile.getProfile().getUser());
+		invoice.setBranch(userProfile.getProfile().getUser().getBranch());
+		invoice = invoiceRepository.save(invoice);
+		if (seatId.isPresent()) {
+			Seat seat = seatRepository.findById(seatId.get())
+					.orElseThrow(() -> new ResourceNotFoundException("Seat does not exist"));
+			if (seat.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
+				throw new UnauthorizedException("Transaction is unauthorized");
+			}
+			saleRepository.updateInvoiceBySeatId(invoice.getId(), seatId.get());
+		} else {
+			saleRepository.updateInvoiceByUserId(invoice.getId(), userProfile.getProfile().getUser().getId());
+		}
+		return invoice;
+	}
+
 	private SaleTemporary addItem(SaleRequest requestItem, User user, Optional<Seat> seat, Optional<Invoice> invoice,
 			Optional<SaleTemporary> parentSale) {
 		Long saleTmpId = requestItem.getSaleTmpId();

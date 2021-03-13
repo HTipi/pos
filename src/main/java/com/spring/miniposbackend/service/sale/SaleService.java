@@ -20,6 +20,7 @@ import com.spring.miniposbackend.model.admin.BranchCurrency;
 import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.model.admin.Seat;
 import com.spring.miniposbackend.model.admin.User;
+import com.spring.miniposbackend.model.sale.Invoice;
 import com.spring.miniposbackend.model.sale.Sale;
 import com.spring.miniposbackend.model.sale.SaleDetail;
 import com.spring.miniposbackend.model.sale.SaleTemporary;
@@ -29,6 +30,7 @@ import com.spring.miniposbackend.repository.admin.BranchSettingRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
 import com.spring.miniposbackend.repository.admin.SeatRepository;
 import com.spring.miniposbackend.repository.admin.UserRepository;
+import com.spring.miniposbackend.repository.sale.InvoiceRepository;
 import com.spring.miniposbackend.repository.sale.SaleDetailRepository;
 import com.spring.miniposbackend.repository.sale.SaleRepository;
 import com.spring.miniposbackend.repository.sale.SaleTemporaryRepository;
@@ -57,6 +59,8 @@ public class SaleService {
 
 	@Autowired
 	private ItemBranchRepository itemRepository;
+	@Autowired
+	private InvoiceRepository invoiceRepository;
 
 	@Autowired
 	private SeatRepository seatRepository;
@@ -87,7 +91,7 @@ public class SaleService {
 	}
 
 	@Transactional
-	public List<SaleDetail> create(Optional<Integer> seatId, Integer branchId, Integer userId, Double discount,
+	public List<SaleDetail> create(Optional<Long> invoiceId,Optional<Integer> seatId, Integer branchId, Integer userId, Double discount,
 			Double cashIn, Double change, Integer currencyId) {
 		entityManager.clear();
 		User user = userRepository.findById(userId)
@@ -95,13 +99,24 @@ public class SaleService {
 		Branch branch = branchRepository.findById(branchId)
 				.orElseThrow(() -> new ResourceNotFoundException("Branch does not exist"));
 		Seat seat = null;
+		Invoice invoice = null;
 		String seatName = "";
 		List<SaleTemporary> saleTemps;
 		Sale sale;
 		BranchCurrency branchCurrency = branchCurrencyRepository.findById(currencyId)
 				.orElseThrow(() -> new ResourceNotFoundException("Currency does not exist"));
 
-		if (seatId.isPresent()) {
+		if(invoiceId.isPresent()) {
+			invoice = invoiceRepository.findById(invoiceId.get()).orElseThrow(() -> new ResourceNotFoundException("Invoice does not exist"));
+			if (invoice.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
+				throw new UnauthorizedException("Transaction is unauthorized");
+			}
+			saleTemps = saleTemporaryRepository.findByInvoiceId(invoiceId.get());
+			if (saleTemps.size() == 0) {
+				throw new ResourceNotFoundException("Record not found");
+			}
+		}
+		else if (seatId.isPresent()) {
 			seat = seatRepository.findById(seatId.get())
 					.orElseThrow(() -> new ResourceNotFoundException("Seat does not exist"));
 
@@ -140,7 +155,10 @@ public class SaleService {
 				addItem(branch, user, saleResult, subItem, Optional.of(saleDetail));
 			});
 		});
-		if (seatId.isPresent()) {
+		if(invoiceId.isPresent()) {
+			saleTemporaryRepository.deleteByInvoiceId(invoiceId.get());
+		}
+		else if (seatId.isPresent()) {
 			saleTemporaryRepository.deleteBySeatId(seatId.get());
 		} else {
 			saleTemporaryRepository.deleteByUserId(userId);

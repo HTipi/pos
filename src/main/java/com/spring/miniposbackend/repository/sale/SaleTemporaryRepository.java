@@ -69,23 +69,33 @@ public interface SaleTemporaryRepository extends JpaRepository<SaleTemporary, Lo
 	List<SaleTemporary> findByUserIdWithisPrinted(Integer userId, boolean isPrinted);
 
 	@Modifying
+	@Query(value = "delete from Sales_temp where invoice_id=?1", nativeQuery = true)
+	void deleteByInvoiceId(Long invoiceId);
+	@Modifying
 	@Query(value = "delete from Sales_temp where seat_id=?1", nativeQuery = true)
 	void deleteBySeatId(Integer seatId);
 	@Modifying
 	@Query(value = "delete from Sales_temp where user_id=?1 and seat_id is null", nativeQuery = true)
 	void deleteByUserId(Integer userId);
-
 	@Modifying
 	@Query(value = "delete from Sales_temp where id=?1", nativeQuery = true)
 	void deleteBySaleTempId(Long saleTmpId);
 
 	@Modifying
-	@Query(value = "update Sales_temp set useredit_id=?1 where seat_id=?2", nativeQuery = true)
+	@Query(value = "update Sales_temp set useredit_id=?1 where seat_id=?2 and invoice is null", nativeQuery = true)
 	void updateUserEditSeat(Integer userId, Integer seatId);
 	
 	@Modifying
 	@Query(value = "update Sales_temp set useredit_id=?1 where invoice_id=?2", nativeQuery = true)
 	void updateUserEditInvoice(Integer userId, Long invoiceId);
+	
+	@Modifying
+	@Query(value = "update Sales_temp set invoice_id=?1 where seat_id=?2", nativeQuery = true)
+	void updateInvoiceBySeatId(Long invoiceId, Integer seatId);
+	
+	@Modifying
+	@Query(value = "update Sales_temp set invoice_id=?1 where user_id=?2", nativeQuery = true)
+	void updateInvoiceByUserId(Long invoiceId, Integer userId);
 
 	@Query(value = "select count(s) from SaleTemporary s where s.user.branch.id = ?1")
 	Optional<Integer> findByBranchId(Integer branchId);

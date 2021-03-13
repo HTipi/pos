@@ -8,9 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import com.spring.miniposbackend.exception.InternalErrorException;
 import com.spring.miniposbackend.model.SuccessResponse;
-import com.spring.miniposbackend.repository.admin.BranchSettingRepository;
 import com.spring.miniposbackend.service.sale.SaleService;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
@@ -22,8 +20,6 @@ public class SaleController {
 	private SaleService saleService;
 	@Autowired
 	private UserProfileUtil userProfile;
-	@Autowired
-	private BranchSettingRepository branchSettingRepository;
 
 	@GetMapping("by-user")
 	@PreAuthorize("hasAnyRole('SALE')")
@@ -47,11 +43,11 @@ public class SaleController {
 
 	@PostMapping
 	@PreAuthorize("hasAnyRole('SALE')")
-	public SuccessResponse create(@RequestParam Optional<Integer> seatId,
+	public SuccessResponse create(@RequestParam Optional<Long> invoiceId,@RequestParam Optional<Integer> seatId,
 			@RequestParam Double discount, @RequestParam Double cashIn, @RequestParam Double change,@RequestParam Integer currencyId) {
 		
 		return new SuccessResponse("00", "make Payment",
-				saleService.create(seatId, userProfile.getProfile().getBranch().getId(),
+				saleService.create(invoiceId,seatId, userProfile.getProfile().getBranch().getId(),
 						userProfile.getProfile().getUser().getId(), discount, cashIn, change,currencyId));
 	}
 

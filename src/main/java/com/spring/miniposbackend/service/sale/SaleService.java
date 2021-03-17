@@ -157,6 +157,7 @@ public class SaleService {
 		});
 		if(invoiceId.isPresent()) {
 			saleTemporaryRepository.deleteByInvoiceId(invoiceId.get());
+			invoiceRepository.deleteById(invoiceId.get());
 		}
 		else if (seatId.isPresent()) {
 			saleTemporaryRepository.deleteBySeatId(seatId.get());

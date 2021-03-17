@@ -39,9 +39,10 @@ public class SaleTemporaryController {
 
 	@GetMapping("by-invoice")
 	@PreAuthorize("hasAnyRole('SALE')")
-	public SuccessResponse getByInvoiceId(@RequestParam Integer invoiceId, @RequestParam Optional<Boolean> isPrinted,
+	public SuccessResponse getByInvoiceId(@RequestParam Long invoiceId, @RequestParam Optional<Boolean> isPrinted,
 			@RequestParam Optional<Boolean> cancel) {
-		return null;
+		return new SuccessResponse("00", "fetch Sale Tmp by User",
+				saleService.showByInvoiceId(invoiceId, isPrinted, cancel));
 	}
 
 	@GetMapping("status-seat")
@@ -50,7 +51,7 @@ public class SaleTemporaryController {
 		return new SuccessResponse("00", "fetch status seat",
 				saleService.showStatusSeatByBranchId(userProfile.getProfile().getBranch().getId()));
 	}
-
+	
 	@GetMapping("by-user")
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse getByUserId(@RequestParam Optional<Boolean> isPrinted,

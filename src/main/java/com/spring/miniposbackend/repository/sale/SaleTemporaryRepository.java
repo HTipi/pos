@@ -72,17 +72,17 @@ public interface SaleTemporaryRepository extends JpaRepository<SaleTemporary, Lo
 	@Query(value = "delete from Sales_temp where invoice_id=?1", nativeQuery = true)
 	void deleteByInvoiceId(Long invoiceId);
 	@Modifying
-	@Query(value = "delete from Sales_temp where seat_id=?1", nativeQuery = true)
+	@Query(value = "delete from Sales_temp where seat_id=?1 and invoice_id is null", nativeQuery = true)
 	void deleteBySeatId(Integer seatId);
 	@Modifying
-	@Query(value = "delete from Sales_temp where user_id=?1 and seat_id is null", nativeQuery = true)
+	@Query(value = "delete from Sales_temp where user_id=?1 and seat_id is null and invoice_id is null", nativeQuery = true)
 	void deleteByUserId(Integer userId);
 	@Modifying
 	@Query(value = "delete from Sales_temp where id=?1", nativeQuery = true)
 	void deleteBySaleTempId(Long saleTmpId);
 
 	@Modifying
-	@Query(value = "update Sales_temp set useredit_id=?1 where seat_id=?2 and invoice is null", nativeQuery = true)
+	@Query(value = "update Sales_temp set useredit_id=?1 where seat_id=?2 and invoice_id is null", nativeQuery = true)
 	void updateUserEditSeat(Integer userId, Integer seatId);
 	
 	@Modifying
@@ -90,21 +90,21 @@ public interface SaleTemporaryRepository extends JpaRepository<SaleTemporary, Lo
 	void updateUserEditInvoice(Integer userId, Long invoiceId);
 	
 	@Modifying
-	@Query(value = "update Sales_temp set invoice_id=?1 where seat_id=?2", nativeQuery = true)
+	@Query(value = "update Sales_temp set invoice_id=?1 where seat_id=?2 and invoice_id is null", nativeQuery = true)
 	void updateInvoiceBySeatId(Long invoiceId, Integer seatId);
 	
 	@Modifying
-	@Query(value = "update Sales_temp set invoice_id=?1 where user_id=?2", nativeQuery = true)
+	@Query(value = "update Sales_temp set invoice_id=?1 where user_id=?2 and invoice_id is null", nativeQuery = true)
 	void updateInvoiceByUserId(Long invoiceId, Integer userId);
 
-	@Query(value = "select count(s) from SaleTemporary s where s.user.branch.id = ?1")
-	Optional<Integer> findByBranchId(Integer branchId);
+//	@Query(value = "select count(s) from SaleTemporary s where s.user.branch.id = ?1")
+//	Optional<Integer> findByBranchId(Integer branchId);
 	
 	@Query(value = "select sum(s.quantity) from SaleTemporary s where s.user.id = ?1 and s.itemBranch.id=?2")
 	Optional<Integer> findItemBalanceByUserId(Integer userId,Long itemBranchId);
 	@Query(value = "select sum(s.quantity) from SaleTemporary s where s.seat.id = ?1 and s.itemBranch.id=?2")
 	Optional<Integer> findItemBalanceBySeatId(Integer seatId,Long itemBranchId);
 	
-	@Query(value = "select s.seat.id from SaleTemporary s where s.user.branch.id = ?1")
+	@Query(value = "select s.seat.id from SaleTemporary s where s.user.branch.id = ?1 and s.invoice is null")
 	List<Integer> findStatusSeatByBranchId(Integer branchId);
 }

@@ -1,3 +1,4 @@
+
 package com.spring.miniposbackend.model.sale;
 
 import java.util.List;
@@ -21,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.AuditModel;
 import com.spring.miniposbackend.model.admin.Branch;
 import com.spring.miniposbackend.model.admin.User;
-
+import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,40 +31,37 @@ import lombok.Setter;
 @Setter
 @Getter
 @DynamicUpdate
-public class Invoice extends AuditModel{
-	
+public class Invoice extends AuditModel {
 	private static final long serialVersionUID = 1L;
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id", nullable = false)
 	private Long id;
-	
 	@Column(name = "remark", nullable = false)
 	private String remark;
-	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "branch_id", nullable = false)
 	@JsonIgnore
-	private Branch branch; 
-	
+	private Branch branch;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
 	@JsonIgnore
 	private User user;
-	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "invoice", cascade = CascadeType.REMOVE)
 	@JsonIgnore
 	private List<SaleTemporary> saleTemporaries;
-	
 	@Transient
 	private double grandTotal;
-	
+
 	public double getGrandTotal() {
 		grandTotal = 0;
-		saleTemporaries.forEach(saleTemp ->{
+		saleTemporaries.forEach(saleTemp -> {
 			grandTotal += saleTemp.getTotal();
 		});
 		return grandTotal;
+	}
+
+	public Date getValueDate() {
+		return createdAt;
 	}
 }

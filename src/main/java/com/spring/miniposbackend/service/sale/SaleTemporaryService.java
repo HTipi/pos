@@ -313,6 +313,7 @@ public class SaleTemporaryService {
 		} else {
 			saleRepository.updateInvoiceByUserId(invoice.getId(), userProfile.getProfile().getUser().getId());
 		}
+		invoice.setSaleTemporaries(saleRepository.findByInvoiceId(invoice.getId()));
 		return invoice;
 	}
 

@@ -101,7 +101,7 @@ public class ItemBranchService {
 
 	public ImageResponse getImage(ItemBranch itemBranch) {
 		if (itemBranch.getImage() == null) {
-			return new ImageResponse(itemBranch.getId(), null, itemBranch.getVersion());
+			return new ImageResponse(itemBranch.getItem_Id(), null, itemBranch.getVersion());
 		}
 		try {
 			String fileLocation = imagePath + "/" + itemBranch.getImage();

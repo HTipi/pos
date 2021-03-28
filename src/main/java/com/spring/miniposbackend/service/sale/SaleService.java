@@ -115,6 +115,7 @@ public class SaleService {
 			if (saleTemps.size() == 0) {
 				throw new ResourceNotFoundException("Record not found");
 			}
+			seatName = saleTemps.get(0).getSeat_name();
 		}
 		else if (seatId.isPresent()) {
 			seat = seatRepository.findById(seatId.get())

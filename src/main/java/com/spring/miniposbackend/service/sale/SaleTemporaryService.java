@@ -291,9 +291,7 @@ public class SaleTemporaryService {
 				saleTmps = saleRepository.findBySeatUserId(userId);
 			}
 		}
-
 		return saleTmps;
-
 	}
 
 	@Transactional
@@ -313,6 +311,7 @@ public class SaleTemporaryService {
 		} else {
 			saleRepository.updateInvoiceByUserId(invoice.getId(), userProfile.getProfile().getUser().getId());
 		}
+		invoice.setSaleTemporaries(saleRepository.findByInvoiceId(invoice.getId()));
 		return invoice;
 	}
 

@@ -21,6 +21,13 @@ public class InvoiceService {
 		return invoiceRepository.findByBranchId(userProfile.getProfile().getBranch().getId());
 	}
 	
+	public Invoice delete(Long invoiceId) {
+		return invoiceRepository.findById(invoiceId).map(invoice->{
+			invoiceRepository.delete(invoice);
+			return invoice;
+		}).orElseThrow(()->new ResourceNotFoundException("Invoice not found"));
+	}
+	
 	public Invoice updateRemark(Long invoiceId,String remark) {
 		return invoiceRepository.findById(invoiceId).map((invoice)->{
 			invoice.setRemark(remark);

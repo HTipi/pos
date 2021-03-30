@@ -154,6 +154,10 @@ public class SaleDetail extends AuditModel {
 	public String getUserName() {
 		return user.getUsername();
 	}
+	
+	public Long getItemCorpId() {
+		return itemBranch.getItem_Id();
+	}
 
 	public double getTotal() {
 		return subTotal.doubleValue() - discountTotal.doubleValue();

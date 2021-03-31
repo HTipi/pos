@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.spring.miniposbackend.exception.InternalErrorException;
 import com.spring.miniposbackend.model.SuccessResponse;
+import com.spring.miniposbackend.model.sale.Invoice;
 import com.spring.miniposbackend.modelview.SaleRequest;
 import com.spring.miniposbackend.service.sale.SaleTemporaryService;
 import com.spring.miniposbackend.util.UserProfileUtil;
@@ -51,7 +52,7 @@ public class SaleTemporaryController {
 		return new SuccessResponse("00", "fetch status seat",
 				saleService.showStatusSeatByBranchId(userProfile.getProfile().getBranch().getId()));
 	}
-	
+
 	@GetMapping("by-user")
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse getByUserId(@RequestParam Optional<Boolean> isPrinted,
@@ -94,6 +95,19 @@ public class SaleTemporaryController {
 			@RequestParam String remark) {
 		return new SuccessResponse("00", "Sale has been move to pending",
 				saleService.moveToPendingOrder(seatId, remark));
+	}
+
+	@PostMapping("move-to-pending")
+	@PreAuthorize("hasAnyRole('SALE')")
+	public SuccessResponse moveToPendingWithoutSaving(@RequestParam(name = "seatId") Optional<Integer> seatId,
+			@RequestParam String remark, @RequestBody List<SaleRequest> requestItems) {
+		Object obj = saleService.moveToPending(requestItems, seatId, remark);
+		if (obj instanceof Invoice) {
+			return new SuccessResponse("00", "Sale has been move to pending", obj);
+		} else {
+			return new SuccessResponse("1", "Please update your list", obj);
+		}
+
 	}
 
 	@PatchMapping("{seatId}")

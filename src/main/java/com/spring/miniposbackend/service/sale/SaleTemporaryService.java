@@ -51,6 +51,47 @@ public class SaleTemporaryService {
 	private BranchSettingRepository branchSettingRepository;
 
 	@Transactional
+	public Object moveToPending(List<SaleRequest> requestItems, Optional<Integer> seatId, String remark) {
+		entityManager.clear();
+		Optional<Seat> seat = Optional.empty();
+		List<SaleTemporary> saletmps = new ArrayList<SaleTemporary>();
+		User user = userProfile.getProfile().getUser();
+		if (seatId.isPresent()) {
+			seat = seatRepository.findById(seatId.get());
+			if (!seat.isPresent()) {
+				throw new ResourceNotFoundException("Seat does not exist");
+			}
+			saletmps = saleRepository.findBySeatId(seatId.get());
+			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
+				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
+				return saletmps;
+			}
+		}
+		Invoice invoice = new Invoice();
+		invoice.setRemark(remark);
+		invoice.setUser(userProfile.getProfile().getUser());
+		invoice.setBranch(userProfile.getProfile().getUser().getBranch());
+		invoice = invoiceRepository.save(invoice);
+		Optional<Seat> finSeat = seat;
+		Optional<Invoice> finInvoice = Optional.of(invoice);
+		requestItems.forEach((requestItem) -> {
+			SaleTemporary saleTemporary = addItem(requestItem, user, finSeat, finInvoice, Optional.empty());
+			List<SaleRequest> subItems = requestItem.getAddOns() == null ? new ArrayList<SaleRequest>()
+					: requestItem.getAddOns();
+			subItems.forEach((subItem) -> {
+				SaleTemporary addOnItem = addItem(subItem, user, finSeat, finInvoice, Optional.of(saleTemporary));
+				saleTemporary.setPrice(saleTemporary.getPrice().add(addOnItem.getPrice()));
+			});
+			if (requestItem.getAddOns() != null) {
+				saleRepository.save(saleTemporary);
+			}
+		});
+		entityManager.flush();
+		entityManager.clear();
+		return invoice;
+	}
+	
+	@Transactional
 	public List<SaleTemporary> addItems(List<SaleRequest> requestItems, Optional<Integer> seatId,
 			Optional<Long> invoiceId) {
 		entityManager.clear();

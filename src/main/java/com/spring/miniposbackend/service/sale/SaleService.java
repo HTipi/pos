@@ -25,11 +25,9 @@ import com.spring.miniposbackend.model.sale.Sale;
 import com.spring.miniposbackend.model.sale.SaleDetail;
 import com.spring.miniposbackend.model.sale.SaleTemporary;
 import com.spring.miniposbackend.repository.admin.BranchCurrencyRepository;
-import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.admin.BranchSettingRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
 import com.spring.miniposbackend.repository.admin.SeatRepository;
-import com.spring.miniposbackend.repository.admin.UserRepository;
 import com.spring.miniposbackend.repository.sale.InvoiceRepository;
 import com.spring.miniposbackend.repository.sale.SaleDetailRepository;
 import com.spring.miniposbackend.repository.sale.SaleRepository;
@@ -46,16 +44,10 @@ public class SaleService {
 	private EntityManager entityManager;
 
 	@Autowired
-	private UserRepository userRepository;
-
-	@Autowired
 	private SaleTemporaryRepository saleTemporaryRepository;
 
 	@Autowired
 	private SaleDetailRepository saleDetailRepository;
-
-	@Autowired
-	private BranchRepository branchRepository;
 
 	@Autowired
 	private ItemBranchRepository itemRepository;
@@ -91,13 +83,11 @@ public class SaleService {
 	}
 
 	@Transactional
-	public List<SaleDetail> create(Optional<Long> invoiceId,Optional<Integer> seatId, Integer branchId, Integer userId, Double discount,
+	public Object create(Optional<Long> invoiceId,Optional<Integer> seatId, Double discount,
 			Double cashIn, Double change, Integer currencyId) {
 		entityManager.clear();
-		User user = userRepository.findById(userId)
-				.orElseThrow(() -> new ResourceNotFoundException("User does not exist"));
-		Branch branch = branchRepository.findById(branchId)
-				.orElseThrow(() -> new ResourceNotFoundException("Branch does not exist"));
+		User user = userProfile.getProfile().getUser();
+		Branch branch = userProfile.getProfile().getBranch();
 		Seat seat = null;
 		Invoice invoice = null;
 		String seatName = "";
@@ -115,6 +105,10 @@ public class SaleService {
 			if (saleTemps.size() == 0) {
 				throw new ResourceNotFoundException("Record not found");
 			}
+			else if (saleTemps.size() > 0 && !saleTemps.get(0).getUserEdit().getId().equals(user.getId())) {
+				saleTemporaryRepository.updateUserEditInvoice(user.getId(), invoiceId.get());
+				return saleTemps;
+			}
 			seatName = saleTemps.get(0).getSeat_name();
 		}
 		else if (seatId.isPresent()) {
@@ -128,9 +122,12 @@ public class SaleService {
 			saleTemps = saleTemporaryRepository.findBySeatId(seatId.get());
 			if (saleTemps.size() == 0) {
 				throw new ResourceNotFoundException("Seat not found");
+			}else if (saleTemps.size() > 0 && !saleTemps.get(0).getUserEdit().getId().equals(user.getId())) {
+				saleTemporaryRepository.updateUserEditSeat(user.getId(), seatId.get());
+				return saleTemps;
 			}
 		} else {
-			saleTemps = saleTemporaryRepository.findByUserId(userId);
+			saleTemps = saleTemporaryRepository.findByUserId(user.getId());
 			if (saleTemps.size() == 0) {
 				throw new ResourceNotFoundException("Record not found");
 			}
@@ -163,7 +160,7 @@ public class SaleService {
 		else if (seatId.isPresent()) {
 			saleTemporaryRepository.deleteBySeatId(seatId.get());
 		} else {
-			saleTemporaryRepository.deleteByUserId(userId);
+			saleTemporaryRepository.deleteByUserId(user.getId());
 		}
 		List<SaleDetail> saleDetails = saleDetailRepository.findMainBySaleId(sale.getId());
 
@@ -175,7 +172,7 @@ public class SaleService {
 		}
 		saleResult.setSubTotal(BigDecimal.valueOf(subTotal));
 		saleResult.setDiscountSaleDetail(BigDecimal.valueOf(discountAmount));
-		String receiptNum = receiptService.getReceiptNumberByBranchId(branchId).toString();
+		String receiptNum = receiptService.getReceiptNumberByBranchId(branch.getId()).toString();
 		saleResult.setReceiptNumber(receiptNum);
 		saleRepository.save(saleResult);
 		entityManager.flush();

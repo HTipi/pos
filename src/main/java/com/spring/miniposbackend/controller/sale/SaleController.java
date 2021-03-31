@@ -30,9 +30,9 @@ public class SaleController {
 
 	@GetMapping("summary/by-user")
 	@PreAuthorize("hasAnyRole('SALE')")
-	public SuccessResponse getSaleByUserId(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> date,@RequestParam boolean byUser) {
-		return new SuccessResponse("00", "fetch Sale Sum By User",
-				saleService.showSaleByUser(date,byUser));
+	public SuccessResponse getSaleByUserId(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> date,
+			@RequestParam boolean byUser) {
+		return new SuccessResponse("00", "fetch Sale Sum By User", saleService.showSaleByUser(date, byUser));
 	}
 
 	@GetMapping("by-branch")
@@ -43,12 +43,12 @@ public class SaleController {
 
 	@PostMapping
 	@PreAuthorize("hasAnyRole('SALE')")
-	public SuccessResponse create(@RequestParam Optional<Long> invoiceId,@RequestParam Optional<Integer> seatId,
-			@RequestParam Double discount, @RequestParam Double cashIn, @RequestParam Double change,@RequestParam Integer currencyId) {
-		
-		return new SuccessResponse("00", "make Payment",
-				saleService.create(invoiceId,seatId, userProfile.getProfile().getBranch().getId(),
-						userProfile.getProfile().getUser().getId(), discount, cashIn, change,currencyId));
+	public SuccessResponse create(@RequestParam Optional<Long> invoiceId, @RequestParam Optional<Integer> seatId,
+			@RequestParam Double discount, @RequestParam Double cashIn, @RequestParam Double change,
+			@RequestParam Integer currencyId) {
+
+		Object obj = saleService.create(invoiceId, seatId, discount, cashIn, change, currencyId);
+		return new SuccessResponse("00", "make Payment", obj);
 	}
 
 	@PatchMapping("reverse/{saleId}")

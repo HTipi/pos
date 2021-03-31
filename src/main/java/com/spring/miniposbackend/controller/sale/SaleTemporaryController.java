@@ -97,7 +97,7 @@ public class SaleTemporaryController {
 				saleService.moveToPendingOrder(seatId, remark));
 	}
 
-	@PostMapping("move-to-pending")
+	@PostMapping("save-to-pending")
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse moveToPendingWithoutSaving(@RequestParam(name = "seatId") Optional<Integer> seatId,
 			@RequestParam String remark, @RequestBody List<SaleRequest> requestItems) {

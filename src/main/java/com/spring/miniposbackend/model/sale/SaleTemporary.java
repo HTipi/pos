@@ -1,4 +1,3 @@
-
 package com.spring.miniposbackend.model.sale;
 
 import java.math.BigDecimal;
@@ -43,53 +42,67 @@ public class SaleTemporary extends AuditModel {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id", nullable = false)
 	private Long id;
+	
 	@Column(name = "value_date", nullable = false, updatable = false)
 	private Date valueDate;
+	
 	@Column(name = "price", nullable = false, precision = 10, scale = 2)
 	private BigDecimal price;
+	
 	@Column(name = "quantity", nullable = false)
 	@ColumnDefault("1")
 	private Short quantity;
+	
 	@Column(name = "discount_amount", nullable = false, precision = 10, scale = 2)
 	@ColumnDefault("0")
 	private BigDecimal discountAmount;
+	
 	@Column(name = "discount_percentage", nullable = false)
 	@Min(0)
 	@Max(100)
 	@ColumnDefault("0")
 	private Short discountPercentage;
+	
 	@Column(name = "is_printed", nullable = false)
 	@ColumnDefault("false")
 	private boolean isPrinted;
+	
 	@Column(name = "cancel", nullable = false)
 	@ColumnDefault("false")
 	private boolean cancel;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "seat_id", nullable = true)
 	@JsonIgnore
 	private Seat seat;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
 	@JsonIgnore
 	private User user;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "useredit_id", nullable = false)
 	@JsonIgnore
 	private User userEdit;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "item_branch_id", nullable = false)
 	@JsonIgnore
 	private ItemBranch itemBranch;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "invoice_id", nullable = true)
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	@JsonIgnore
 	private Invoice invoice;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "parent_sale_id", nullable = true)
 	@JsonIgnore
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private SaleTemporary parentSaleTemporary;
+	
 	@OneToMany(fetch = FetchType.LAZY)
 	@JoinColumn(name = "parent_sale_id", nullable = true)
 	@OnDelete(action = OnDeleteAction.CASCADE)

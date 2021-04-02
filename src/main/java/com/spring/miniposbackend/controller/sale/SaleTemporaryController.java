@@ -65,48 +65,54 @@ public class SaleTemporaryController {
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse create(@RequestBody List<SaleRequest> requestItem,
 			@RequestParam(name = "invoice-id") Optional<Long> invoiceId,
-			@RequestParam(name = "seat-id") Optional<Integer> seatId) {
+			@RequestParam(name = "seat-id") Optional<Integer> seatId,
+			@RequestParam(name = "user-id") Integer userId) {
 
-		return new SuccessResponse("00", "add SaleTmp", saleService.addItems(requestItem, seatId, invoiceId));
+		return new SuccessResponse("00", "add SaleTmp", saleService.addItems(requestItem, seatId, invoiceId,userId));
 	}
 
 	@DeleteMapping("item/{saleTempId}")
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse remove(@PathVariable Long saleTempId,
 			@RequestParam(name = "invoice-id") Optional<Long> invoiceId,
-			@RequestParam(name = "seat-id") Optional<Integer> seatId) {
-		return new SuccessResponse("00", "remove SaleTmp", saleService.removeItem(saleTempId, seatId, invoiceId));
+			@RequestParam(name = "seat-id") Optional<Integer> seatId,
+			@RequestParam(name = "user-id") Integer userId) {
+		return new SuccessResponse("00", "remove SaleTmp", saleService.removeItem(saleTempId, seatId, invoiceId,userId));
 	}
 
-	@PatchMapping("qty/{saleTempId}")
-	@PreAuthorize("hasAnyRole('SALE')")
-	public SuccessResponse updateQuantity(@PathVariable Long saleTempId,
-			@RequestParam(value = "quantity") Short quantity,
-			@RequestParam(name = "invoice-id") Optional<Long> invoiceId,
-			@RequestParam(name = "seat-id") Optional<Integer> seatId) {
-
-		return new SuccessResponse("00", "update QTY",
-				saleService.setQuantity(saleTempId, quantity, seatId, invoiceId));
-	}
+//	@PatchMapping("qty/{saleTempId}")
+//	@PreAuthorize("hasAnyRole('SALE')")
+//	public SuccessResponse updateQuantity(@PathVariable Long saleTempId,
+//			@RequestParam(value = "quantity") Short quantity,
+//			@RequestParam(name = "invoice-id") Optional<Long> invoiceId,
+//			@RequestParam(name = "seat-id") Optional<Integer> seatId,
+//			@RequestParam(name = "user-id") Integer userId) {
+//
+//		return new SuccessResponse("00", "update QTY",
+//				saleService.setQuantity(saleTempId, quantity, seatId, invoiceId,userId));
+//	}
 
 	@PostMapping("move-to-pending")
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse moveToPending(@RequestParam(name = "seatId") Optional<Integer> seatId,
-			@RequestParam String remark) {
-		return new SuccessResponse("00", "Sale has been move to pending",
-				saleService.moveToPendingOrder(seatId, remark));
+			@RequestParam String remark,@RequestParam(name = "user-id") Integer userId) {
+		Object obj = saleService.moveToPendingOrder(seatId, remark,userId);
+		if(obj instanceof Invoice) {
+			return new SuccessResponse("00", "Sale has been move to pending",
+					obj);
+		}
+		return new SuccessResponse("0", "Please update your list",
+				obj);
+		
 	}
 
 	@PostMapping("save-to-pending")
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse moveToPendingWithoutSaving(@RequestParam(name = "seatId") Optional<Integer> seatId,
 			@RequestParam String remark, @RequestBody List<SaleRequest> requestItems) {
-		Object obj = saleService.moveToPending(requestItems, seatId, remark);
-		if (obj instanceof Invoice) {
-			return new SuccessResponse("00", "Sale has been move to pending", obj);
-		} else {
-			return new SuccessResponse("1", "Please update your list", obj);
-		}
+		
+			return new SuccessResponse("00", "Sale has been move to pending", saleService.moveToPending(requestItems, seatId, remark));
+		
 
 	}
 

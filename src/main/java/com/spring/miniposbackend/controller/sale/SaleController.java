@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.spring.miniposbackend.model.SuccessResponse;
+import com.spring.miniposbackend.model.sale.SaleDetail;
 import com.spring.miniposbackend.service.sale.SaleService;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
@@ -45,10 +46,13 @@ public class SaleController {
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse create(@RequestParam Optional<Long> invoiceId, @RequestParam Optional<Integer> seatId,
 			@RequestParam Double discount, @RequestParam Double cashIn, @RequestParam Double change,
-			@RequestParam Integer currencyId) {
-
-		Object obj = saleService.create(invoiceId, seatId, discount, cashIn, change, currencyId);
-		return new SuccessResponse("00", "make Payment", obj);
+			@RequestParam Integer currencyId,@RequestParam Integer userId) {
+		Object obj = saleService.create(invoiceId, seatId, discount, cashIn, change, currencyId,userId);
+		if(obj instanceof SaleDetail)
+		{
+			return new SuccessResponse("00", "Update list", obj);
+		}
+		return new SuccessResponse("0", "make Payment", obj);
 	}
 
 	@PatchMapping("reverse/{saleId}")

@@ -84,7 +84,7 @@ public class SaleService {
 
 	@Transactional
 	public Object create(Optional<Long> invoiceId,Optional<Integer> seatId, Double discount,
-			Double cashIn, Double change, Integer currencyId) {
+			Double cashIn, Double change, Integer currencyId,Integer userId) {
 		entityManager.clear();
 		User user = userProfile.getProfile().getUser();
 		Branch branch = userProfile.getProfile().getBranch();
@@ -105,7 +105,7 @@ public class SaleService {
 			if (saleTemps.size() == 0) {
 				throw new ResourceNotFoundException("Record not found");
 			}
-			else if (saleTemps.size() > 0 && !saleTemps.get(0).getUserEdit().getId().equals(user.getId())) {
+			else if (saleTemps.size() > 0 && !saleTemps.get(0).getUserEdit().getId().equals(userId)) {
 				saleTemporaryRepository.updateUserEditInvoice(user.getId(), invoiceId.get());
 				return saleTemps;
 			}
@@ -122,7 +122,7 @@ public class SaleService {
 			saleTemps = saleTemporaryRepository.findBySeatId(seatId.get());
 			if (saleTemps.size() == 0) {
 				throw new ResourceNotFoundException("Seat not found");
-			}else if (saleTemps.size() > 0 && !saleTemps.get(0).getUserEdit().getId().equals(user.getId())) {
+			}else if (saleTemps.size() > 0 && !saleTemps.get(0).getUserEdit().getId().equals(userId)) {
 				saleTemporaryRepository.updateUserEditSeat(user.getId(), seatId.get());
 				return saleTemps;
 			}

@@ -3,6 +3,7 @@ package com.spring.miniposbackend.service.sale;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,20 +52,14 @@ public class SaleTemporaryService {
 	private BranchSettingRepository branchSettingRepository;
 
 	@Transactional
-	public Object moveToPending(List<SaleRequest> requestItems, Optional<Integer> seatId, String remark) {
+	public Invoice moveToPending(List<SaleRequest> requestItems, Optional<Integer> seatId, String remark) {
 		entityManager.clear();
 		Optional<Seat> seat = Optional.empty();
-		List<SaleTemporary> saletmps = new ArrayList<SaleTemporary>();
 		User user = userProfile.getProfile().getUser();
 		if (seatId.isPresent()) {
 			seat = seatRepository.findById(seatId.get());
 			if (!seat.isPresent()) {
 				throw new ResourceNotFoundException("Seat does not exist");
-			}
-			saletmps = saleRepository.findBySeatId(seatId.get());
-			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
-				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
-				return saletmps;
 			}
 		}
 		Invoice invoice = new Invoice();
@@ -93,7 +88,7 @@ public class SaleTemporaryService {
 	
 	@Transactional
 	public List<SaleTemporary> addItems(List<SaleRequest> requestItems, Optional<Integer> seatId,
-			Optional<Long> invoiceId) {
+			Optional<Long> invoiceId,Integer userId) {
 		entityManager.clear();
 		Optional<Seat> seat = Optional.empty();
 		Optional<Invoice> invoice = Optional.empty();
@@ -105,7 +100,7 @@ public class SaleTemporaryService {
 				throw new ResourceNotFoundException("Invoice does not exit");
 			}
 			saletmps = saleRepository.findByInvoiceId(invoiceId.get());
-			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
+			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(userId)) {
 				saleRepository.updateUserEditInvoice(user.getId(), invoiceId.get());
 				return saletmps;
 			}
@@ -115,7 +110,7 @@ public class SaleTemporaryService {
 				throw new ResourceNotFoundException("Seat does not exist");
 			}
 			saletmps = saleRepository.findBySeatId(seatId.get());
-			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
+			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(userId)) {
 				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
 				return saletmps;
 			}
@@ -147,7 +142,7 @@ public class SaleTemporaryService {
 	}
 
 	@Transactional
-	public List<SaleTemporary> removeItem(Long saleTempId, Optional<Integer> seatId, Optional<Long> invoiceId) {
+	public List<SaleTemporary> removeItem(Long saleTempId, Optional<Integer> seatId, Optional<Long> invoiceId, Integer userId) {
 		List<SaleTemporary> list = new ArrayList<SaleTemporary>();
 		List<SaleTemporary> saletmps = new ArrayList<SaleTemporary>();
 		User user = userProfile.getProfile().getUser();
@@ -157,7 +152,7 @@ public class SaleTemporaryService {
 				throw new ResourceNotFoundException("Invoice does not exit");
 			}
 			saletmps = saleRepository.findByInvoiceId(invoiceId.get());
-			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
+			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(userId)) {
 				saleRepository.updateUserEditInvoice(user.getId(), invoiceId.get());
 				return saletmps;
 			}
@@ -166,8 +161,9 @@ public class SaleTemporaryService {
 			if (!seat.isPresent()) {
 				throw new ResourceNotFoundException("Seat does not exist");
 			}
+			
 			saletmps = saleRepository.findBySeatId(seatId.get());
-			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
+			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(userId)) {
 				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
 				return saletmps;
 			}
@@ -193,7 +189,7 @@ public class SaleTemporaryService {
 
 	@Transactional
 	public List<SaleTemporary> setQuantity(Long saleTempId, Short quantity, Optional<Integer> seatId,
-			Optional<Long> invoiceId) {
+			Optional<Long> invoiceId,Integer userId) {
 		List<SaleTemporary> list = new ArrayList<SaleTemporary>();
 		User user = userProfile.getProfile().getUser();
 		List<SaleTemporary> saletmps = new ArrayList<SaleTemporary>();
@@ -203,7 +199,7 @@ public class SaleTemporaryService {
 				throw new ResourceNotFoundException("Invoice does not exit");
 			}
 			saletmps = saleRepository.findByInvoiceId(invoiceId.get());
-			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
+			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(userId)) {
 				saleRepository.updateUserEditInvoice(user.getId(), invoiceId.get());
 				return saletmps;
 			}
@@ -213,7 +209,7 @@ public class SaleTemporaryService {
 				throw new ResourceNotFoundException("Seat does not exist");
 			}
 			saletmps = saleRepository.findBySeatId(seatId.get());
-			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(user.getId())) {
+			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(userId)) {
 				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
 				return saletmps;
 			}
@@ -336,12 +332,17 @@ public class SaleTemporaryService {
 	}
 
 	@Transactional
-	public Invoice moveToPendingOrder(Optional<Integer> seatId, String remark) {
+	public Object moveToPendingOrder(Optional<Integer> seatId, String remark,Integer userId) {
 		Invoice invoice = new Invoice();
 		invoice.setRemark(remark);
 		invoice.setUser(userProfile.getProfile().getUser());
 		invoice.setBranch(userProfile.getProfile().getUser().getBranch());
 		invoice = invoiceRepository.save(invoice);
+		List<SaleTemporary> saletmps = saleRepository.findBySeatId(seatId.get());
+		if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(userId)) {
+			saleRepository.updateUserEditSeat(userProfile.getProfile().getUser().getId(), seatId.get());
+			return saletmps;
+		}
 		if (seatId.isPresent()) {
 			Seat seat = seatRepository.findById(seatId.get())
 					.orElseThrow(() -> new ResourceNotFoundException("Seat does not exist"));

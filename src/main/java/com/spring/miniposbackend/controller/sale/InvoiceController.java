@@ -23,7 +23,7 @@ public class InvoiceController {
 
 	@GetMapping("by-branch")
 	@PreAuthorize("hasAnyRole('SALE')")
-	public SuccessResponse getByUserId() {
+	public SuccessResponse getByBranchId() {
 		return new SuccessResponse("00", "fetch Invioce by branch", invoiceService.showByBrandId());
 	}
 	
@@ -36,6 +36,6 @@ public class InvoiceController {
 	@DeleteMapping("{invoiceId}")
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse remove(@PathVariable Long invoiceId) {
-		return new SuccessResponse("00", "Patch remark", invoiceService.delete(invoiceId));
+		return new SuccessResponse("00", "remove invoice-pending", invoiceService.delete(invoiceId));
 	}
 }

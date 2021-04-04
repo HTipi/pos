@@ -1,6 +1,7 @@
 package com.spring.miniposbackend.controller.sale;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,12 +48,13 @@ public class SaleController {
 	public SuccessResponse create(@RequestParam Optional<Long> invoiceId, @RequestParam Optional<Integer> seatId,
 			@RequestParam Double discount, @RequestParam Double cashIn, @RequestParam Double change,
 			@RequestParam Integer currencyId,@RequestParam Integer userId) {
-		Object obj = saleService.create(invoiceId, seatId, discount, cashIn, change, currencyId,userId);
+		List list = saleService.create(invoiceId, seatId, discount, cashIn, change, currencyId,userId);
+		Object obj = list.get(0);
 		if(obj instanceof SaleDetail)
 		{
-			return new SuccessResponse("00", "Update list", obj);
+			return new SuccessResponse("00", "Update list", list);
 		}
-		return new SuccessResponse("0", "make Payment", obj);
+		return new SuccessResponse("0", "make Payment", list);
 	}
 
 	@PatchMapping("reverse/{saleId}")

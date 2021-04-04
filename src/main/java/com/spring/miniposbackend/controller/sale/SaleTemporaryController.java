@@ -95,7 +95,7 @@ public class SaleTemporaryController {
 	@PostMapping("move-to-pending")
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse moveToPending(@RequestParam(name = "seatId") Optional<Integer> seatId,
-			@RequestParam String remark,@RequestParam(name = "user-id") Integer userId) {
+			@RequestParam String remark,@RequestParam(name = "userId") Integer userId) {
 		Object obj = saleService.moveToPendingOrder(seatId, remark,userId);
 		if(obj instanceof Invoice) {
 			return new SuccessResponse("00", "Sale has been move to pending",
@@ -109,11 +109,13 @@ public class SaleTemporaryController {
 	@PostMapping("save-to-pending")
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse moveToPendingWithoutSaving(@RequestParam(name = "seatId") Optional<Integer> seatId,
-			@RequestParam String remark, @RequestBody List<SaleRequest> requestItems) {
+			@RequestParam String remark, @RequestBody List<SaleRequest> requestItems,@RequestParam(name = "userId") Integer userId) {
+		Object obj = saleService.moveToPending(requestItems, seatId, remark,userId);
+		if(obj instanceof Invoice) {
+			return new SuccessResponse("00", "Sale has been move to pending", obj);
+		}
 		
-			return new SuccessResponse("00", "Sale has been move to pending", saleService.moveToPending(requestItems, seatId, remark));
-		
-
+			return new SuccessResponse("0", "Please update your list", obj);
 	}
 
 	@PatchMapping("{seatId}")

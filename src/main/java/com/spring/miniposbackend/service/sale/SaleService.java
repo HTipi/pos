@@ -83,7 +83,7 @@ public class SaleService {
 	}
 
 	@Transactional
-	public Object create(Optional<Long> invoiceId,Optional<Integer> seatId, Double discount,
+	public List create(Optional<Long> invoiceId,Optional<Integer> seatId, Double discount,
 			Double cashIn, Double change, Integer currencyId,Integer userId) {
 		entityManager.clear();
 		User user = userProfile.getProfile().getUser();
@@ -121,8 +121,12 @@ public class SaleService {
 			seatName = seat.getName();
 			saleTemps = saleTemporaryRepository.findBySeatId(seatId.get());
 			if (saleTemps.size() == 0) {
-				throw new ResourceNotFoundException("Seat not found");
+				throw new ConflictException("ប្រតិបតិ្តការនេះបានបម្រុងដោយអ្នកផ្សេងរួចហើយ", "15");
 			}else if (saleTemps.size() > 0 && !saleTemps.get(0).getUserEdit().getId().equals(userId)) {
+				if(saleTemps.get(0).getInvoice_id() != null)
+				{
+					throw new ConflictException("ប្រតិបតិ្តការនេះបានបម្រុងដោយអ្នកផ្សេងរួចហើយ", "15");
+				}
 				saleTemporaryRepository.updateUserEditSeat(user.getId(), seatId.get());
 				return saleTemps;
 			}

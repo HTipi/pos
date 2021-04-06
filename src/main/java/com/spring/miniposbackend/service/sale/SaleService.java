@@ -97,7 +97,7 @@ public class SaleService {
 				.orElseThrow(() -> new ResourceNotFoundException("Currency does not exist"));
 
 		if(invoiceId.isPresent()) {
-			invoice = invoiceRepository.findById(invoiceId.get()).orElseThrow(() -> new ResourceNotFoundException("Invoice does not exist"));
+			invoice = invoiceRepository.findById(invoiceId.get()).orElseThrow(() -> new ResourceNotFoundException("វិក័យប័ត្រនេះបានគិតរួចហើយ","16"));
 			if (invoice.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
 				throw new UnauthorizedException("Transaction is unauthorized");
 			}

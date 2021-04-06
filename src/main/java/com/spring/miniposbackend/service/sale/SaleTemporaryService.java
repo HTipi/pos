@@ -177,8 +177,6 @@ public class SaleTemporaryService {
 				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
 				return saletmps;
 			}
-			System.out.println(user.getId());
-			System.out.println(seatId.get());
 			saleRepository.updateUserEditSeat(user.getId(), seatId.get());
 		}
 		SaleTemporary saletemp = saleRepository.findById(saleTempId).map(sale -> {
@@ -190,9 +188,13 @@ public class SaleTemporaryService {
 					|| !itemBranch.isEnable()) {
 				throw new UnauthorizedException("Item is unauthorized");
 			}
+			if (sale.getParentSaleTemporary() != null) {
+				saleRepository.deductPriceBySaleTempId(sale.getParentSaleTemporary().getId(), sale.getPrice());
+			}
 			saleRepository.deleteBySaleTempId(saleTempId);
 			return sale;
-		}).orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
+		}).orElseThrow(
+				() -> new ResourceNotFoundException("ប្រតិបត្តិការនេះត្រូវបានលុបដោយអ្នកប្រើប្រាស់ម្នាក់ទៀត", "17"));
 
 		list.add(saletemp);
 

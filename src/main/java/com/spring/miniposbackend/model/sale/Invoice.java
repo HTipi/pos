@@ -56,7 +56,10 @@ public class Invoice extends AuditModel {
 	public double getGrandTotal() {
 		grandTotal = 0;
 		saleTemporaries.forEach(saleTemp -> {
-			grandTotal += saleTemp.getTotal();
+			if (saleTemp.getParentSaleTemporary() == null) {
+				grandTotal += saleTemp.getTotal();
+			}
+					
 		});
 		return grandTotal;
 	}

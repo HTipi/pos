@@ -1,5 +1,6 @@
 package com.spring.miniposbackend.repository.sale;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -82,7 +83,11 @@ public interface SaleTemporaryRepository extends JpaRepository<SaleTemporary, Lo
 	@Modifying
 	@Query(value = "delete from Sales_temp where id=?1", nativeQuery = true)
 	void deleteBySaleTempId(Long saleTmpId);
-
+	
+	@Modifying
+	@Query(value = "update Sales_temp set price=price-?2 where id=?1", nativeQuery = true)
+	void deductPriceBySaleTempId(Long saleTmpId,BigDecimal price);
+	
 	@Modifying
 	@Query(value = "update Sales_temp set useredit_id=?1 where seat_id=?2 and invoice_id is null", nativeQuery = true)
 	void updateUserEditSeat(Integer userId, Integer seatId);

@@ -36,4 +36,8 @@ public class PrinterItemType {
 	@JsonIgnore
 	ItemType itemType;
 	
+	public Integer getItemTypeId() {
+		return itemType.getId();
+	}
+	
 }

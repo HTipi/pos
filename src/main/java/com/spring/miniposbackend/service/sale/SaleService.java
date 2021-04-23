@@ -103,7 +103,7 @@ public class SaleService {
 			}
 			saleTemps = saleTemporaryRepository.findByInvoiceId(invoiceId.get());
 			if (saleTemps.size() == 0) {
-				throw new ResourceNotFoundException("Record not found");
+				throw new ResourceNotFoundException("វិក័យប័ត្រនេះបានគិតរួចហើយ","16");
 			}
 			else if (saleTemps.size() > 0 && !saleTemps.get(0).getUserEdit().getId().equals(userId)) {
 				saleTemporaryRepository.updateUserEditInvoice(user.getId(), invoiceId.get());
@@ -121,7 +121,7 @@ public class SaleService {
 			seatName = seat.getName();
 			saleTemps = saleTemporaryRepository.findBySeatId(seatId.get());
 			if (saleTemps.size() == 0) {
-				throw new ConflictException("ប្រតិបតិ្តការនេះបានបម្រុងដោយអ្នកផ្សេងរួចហើយ", "15");
+				throw new ConflictException("វិក័យប័ត្រនេះបានគិតរួចហើយ","16");
 			}else if (saleTemps.size() > 0 && !saleTemps.get(0).getUserEdit().getId().equals(userId)) {
 				if(saleTemps.get(0).getInvoice_id() != null)
 				{
@@ -133,7 +133,7 @@ public class SaleService {
 		} else {
 			saleTemps = saleTemporaryRepository.findByUserId(user.getId());
 			if (saleTemps.size() == 0) {
-				throw new ResourceNotFoundException("Record not found");
+				throw new ResourceNotFoundException("វិក័យប័ត្រនេះបានគិតរួចហើយ","16");
 			}
 		}
 		sale = new Sale();

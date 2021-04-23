@@ -105,7 +105,7 @@ public class SaleTemporaryService {
 		if (invoiceId.isPresent()) {
 			invoice = invoiceRepository.findById(invoiceId.get());
 			if (!invoice.isPresent()) {
-				throw new ResourceNotFoundException("Invoice does not exit");
+				throw new ResourceNotFoundException("វិក័យប័ត្រនេះបានគិតរួចហើយ","16");
 			}
 			saletmps = saleRepository.findByInvoiceId(invoiceId.get());
 			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(userId)) {
@@ -158,7 +158,7 @@ public class SaleTemporaryService {
 		if (invoiceId.isPresent()) {
 			Optional<Invoice> invoice = invoiceRepository.findById(invoiceId.get());
 			if (!invoice.isPresent()) {
-				throw new ResourceNotFoundException("Invoice does not exit");
+				throw new ResourceNotFoundException("វិក័យប័ត្រនេះបានគិតរួចហើយ","16");
 			}
 			saletmps = saleRepository.findByInvoiceId(invoiceId.get());
 			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(userId)) {
@@ -173,7 +173,10 @@ public class SaleTemporaryService {
 			}
 
 			saletmps = saleRepository.findBySeatId(seatId.get());
-			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(userId)) {
+			if (saletmps.size() == 0) {
+				throw new ConflictException("វិក័យប័ត្រនេះបានគិតរួចហើយ","16");
+				}
+			if (!saletmps.get(0).getUserEdit().getId().equals(userId)) {
 				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
 				return saletmps;
 			}
@@ -195,7 +198,6 @@ public class SaleTemporaryService {
 			return sale;
 		}).orElseThrow(
 				() -> new ResourceNotFoundException("ប្រតិបត្តិការនេះត្រូវបានលុបដោយអ្នកប្រើប្រាស់ម្នាក់ទៀត", "17"));
-
 		list.add(saletemp);
 
 		return list;
@@ -403,7 +405,9 @@ public class SaleTemporaryService {
 						throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 				}
 			}
+			
 			return saleRepository.findById(saleTmpId).map(saleTmp -> {
+				
 				saleTmp.setValueDate(new Date());
 				saleTmp.setQuantity(quantity);
 				saleTmp.setDiscountPercentage(discountPercentage);
@@ -420,6 +424,9 @@ public class SaleTemporaryService {
 				}
 				return saleRepository.save(saleTmp);
 			}).orElseGet(() -> {
+				if(saleTmpId>0 && item.getType().contentEquals("MAINITEM")) {
+					throw new ConflictException("វិក័យប័ត្រនេះបានគិតរួចហើយ","16");
+				}
 				SaleTemporary saleTmp = new SaleTemporary();
 				saleTmp.setItemBranch(item);
 				saleTmp.setValueDate(new Date());

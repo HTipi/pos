@@ -46,11 +46,6 @@ public class ItemType extends AuditModel{
     @JsonIgnore
     private Corporate corporate;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "printer_id",nullable = true)
-    @JsonIgnore
-    private Printer printer;
-	
 	@Column(name ="version", nullable = false)
 	private Short version= 0;
 	

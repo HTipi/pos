@@ -1,7 +1,5 @@
 package com.spring.miniposbackend.model.admin;
 
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,10 +8,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.ColumnDefault;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -24,29 +19,21 @@ import lombok.Setter;
 @Table(name = "printers")
 @Getter
 @Setter
-public class Printer {
+public class PrinterItemType {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id", nullable = false)
 	private Integer id;
 	
-	@Column(name = "code", nullable = false,length = 32)
-    private String code;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "printer_id", nullable = false)
+	@JsonIgnore
+	Printer printer;	
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "branch_id", nullable = false)
+	@JoinColumn(name = "item_type_id", nullable = false)
 	@JsonIgnore
-	Branch branch;
+	ItemType itemType;
 	
-	@OneToMany(mappedBy = "printer", fetch = FetchType.EAGER)
-	List<PrinterItemType> printerItemTypes;
-
-	@Column(name = "enable", nullable = false)
-    @ColumnDefault("false")
-    private boolean enable;
-	
-	@Column(name = "paymentPrinter", nullable = false)
-    @ColumnDefault("false")
-	private boolean paymentPrinter;
 }

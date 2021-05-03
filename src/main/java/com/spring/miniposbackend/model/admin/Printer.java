@@ -1,5 +1,6 @@
 package com.spring.miniposbackend.model.admin;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -34,11 +35,18 @@ public class Printer {
 	@Column(name = "code", nullable = false,length = 32)
     private String code;
 	
+	@Column(name = "ip", nullable = false,length = 14)
+    private String ip;
+	
+	@Column(name = "name", nullable = true,length = 14)
+    private String name;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "branch_id", nullable = false)
 	@JsonIgnore
 	Branch branch;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy = "printer", fetch = FetchType.EAGER)
 	List<PrinterItemType> printerItemTypes;
 
@@ -49,4 +57,12 @@ public class Printer {
 	@Column(name = "paymentPrinter", nullable = false)
     @ColumnDefault("false")
 	private boolean paymentPrinter;
+	
+	public List<Integer> getItemTypes(){
+		List<Integer> tmp = new ArrayList<Integer>();
+		for (int i = 0; i < printerItemTypes.size(); i++) {
+			tmp.add(printerItemTypes.get(i).getItemTypeId());
+		}
+		return tmp;
+	}
 }

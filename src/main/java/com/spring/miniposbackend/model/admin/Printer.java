@@ -58,6 +58,10 @@ public class Printer {
     @ColumnDefault("false")
 	private boolean paymentPrinter;
 	
+	@Column(name = "separatePrinter", nullable = true)
+    @ColumnDefault("false")
+	private boolean separatePrinter;
+	
 	public List<Integer> getItemTypes(){
 		List<Integer> tmp = new ArrayList<Integer>();
 		for (int i = 0; i < printerItemTypes.size(); i++) {

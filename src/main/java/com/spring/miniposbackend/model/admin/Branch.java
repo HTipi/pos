@@ -58,7 +58,13 @@ public class Branch extends AuditModel {
 
 	@OneToMany(mappedBy = "branch", fetch = FetchType.LAZY)
 	@JsonIgnore
-	private List<DeliveryContact> deliveryContacts = new ArrayList<>();
+	private List<DeliveryContact> deliveryContacts = new ArrayList<DeliveryContact>();
+	
+
+	@OneToMany(mappedBy = "branchPaymentIdentity.branch", fetch = FetchType.LAZY)
+	@JsonIgnore
+	private List<BranchPaymentChannel> branchPaymentChannels = new ArrayList<BranchPaymentChannel>();
+
 
 	@Column(name = "enable", nullable = false)
 	@ColumnDefault("true")

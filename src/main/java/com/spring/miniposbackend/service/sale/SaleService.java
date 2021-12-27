@@ -27,6 +27,7 @@ import com.spring.miniposbackend.model.sale.SaleTemporary;
 import com.spring.miniposbackend.repository.admin.BranchCurrencyRepository;
 import com.spring.miniposbackend.repository.admin.BranchSettingRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
+import com.spring.miniposbackend.repository.admin.PaymentChannelRepository;
 import com.spring.miniposbackend.repository.admin.SeatRepository;
 import com.spring.miniposbackend.repository.sale.InvoiceRepository;
 import com.spring.miniposbackend.repository.sale.SaleDetailRepository;
@@ -39,7 +40,8 @@ public class SaleService {
 
 	@Autowired
 	private SaleRepository saleRepository;
-
+	@Autowired
+	private PaymentChannelRepository paymentChannelRepository;
 	@Autowired
 	private EntityManager entityManager;
 
@@ -83,7 +85,7 @@ public class SaleService {
 	}
 
 	@Transactional
-	public List create(Optional<Long> invoiceId,Optional<Integer> seatId, Double discount,
+	public List create(Optional<Long> invoiceId,Optional<Integer> seatId,Optional<Integer> channelId, Double discount,
 			Double cashIn, Double change, Integer currencyId,Integer userId) {
 		entityManager.clear();
 		User user = userProfile.getProfile().getUser();
@@ -148,6 +150,9 @@ public class SaleService {
 		sale.setCashIn(cashIn);
 		sale.setChange(change);
 		sale.setBranchCurrency(branchCurrency);
+		if(channelId.isPresent()) {
+			sale.setPaymentChannel(paymentChannelRepository.findById(channelId.get()).orElse(null));
+		}
 		Sale saleResult = saleRepository.save(sale);
 		saleTemps.forEach((saleTemp) -> {
 			SaleDetail saleDetail = addItem(branch, user, saleResult, saleTemp, Optional.empty());

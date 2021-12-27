@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.AuditModel;
 import com.spring.miniposbackend.model.admin.Branch;
 import com.spring.miniposbackend.model.admin.BranchCurrency;
+import com.spring.miniposbackend.model.admin.PaymentChannel;
 import com.spring.miniposbackend.model.admin.User;
 
 import lombok.Getter;
@@ -77,6 +78,11 @@ public class Sale extends AuditModel {
 	public String getFullName() {
 		return user.getFullName();
 	}
+	
+	@ManyToOne
+	@JoinColumn(name = "payment_channel_id", nullable = true)
+	@JsonIgnore
+	private PaymentChannel paymentChannel;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "branch_id", nullable = false)

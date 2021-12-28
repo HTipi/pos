@@ -28,6 +28,10 @@ public class BranchPaymentChannel {
 		return branchPaymentIdentity.getChannel();
 	}
 	
+	public Integer getPaymentChannelId() {
+		return getPaymentChannel().getId();
+	}
+	
 	public String getPaymentChannelName() {
 		return getPaymentChannel().getName();
 	}

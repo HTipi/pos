@@ -3,6 +3,7 @@ package com.spring.miniposbackend.modelview;
 import java.util.List;
 
 import com.spring.miniposbackend.model.admin.Branch;
+import com.spring.miniposbackend.model.admin.BranchPaymentChannel;
 import com.spring.miniposbackend.model.admin.Corporate;
 import com.spring.miniposbackend.model.admin.User;
 import com.spring.miniposbackend.model.admin.UserRole;
@@ -14,12 +15,14 @@ public class UserResponse {
 	private Corporate corporate;
 	private byte[] image;
 	private List<UserRole> userRoles;
+	private List<BranchPaymentChannel> paymentChannels;
 	private String token;
 	
 	public UserResponse(User user, List<UserRole> userRoles, byte[] image) {
 		this.user = user;
 		branch = user.getBranch();
 		corporate = branch.getCorporate();
+		paymentChannels= branch.getBranchPaymentChannels();
 		this.userRoles = userRoles;
 		this.image = image;
 	}
@@ -29,6 +32,7 @@ public class UserResponse {
 		this.token = token;
 		branch = user.getBranch();
 		corporate = branch.getCorporate();
+		paymentChannels= branch.getBranchPaymentChannels();
 		this.userRoles = userRoles;
 		this.image = image;
 	}
@@ -81,5 +85,9 @@ public class UserResponse {
 	public String getFullName() {
 		
 		return user.getFullName();
+	}
+	
+	public List<BranchPaymentChannel> getBranchPaymentChannels(){
+		return paymentChannels;
 	}
 }

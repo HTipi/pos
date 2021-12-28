@@ -71,4 +71,15 @@ public class UserResponse {
 	public Integer getBranchId() {
 		return branch.getId();
 	}
+	public String getBranchTelephone() {
+		return branch.getTelephone();
+	}
+	public String getBranchAddressDesc() {
+		
+		return branch.getAddressDesc();
+	}
+	public String getFullName() {
+		
+		return user.getFullName();
+	}
 }

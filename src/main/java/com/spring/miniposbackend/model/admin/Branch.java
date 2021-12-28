@@ -36,6 +36,9 @@ public class Branch extends AuditModel {
 
 	@Column(name = "telephone", nullable = false, length = 20)
 	private String telephone;
+	
+	@Column(name = "address_desc", nullable = true, length = 100)
+	private String addressDesc;
 
 	@Column(name = "is_main", nullable = false)
 	@ColumnDefault("false")

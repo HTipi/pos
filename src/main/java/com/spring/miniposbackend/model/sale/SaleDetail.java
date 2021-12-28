@@ -189,5 +189,8 @@ public class SaleDetail extends AuditModel {
 	public double getGrandTotal() {
 		return sale.getTotal();
 	}
+	public BigDecimal getTotalBeforeDiscount() {
+		return sale.getSubTotal();
+	}
 
 }

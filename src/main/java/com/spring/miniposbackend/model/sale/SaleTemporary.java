@@ -154,6 +154,10 @@ public class SaleTemporary extends AuditModel {
 		}
 		return invoice.getId();
 	}
+	
+	public Integer getItemTypeId() {
+		return itemBranch.getItemTypeId();
+	}
 
 	private Integer getDecimalPlace() {
 		Optional<BranchCurrency> branchCurrency = itemBranch.getBranch().getBranchCurrencies().stream()

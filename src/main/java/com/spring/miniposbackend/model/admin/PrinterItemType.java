@@ -16,7 +16,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "printeres_item_types")
+@Table(name = "printers_item_types")
 @Getter
 @Setter
 public class PrinterItemType {

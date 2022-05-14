@@ -97,6 +97,15 @@ public class SaleDashboardController {
 		}
 
 	}
+	@GetMapping("/item/list")
+	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
+	public SuccessResponse itemListDetail(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> from,
+			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> to,@RequestParam Optional<Integer> branchId,
+			@RequestParam Integer itemTypeId) {
+		return new SuccessResponse("00", "fetch report", branchDashboardService
+				.itemListByBranchId(itemTypeId,branchId.get(), from.get(), to.get()));
+
+	}
 
 	@GetMapping("/item-chart/summary")
 	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")

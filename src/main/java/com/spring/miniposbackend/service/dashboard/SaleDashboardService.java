@@ -15,6 +15,7 @@ import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.model.sale.SaleDetail;
 import com.spring.miniposbackend.modelview.dashboard.BranchSummaryChart;
 import com.spring.miniposbackend.modelview.dashboard.BranchSummaryDetail;
+import com.spring.miniposbackend.modelview.dashboard.ItemList;
 import com.spring.miniposbackend.modelview.dashboard.ItemSummaryChart;
 import com.spring.miniposbackend.modelview.dashboard.ItemSummaryDetail;
 import com.spring.miniposbackend.modelview.dashboard.ItemTypeSummaryChart;
@@ -193,6 +194,26 @@ public class SaleDashboardService {
 							rs.getInt("daily_sale"), rs.getDouble("monthly_sale_amount"),
 							rs.getDouble("weekly_sale_amount"), rs.getDouble("daily_sale_amount"),rs.getDouble("monthly_discount_amount"),
 							rs.getDouble("weekly_discount_amount"), rs.getDouble("daily_discount_amount")));
+		}).orElseThrow(() -> new ResourceNotFoundException("User does not exist"));
+
+	}
+	public List<ItemList> itemListByBranchId(Integer itemTypeId,Integer branchId, Date startDate,
+			Date endDate) {
+
+		return branchRepository.findById(branchId).map((branch) -> {
+			if (userProfile.getProfile().getCorporate().getId() != branch.getCorporate().getId()) {
+				throw new UnauthorizedException("Branch is unauthorized");
+			}
+			MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource();
+			mapSqlParameterSource.addValue("startDate", startDate);
+			mapSqlParameterSource.addValue("endDate", endDate);
+			mapSqlParameterSource.addValue("branchId", branchId);
+			mapSqlParameterSource.addValue("itemTypeId", itemTypeId);
+
+			return jdbc.query("select * from itemlistbybranchid(:itemTypeId,:branchId,:startDate,:endDate)",
+					mapSqlParameterSource,
+					(rs, rowNum) -> new ItemList(rs.getLong("itemid"), rs.getString("itemname"),
+							rs.getString("itemkh"),rs.getDouble("saleamt"),rs.getDouble("disamt"),rs.getInt("saleitem"),rs.getDouble("total")));
 		}).orElseThrow(() -> new ResourceNotFoundException("User does not exist"));
 
 	}

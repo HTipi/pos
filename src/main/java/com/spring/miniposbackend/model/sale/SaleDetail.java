@@ -153,7 +153,7 @@ public class SaleDetail extends AuditModel {
 	public String getUserName() {
 		return user.getUsername();
 	}
-	
+
 	public Long getItemCorpId() {
 		return itemBranch.getItem_Id();
 	}
@@ -189,8 +189,15 @@ public class SaleDetail extends AuditModel {
 	public double getGrandTotal() {
 		return sale.getTotal();
 	}
+
 	public BigDecimal getTotalBeforeDiscount() {
 		return sale.getSubTotal();
+	}
+
+	public String getPaymentChannel() {
+		if (sale.getPaymentChannel() == null)
+			return "";
+		return sale.getPaymentChannel().getName();
 	}
 
 }

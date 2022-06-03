@@ -212,7 +212,7 @@ public class ItemService {
 	public ItemBranch update(Long itemId, Item requestItem) {
 		boolean check = saleTemporaryRepository.existsByMainItemId(itemId);
 		if (check) {
-			throw new ConflictException("សូមបញ្ចប់ការបញ្ជាទិញផលិតផលនេះសិនមុននឹងលុប", "14");
+			throw new ConflictException("សូមបញ្ចប់ការបញ្ជាទិញផលិតផលនេះសិនមុននឹងកែប្រែ", "14");
 		}
 		return itemRepository.findById(itemId).map((item) -> {
 			if (userProfile.getProfile().getCorporate().getId() != item.getItemType().getCorporate().getId()) {
@@ -222,9 +222,9 @@ public class ItemService {
 
 			itemBr.forEach((items) -> {
 				boolean pending = false;
-				if (items.getItemBalance() > 0) {
-					throw new ConflictException("The item is still in stock", "13");
-				}
+//				if (items.getItemBalance() > 0) {
+//					throw new ConflictException("The item is still in stock", "13");
+//				}
 				pending = saleTemporaryRepository.existsByItemId(itemId);
 				if (pending)
 					throw new ConflictException("The item is pending ordered", "10");

@@ -13,6 +13,7 @@ public class SaleRequest {
 	Short quantity;
 	Short discountPercentage;
 	Double discountAmount;
+	Double price = Double.valueOf(0);
 	List<SaleRequest> addOns;
 
 }

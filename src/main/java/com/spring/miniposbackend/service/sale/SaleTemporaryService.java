@@ -105,7 +105,7 @@ public class SaleTemporaryService {
 		if (invoiceId.isPresent()) {
 			invoice = invoiceRepository.findById(invoiceId.get());
 			if (!invoice.isPresent()) {
-				throw new ResourceNotFoundException("វិក័យប័ត្រនេះបានគិតរួចហើយ","16");
+				throw new ResourceNotFoundException("វិក័យប័ត្រនេះបានគិតរួចហើយ", "16");
 			}
 			saletmps = saleRepository.findByInvoiceId(invoiceId.get());
 			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(userId)) {
@@ -158,7 +158,7 @@ public class SaleTemporaryService {
 		if (invoiceId.isPresent()) {
 			Optional<Invoice> invoice = invoiceRepository.findById(invoiceId.get());
 			if (!invoice.isPresent()) {
-				throw new ResourceNotFoundException("វិក័យប័ត្រនេះបានគិតរួចហើយ","16");
+				throw new ResourceNotFoundException("វិក័យប័ត្រនេះបានគិតរួចហើយ", "16");
 			}
 			saletmps = saleRepository.findByInvoiceId(invoiceId.get());
 			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(userId)) {
@@ -174,8 +174,8 @@ public class SaleTemporaryService {
 
 			saletmps = saleRepository.findBySeatId(seatId.get());
 			if (saletmps.size() == 0) {
-				throw new ConflictException("វិក័យប័ត្រនេះបានគិតរួចហើយ","16");
-				}
+				throw new ConflictException("វិក័យប័ត្រនេះបានគិតរួចហើយ", "16");
+			}
 			if (!saletmps.get(0).getUserEdit().getId().equals(userId)) {
 				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
 				return saletmps;
@@ -195,6 +195,12 @@ public class SaleTemporaryService {
 				saleRepository.deductPriceBySaleTempId(sale.getParentSaleTemporary().getId(), sale.getPrice());
 			}
 			saleRepository.deleteBySaleTempId(saleTempId);
+			if (itemBranch.getItem().getType().equalsIgnoreCase("SUBITEM")) {
+				SaleTemporary parentSale = saleRepository.findById(sale.getParentSaleTemporary().getId())
+						.orElseThrow(() -> new ResourceNotFoundException("item not found", "17"));
+				parentSale.setPrice(parentSale.getPrice().subtract(itemBranch.getPrice()));
+				saleRepository.save(parentSale);
+			}
 			return sale;
 		}).orElseThrow(
 				() -> new ResourceNotFoundException("ប្រតិបត្តិការនេះត្រូវបានលុបដោយអ្នកប្រើប្រាស់ម្នាក់ទៀត", "17"));
@@ -386,6 +392,7 @@ public class SaleTemporaryService {
 		Short quantity = requestItem.getQuantity();
 		Short discountPercentage = requestItem.getDiscountPercentage();
 		Double discountAmount = requestItem.getDiscountAmount();
+		Double price = requestItem.getPrice();
 		if (quantity < 1) {
 			throw new UnprocessableEntityException("Quantity must be greater than 0");
 		}
@@ -405,14 +412,14 @@ public class SaleTemporaryService {
 						throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 				}
 			}
-			
+
 			return saleRepository.findById(saleTmpId).map(saleTmp -> {
-				
+
 				saleTmp.setValueDate(new Date());
 				saleTmp.setQuantity(quantity);
 				saleTmp.setDiscountPercentage(discountPercentage);
 				saleTmp.setDiscountAmount(BigDecimal.valueOf(discountAmount));
-				saleTmp.setPrice(item.getPrice());
+				saleTmp.setPrice(BigDecimal.valueOf(price));
 				saleTmp.setUserEdit(user);
 				if (invoice.isPresent()) {
 					saleTmp.setInvoice(invoice.get());
@@ -424,14 +431,14 @@ public class SaleTemporaryService {
 				}
 				return saleRepository.save(saleTmp);
 			}).orElseGet(() -> {
-				if(saleTmpId>0 && item.getType().contentEquals("MAINITEM")) {
-					throw new ConflictException("វិក័យប័ត្រនេះបានគិតរួចហើយ","16");
+				if (saleTmpId > 0 && item.getType().contentEquals("MAINITEM")) {
+					throw new ConflictException("វិក័យប័ត្រនេះបានគិតរួចហើយ", "16");
 				}
 				SaleTemporary saleTmp = new SaleTemporary();
 				saleTmp.setItemBranch(item);
 				saleTmp.setValueDate(new Date());
 				saleTmp.setQuantity(quantity);
-				saleTmp.setPrice(item.getPrice());
+				saleTmp.setPrice(BigDecimal.valueOf(price));
 				saleTmp.setDiscountPercentage(discountPercentage);
 				saleTmp.setDiscountAmount(BigDecimal.valueOf(discountAmount));
 				saleTmp.setPrinted(false);

@@ -33,8 +33,8 @@ public class SaleController {
 	@GetMapping("summary/by-user")
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse getSaleByUserId(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> date,
-			@RequestParam boolean byUser) {
-		return new SuccessResponse("00", "fetch Sale Sum By User", saleService.showSaleByUser(date, byUser));
+			@RequestParam boolean byUser,@RequestParam Optional<Integer> paymentId) {
+		return new SuccessResponse("00", "fetch Sale Sum By User", saleService.showSaleByUser(date, byUser,paymentId));
 	}
 
 	@GetMapping("by-branch")

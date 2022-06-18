@@ -77,7 +77,8 @@ public class BranchService {
 			}
 			try {
 				// read and write the file to the selected location-
-				String baseLocation = String.format("%s/"+imagePath, System.getProperty("catalina.base"));
+				//String baseLocation = String.format("%s/"+imagePath, System.getProperty("catalina.base"));
+				String baseLocation = imagePath;
 				String fileName = imageUtil.uploadImage(baseLocation, branch.getId().toString(), file);
 				branch.setLogo(fileName);
 				return branchRepository.save(branch);

@@ -69,12 +69,32 @@ public class SaleService {
 	@Autowired
 	private BranchCurrencyRepository branchCurrencyRepository;
 
-	public List<Sale> showSaleByUser(@DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> date,boolean byUser) {
+	public List<Sale> showSaleByUser(@DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> date, boolean byUser,
+			Optional<Integer> paymentId) {
 		if (date.isPresent()) {
-			if(byUser)
-			return saleRepository.findByIdWithValueDate(userProfile.getProfile().getUser().getId(), date.get());
-			else 
-				return saleRepository.findByBranchIdWithValueDate(userProfile.getProfile().getBranch().getId(), date.get());	
+			if (byUser) {
+				if (paymentId.isPresent()) {
+					if (paymentId.get() == 0)
+						return saleRepository.findByIdWithValueDateAndPaymentNullId(
+								userProfile.getProfile().getUser().getId(), date.get());
+					else
+						return saleRepository.findByIdWithValueDateAndPaymentId(
+								userProfile.getProfile().getUser().getId(), date.get(), paymentId.get());
+				} else
+					return saleRepository.findByIdWithValueDate(userProfile.getProfile().getUser().getId(), date.get());
+
+			} else {
+				if (paymentId.isPresent()) {
+					if (paymentId.get() == 0)
+						return saleRepository.findByBranchIdWithValueDateAndPaymentNullId(
+								userProfile.getProfile().getUser().getId(), date.get());
+					else
+						return saleRepository.findByBranchIdWithValueDateAndPaymentId(
+								userProfile.getProfile().getUser().getId(), date.get(), paymentId.get());
+				} else
+					return saleRepository.findByBranchIdWithValueDate(userProfile.getProfile().getUser().getId(),
+							date.get());
+			}
 		}
 		return saleRepository.findByUserId(userProfile.getProfile().getUser().getId());
 
@@ -85,8 +105,8 @@ public class SaleService {
 	}
 
 	@Transactional
-	public List create(Optional<Long> invoiceId,Optional<Integer> seatId,Optional<Integer> channelId, Double discount,
-			Double cashIn, Double change, Integer currencyId,Integer userId) {
+	public List create(Optional<Long> invoiceId, Optional<Integer> seatId, Optional<Integer> channelId, Double discount,
+			Double cashIn, Double change, Integer currencyId, Integer userId) {
 		entityManager.clear();
 		User user = userProfile.getProfile().getUser();
 		Branch branch = userProfile.getProfile().getBranch();
@@ -98,22 +118,21 @@ public class SaleService {
 		BranchCurrency branchCurrency = branchCurrencyRepository.findById(currencyId)
 				.orElseThrow(() -> new ResourceNotFoundException("Currency does not exist"));
 
-		if(invoiceId.isPresent()) {
-			invoice = invoiceRepository.findById(invoiceId.get()).orElseThrow(() -> new ResourceNotFoundException("វិក័យប័ត្រនេះបានគិតរួចហើយ","16"));
+		if (invoiceId.isPresent()) {
+			invoice = invoiceRepository.findById(invoiceId.get())
+					.orElseThrow(() -> new ResourceNotFoundException("វិក័យប័ត្រនេះបានគិតរួចហើយ", "16"));
 			if (invoice.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
 				throw new UnauthorizedException("Transaction is unauthorized");
 			}
 			saleTemps = saleTemporaryRepository.findByInvoiceId(invoiceId.get());
 			if (saleTemps.size() == 0) {
-				throw new ResourceNotFoundException("វិក័យប័ត្រនេះបានគិតរួចហើយ","16");
-			}
-			else if (saleTemps.size() > 0 && !saleTemps.get(0).getUserEdit().getId().equals(userId)) {
+				throw new ResourceNotFoundException("វិក័យប័ត្រនេះបានគិតរួចហើយ", "16");
+			} else if (saleTemps.size() > 0 && !saleTemps.get(0).getUserEdit().getId().equals(userId)) {
 				saleTemporaryRepository.updateUserEditInvoice(user.getId(), invoiceId.get());
 				return saleTemps;
 			}
 			seatName = saleTemps.get(0).getSeat_name();
-		}
-		else if (seatId.isPresent()) {
+		} else if (seatId.isPresent()) {
 			seat = seatRepository.findById(seatId.get())
 					.orElseThrow(() -> new ResourceNotFoundException("Seat does not exist"));
 
@@ -123,10 +142,9 @@ public class SaleService {
 			seatName = seat.getName();
 			saleTemps = saleTemporaryRepository.findBySeatId(seatId.get());
 			if (saleTemps.size() == 0) {
-				throw new ConflictException("វិក័យប័ត្រនេះបានគិតរួចហើយ","16");
-			}else if (saleTemps.size() > 0 && !saleTemps.get(0).getUserEdit().getId().equals(userId)) {
-				if(saleTemps.get(0).getInvoice_id() != null)
-				{
+				throw new ConflictException("វិក័យប័ត្រនេះបានគិតរួចហើយ", "16");
+			} else if (saleTemps.size() > 0 && !saleTemps.get(0).getUserEdit().getId().equals(userId)) {
+				if (saleTemps.get(0).getInvoice_id() != null) {
 					throw new ConflictException("ប្រតិបតិ្តការនេះបានបម្រុងដោយអ្នកផ្សេងរួចហើយ", "15");
 				}
 				saleTemporaryRepository.updateUserEditSeat(user.getId(), seatId.get());
@@ -135,7 +153,7 @@ public class SaleService {
 		} else {
 			saleTemps = saleTemporaryRepository.findByUserId(user.getId());
 			if (saleTemps.size() == 0) {
-				throw new ResourceNotFoundException("វិក័យប័ត្រនេះបានគិតរួចហើយ","16");
+				throw new ResourceNotFoundException("វិក័យប័ត្រនេះបានគិតរួចហើយ", "16");
 			}
 		}
 		sale = new Sale();
@@ -150,7 +168,7 @@ public class SaleService {
 		sale.setCashIn(cashIn);
 		sale.setChange(change);
 		sale.setBranchCurrency(branchCurrency);
-		if(channelId.isPresent()) {
+		if (channelId.isPresent()) {
 			sale.setPaymentChannel(paymentChannelRepository.findById(channelId.get()).orElse(null));
 		}
 		Sale saleResult = saleRepository.save(sale);
@@ -162,11 +180,10 @@ public class SaleService {
 				addItem(branch, user, saleResult, subItem, Optional.of(saleDetail));
 			});
 		});
-		if(invoiceId.isPresent()) {
+		if (invoiceId.isPresent()) {
 			saleTemporaryRepository.deleteByInvoiceId(invoiceId.get());
 			invoiceRepository.deleteById(invoiceId.get());
-		}
-		else if (seatId.isPresent()) {
+		} else if (seatId.isPresent()) {
 			saleTemporaryRepository.deleteBySeatId(seatId.get());
 		} else {
 			saleTemporaryRepository.deleteByUserId(user.getId());
@@ -175,7 +192,7 @@ public class SaleService {
 
 		double subTotal = 0.00;
 		double discountAmount = 0.00;
-		for(int i=0;i<saleDetails.size();i++) {
+		for (int i = 0; i < saleDetails.size(); i++) {
 			subTotal += saleDetails.get(i).getSubTotal().doubleValue();
 			discountAmount += saleDetails.get(i).getDiscountTotal().doubleValue();
 		}
@@ -283,7 +300,7 @@ public class SaleService {
 		saleDeail.setQuantity(saleTemporary.getQuantity());
 		saleDeail.setSubTotal(BigDecimal.valueOf(saleTemporary.getSubTotal()));
 		saleDeail.setDiscountTotal(BigDecimal.valueOf(saleTemporary.getDiscountTotal()));
-		if(parentSaleDetail.isPresent()) {
+		if (parentSaleDetail.isPresent()) {
 			saleDeail.setParentSaleDetail(parentSaleDetail.get());
 		}
 		return saleDetailRepository.save(saleDeail);

@@ -58,7 +58,7 @@ public class AuthenticationController {
 				authenticationRequest.getUsername(), token);
 		User user = userToken.getClientAppUserIdentity().getUser();
 		List<UserRole> userRoles = userService.getRoleByUserId(user.getId());
-		String fileLocation = String.format("%s/" + imagePath, System.getProperty("catalina.base")) + "/"
+		String fileLocation = imagePath + "/" 
 				+ user.getBranch().getLogo();
 		byte[] image;
 		try {

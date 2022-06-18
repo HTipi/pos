@@ -3,9 +3,13 @@ package com.spring.miniposbackend.controller.admin;
 import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.modelview.UserResponse;
 import com.spring.miniposbackend.service.admin.UserService;
+import com.spring.miniposbackend.util.ImageUtil;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,12 +20,25 @@ public class UserController {
 	private UserService userService;
 	@Autowired
 	private UserProfileUtil userProfile;
+	@Autowired
+	private ImageUtil imageUtil;
+
+	@Value("${file.path.image.branch}")
+	private String imagePath;
 
 	@GetMapping("me")
 	public SuccessResponse getProfile() {
+		String fileLocation = imagePath + "/" 
+				+ userProfile.getProfile().getBranch().getLogo();
+		byte[] image;
+		try {
+			image = imageUtil.getImage(fileLocation);
+		} catch (IOException e) {
+			image = null;
+		}
 		return new SuccessResponse("00", "fetch ME",
 				new UserResponse(userService.showByUsername(userProfile.getProfile().getUsername()),
-						userService.getRoleByUserId(userProfile.getProfile().getUser().getId()), null));
+						userService.getRoleByUserId(userProfile.getProfile().getUser().getId()), image));
 	}
 
 	@PostMapping("reset-password")

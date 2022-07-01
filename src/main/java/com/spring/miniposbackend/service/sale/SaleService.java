@@ -87,12 +87,12 @@ public class SaleService {
 				if (paymentId.isPresent()) {
 					if (paymentId.get() == 0)
 						return saleRepository.findByBranchIdWithValueDateAndPaymentNullId(
-								userProfile.getProfile().getUser().getId(), date.get());
+								userProfile.getProfile().getBranch().getId(), date.get());
 					else
 						return saleRepository.findByBranchIdWithValueDateAndPaymentId(
-								userProfile.getProfile().getUser().getId(), date.get(), paymentId.get());
+								userProfile.getProfile().getBranch().getId(), date.get(), paymentId.get());
 				} else
-					return saleRepository.findByBranchIdWithValueDate(userProfile.getProfile().getUser().getId(),
+					return saleRepository.findByBranchIdWithValueDate(userProfile.getProfile().getBranch().getId(),
 							date.get());
 			}
 		}

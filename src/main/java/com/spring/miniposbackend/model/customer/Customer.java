@@ -1,57 +1,67 @@
 package com.spring.miniposbackend.model.customer;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.spring.miniposbackend.model.AuditModel;
+import com.spring.miniposbackend.model.admin.Corporate;
+
 import lombok.Getter;
 import lombok.Setter;
 
-import org.hibernate.annotations.ColumnDefault;
-
-import com.spring.miniposbackend.model.AuditModel;
-
-import javax.persistence.*;
-import java.util.Date;
 
 @Entity
 @Table(name = "customers")
-@Setter @Getter
-public class Customer extends AuditModel{
+@Getter @Setter
+public class Customer extends AuditModel {
 
-    /**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 1L;
 
 	@Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private int id;
 
-    @Column(name = "first_name", nullable = false,length = 128)
-    private String firstName;
+    @Column(name = "name", nullable = false, length = 128)
+    private String name;
 
-    @Column(name = "last_name", nullable = false, length = 128)
-    private String lastName;
-
-    @Column(name = "username", nullable = false, unique = true, length = 32)
-    private String username;
-
-    @Column(name = "password", nullable = false)
-    private String password;
-
-    @Column(name = "telephone", nullable = false, length = 20)
-    private String telephone;
-
-    @Column(name = "is_login", nullable = false)
-    @ColumnDefault("false")
-    private boolean islogin;
+    @Column(name = "name_kh", nullable = false)
+    private String nameKh;
     
-    @Column(name = "login_date")
-    private Date loginDate;
+    @Column(name = "sex", nullable = false,length = 1)
+    private String sex;
     
-    @Column(name = "logout_date")
-    private Date logoutDate;
+    @Column(name = "primary_phone", nullable = false)
+    private String primaryPhone;
+    
+    @Column(name = "secondary_phone", nullable = true)
+    private String secondaryPhone;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "corporate_id",nullable = false)
+    @JsonIgnore
+    private Corporate corporate; 
+    
+    @Column(name = "point_balance", nullable = false)
+    private Integer pointBalance;
+    
+    @Column(name = "point_branch", nullable = false)
+    private boolean pointBranch;
+    
     @Column(name = "enable", nullable = false)
-    @ColumnDefault("false")
-    private boolean enable;
-
+    private boolean enable = true;
+    
+    
+    @Transient
+    private Integer branchId;
 }

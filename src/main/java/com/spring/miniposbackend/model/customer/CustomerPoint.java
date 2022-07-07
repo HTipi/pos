@@ -26,14 +26,14 @@ public class CustomerPoint extends AuditModel{
     @JoinColumn(name = "customer_id", nullable = false)
     @JsonIgnore
     private Customer customer;
+    
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "branch_id", nullable = false)
+    @JoinColumn(name = "branch_id", nullable = true)
     @JsonIgnore
     private Branch branch;
 
     @Column(name = "point_balance", nullable = false)
-    @ColumnDefault(value = "0")
     private Integer pointBalance;
 
 

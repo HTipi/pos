@@ -58,16 +58,16 @@ public class SaleDetailService {
 						rs.getDouble("discount_amount"), rs.getDouble("discount_sale_detail")));
 		List<SaleDetailTransaction> details = jdbc
 				.query("select ib.id as item_id, " + "max(i.name) as item_name, " + "sum(sale.quantity) as quantity, "
-						+ "sum(sub_total) as sub_total, " + "sum(sale.discount_total) as discount_total "
+						+ "sum(sub_total) as sub_total, " + "sum(sale.discount_total) as discount_total, i.item_type_id,is_stock,stock_in-stock_out stocks "
 						+ "from sale_details sale " + "inner join item_branches ib on sale.item_branch_id = ib.id "
 						+ "inner join items i on ib.item_id=i.id "
 //				+ "inner join branches branch on sale.branch_id = branch.id "
 //				+ "inner join corporates corporate on branch.corporate_id = corporate.id "
 						+ "where sale.reverse = false and i.type='MAINITEM' " + queryCondition
-						+ "and date_trunc('day',sale.value_date) between :startDate and :endDate " + "group by ib.id",
+						+ "and date_trunc('day',sale.value_date) between :startDate and :endDate " + "group by ib.id,item_type_id,is_stock,stock_in,stock_out",
 						mapSqlParameterSource,
 						(rs, rowNum) -> new SaleDetailTransaction(rs.getLong("item_id"), rs.getString("item_name"),
-								rs.getInt("quantity"), rs.getDouble("sub_total"), rs.getDouble("discount_total")));
+								rs.getInt("quantity"), rs.getDouble("sub_total"), rs.getDouble("discount_total"),rs.getInt("item_type_id"),rs.getBoolean("is_stock"),rs.getInt("stocks")));
 		summary.setDetails(details);
 		return summary;
 

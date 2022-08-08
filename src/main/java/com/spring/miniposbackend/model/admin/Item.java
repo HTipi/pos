@@ -53,6 +53,8 @@ public class Item extends AuditModel{
 	
 	@Column(name = "image",length = 64)
     private String image;
+	@Column(name = "photo",length = 64)
+    private String photo;
 	
 	@Column(name = "price", nullable = false, precision = 10, scale = 2)
     private BigDecimal price;

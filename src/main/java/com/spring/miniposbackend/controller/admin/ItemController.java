@@ -1,5 +1,6 @@
 package com.spring.miniposbackend.controller.admin;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -38,6 +39,13 @@ public class ItemController {
 	@PreAuthorize("hasAnyRole('OWNER')")
 	public Item uploadImage(@PathVariable Long itemId, @RequestParam("imageFile") MultipartFile file) {
 		return itemService.uploadImage(itemId, file);
+	}
+	
+	@PostMapping("{itemId}/uploadPhoto")
+	@PreAuthorize("hasAnyRole('SALE')")
+	public Item uploadPhoto(@PathVariable Long itemId, @RequestParam("imageFile") MultipartFile file) throws IOException {
+		
+		return itemService.uploadPhoto(itemId, file);
 	}
 	
 	@PatchMapping("{itemId}/set-image/{imageId}")

@@ -52,7 +52,7 @@ public class ItemService {
 	@Autowired
 	private SaleTemporaryRepository saleTemporaryRepository;
 
-	@Value("${file.path.image.item}")
+	@Value("${file.path.image.item-photo}")
 	private String imagePath;
 
 	public List<Item> showByCorpoateId(Integer corporateId, Optional<Boolean> enable) {
@@ -104,6 +104,27 @@ public class ItemService {
 			} catch (IOException e) {
 				throw new ConflictException("Upable to upload File");
 
+			} catch (Exception e) {
+				throw new ConflictException(e.getMessage());
+			}
+		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
+	}
+	
+	@Transactional
+	public Item uploadPhoto(Long itemId, MultipartFile file) throws IOException {
+		return itemRepository.findById(itemId).map(item -> {
+			if (file.isEmpty()) {
+				throw new ResourceNotFoundException("File content does not exist");
+			}
+			try {
+				
+				// read and write the file to the selected location-
+				// String baseLocation = String.format("%s/" + imagePath,
+				// System.getProperty("catalina.base"));
+				String baseLocation = imagePath;
+				String fileName = imageUtil.uploadImage(baseLocation, item.getId().toString(), file);
+				item.setPhoto(fileName);
+				return itemRepository.save(item);
 			} catch (Exception e) {
 				throw new ConflictException(e.getMessage());
 			}

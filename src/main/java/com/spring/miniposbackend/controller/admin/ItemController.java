@@ -8,6 +8,10 @@ import java.util.UUID;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -40,14 +44,24 @@ public class ItemController {
 	public Item uploadImage(@PathVariable Long itemId, @RequestParam("imageFile") MultipartFile file) {
 		return itemService.uploadImage(itemId, file);
 	}
-	
+
 	@PostMapping("{itemId}/uploadPhoto")
 	@PreAuthorize("hasAnyRole('SALE')")
-	public Item uploadPhoto(@PathVariable Long itemId, @RequestParam("imageFile") MultipartFile file) throws IOException {
-		
+	public Item uploadPhoto(@PathVariable Long itemId, @RequestParam("imageFile") MultipartFile file)
+			throws IOException {
+
 		return itemService.uploadPhoto(itemId, file);
 	}
-	
+
+	@GetMapping("photo/{itemId}")
+	public ResponseEntity<byte[]> getImageAsResponseEntity(@PathVariable Long itemId) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setCacheControl(CacheControl.noCache().getHeaderValue());
+		ResponseEntity<byte[]> responseEntity = new ResponseEntity<>(itemService.getFileData(itemId), headers,
+				HttpStatus.OK);
+		return responseEntity;
+	}
+
 	@PatchMapping("{itemId}/set-image/{imageId}")
 	@PreAuthorize("hasAnyRole('OWNER')")
 	public SuccessResponse updateImage(@PathVariable Long itemId, @PathVariable UUID imageId) {
@@ -92,6 +106,7 @@ public class ItemController {
 	public SuccessResponse update(@PathVariable Long itemId, @RequestBody Item item) {
 		return new SuccessResponse("00", "Update Item", itemService.update(itemId, item));
 	}
+
 	@PatchMapping("delete/{itemId}")
 	@PreAuthorize("hasAnyRole('OWNER')")
 	public SuccessResponse disable(@PathVariable Long itemId) {

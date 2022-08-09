@@ -1,17 +1,19 @@
 package com.spring.miniposbackend.service.admin;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.exception.UnauthorizedException;
@@ -52,8 +54,10 @@ public class ItemService {
 	@Autowired
 	private SaleTemporaryRepository saleTemporaryRepository;
 
-	@Value("${file.path.image.item-photo}")
+	@Value("${file.path.image.item}")
 	private String imagePath;
+	@Value("${file.path.image.item-photo}")
+	private String photoPath;
 
 	public List<Item> showByCorpoateId(Integer corporateId, Optional<Boolean> enable) {
 		return corporateReposity.findById(corporateId).map(corporate -> {
@@ -117,12 +121,14 @@ public class ItemService {
 				throw new ResourceNotFoundException("File content does not exist");
 			}
 			try {
-				
+
 				// read and write the file to the selected location-
 				// String baseLocation = String.format("%s/" + imagePath,
 				// System.getProperty("catalina.base"));
-				String baseLocation = imagePath;
-				String fileName = imageUtil.uploadImage(baseLocation, item.getId().toString(), file);
+				String baseLocation = photoPath;
+				String fileName = imageUtil.uploadImage(
+						baseLocation + "/" + userProfile.getProfile().getCorporate().getName(), item.getId().toString(),
+						file);
 				item.setPhoto(fileName);
 				return itemRepository.save(item);
 			} catch (Exception e) {
@@ -130,7 +136,38 @@ public class ItemService {
 			}
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
+	
+	public byte[] getFileData(Long itemId) {
+		return itemRepository.findById(itemId).map(item -> {
+			try {
+				   return get(photoPath + "/" + itemId + ".png");
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+				throw new ConflictException(e.getMessage());
+			}
+		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
+		
+	}
 
+	public byte[] get(String filePath) throws Exception {
+		if (filePath.isEmpty()) {
+			return null;
+		}
+		try {
+			File file = new File(filePath);
+			byte[] bArray = new byte[(int) file.length()];
+			FileInputStream fis = new FileInputStream(file);
+			fis.read(bArray);
+			fis.close();
+			return bArray;
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println(e.getMessage());
+			throw new Exception();
+
+		}
+
+	}
 	public ImageResponse getImage(Item item) {
 		if (item.getImage().isEmpty()) {
 			return new ImageResponse(item.getId(), null, item.getVersion());

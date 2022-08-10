@@ -127,7 +127,7 @@ public class ItemService {
 				// System.getProperty("catalina.base"));
 				String baseLocation = photoPath;
 				String fileName = imageUtil.uploadImage(
-						baseLocation + "/" + userProfile.getProfile().getCorporate().getName(), itemId.toString()+".png",
+						baseLocation + "/" + userProfile.getProfile().getCorporate().getId(), itemId.toString(),
 						file);
 				item.setPhoto(fileName);
 				return itemRepository.save(item);
@@ -141,7 +141,7 @@ public class ItemService {
 	public byte[] getFileData(Long itemId) {
 		return itemRepository.findById(itemId).map(item -> {
 			try {
-				   return get(photoPath + "/" + itemId + ".png");
+				   return get(photoPath + "/" + userProfile.getProfile().getCorporate().getId() + "/" + itemId + ".png");
 			} catch (Exception e) {
 				System.out.println(e.getMessage());
 				throw new ConflictException(e.getMessage());

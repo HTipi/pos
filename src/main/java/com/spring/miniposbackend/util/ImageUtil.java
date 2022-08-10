@@ -14,12 +14,13 @@ import org.springframework.web.multipart.MultipartFile;
 public class ImageUtil {
 
 	public String uploadImage(String baseLocation, String newName, MultipartFile file) throws IOException {
-
+		System.out.println(baseLocation + "/" + file.getOriginalFilename());
 		// read and write the file to the selected location-
 		File directory = new File(baseLocation);
 		if (!directory.exists()) {
 			directory.mkdirs();
 		}
+		System.out.println(baseLocation + "/" + file.getOriginalFilename());
 		String fileName = file.getOriginalFilename();
 		String newFileName = newName + fileName.substring(fileName.lastIndexOf("."));
 		System.out.println(baseLocation + "/" + newFileName);

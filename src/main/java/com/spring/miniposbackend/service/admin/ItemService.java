@@ -127,11 +127,12 @@ public class ItemService {
 				// System.getProperty("catalina.base"));
 				String baseLocation = photoPath;
 				String fileName = imageUtil.uploadImage(
-						baseLocation + "/" + userProfile.getProfile().getCorporate().getName(), item.getId().toString(),
+						baseLocation + "/" + userProfile.getProfile().getCorporate().getName(), itemId.toString()+".png",
 						file);
 				item.setPhoto(fileName);
 				return itemRepository.save(item);
 			} catch (Exception e) {
+				System.out.println(e.getMessage());
 				throw new ConflictException(e.getMessage());
 			}
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));

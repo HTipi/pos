@@ -47,10 +47,10 @@ public class ItemController {
 
 	@PostMapping("{itemId}/uploadPhoto")
 	@PreAuthorize("hasAnyRole('SALE')")
-	public Item uploadPhoto(@PathVariable Long itemId, @RequestParam("imageFile") MultipartFile file)
+	public SuccessResponse uploadPhoto(@PathVariable Long itemId, @RequestParam("imageFile") MultipartFile file)
 			throws IOException {
 
-		return itemService.uploadPhoto(itemId, file);
+		return new SuccessResponse("00", "update Image Item", itemService.uploadPhoto(itemId, file));
 	}
 
 	@GetMapping("photo/{itemId}")

@@ -166,4 +166,8 @@ public class ItemBranch extends AuditModel {
 		return branch.getNameKh();
 	}
 
+	public String getPhoto() {
+		return item.getPhoto();
+	}
+
 }

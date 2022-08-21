@@ -80,6 +80,10 @@ public class ItemBranch extends AuditModel {
 	@Type(type = "list-array")
 	@Column(name = "add_on", columnDefinition = "bigint[]")
 	private List<Long> addOnItems;
+	
+	@Type(type = "list-array")
+	@Column(name = "add_on_inven", columnDefinition = "bigint[]")
+	private List<Long> addOnInven;
 
 	public Long getId() {
 		return id;

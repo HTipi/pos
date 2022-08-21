@@ -122,5 +122,12 @@ public class ItemBranchController {
 		return new SuccessResponse("00", "update Sub Item",
 				itemBranchService.updateAddOn(itemBranchId, addOnItems));
 	}
+	
+	@PatchMapping("{itemBranchId}/update-inventory")
+	@PreAuthorize("hasAnyRole('OWNER')")
+	public SuccessResponse updateAddOnInventory(@PathVariable Long itemBranchId, @RequestBody List<Long> addOnItems) {
+		return new SuccessResponse("00", "update Inventory Item",
+				itemBranchService.updateAddOnInventory(itemBranchId, addOnItems));
+	}
 
 }

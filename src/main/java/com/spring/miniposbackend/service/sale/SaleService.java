@@ -179,6 +179,21 @@ public class SaleService {
 			subItems.forEach((subItem) -> {
 				addItem(branch, user, saleResult, subItem, Optional.of(saleDetail));
 			});
+			ItemBranch itemBranch = saleTemp.getItemBranch();
+			List<Long> inventories = itemBranch.getAddOnInven() == null ? new ArrayList<Long>() : itemBranch.getAddOnInven();
+			inventories.forEach((inventory) -> {
+				ItemBranch item = itemRepository.findById(inventory).orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
+				int itembalance = saleTemporaryRepository.findItemBalanceByUserId(user.getId(), item.getId())
+						.orElse(0);
+				if (item.getItemBalance() < itembalance) {
+					String setting = branchSettingRepository
+							.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN").orElse("");
+					if (!setting.contentEquals(setting))
+						throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
+				}
+				item.setStockOut(item.getStockOut() + saleTemp.getQuantity());
+				itemRepository.save(item);
+			});
 		});
 		if (invoiceId.isPresent()) {
 			saleTemporaryRepository.deleteByInvoiceId(invoiceId.get());
@@ -226,8 +241,25 @@ public class SaleService {
 			saleDetailRepository.save(sales);
 			ItemBranch itemBr = itemRepository.findById(sales.getItemBranch().getId())
 					.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
-			itemBr.setStockOut(itemBr.getStockOut() - sales.getQuantity());
-			itemRepository.save(itemBr);
+			if(itemBr.isStock())
+			{
+				itemBr.setStockOut(itemBr.getStockOut() - sales.getQuantity());
+				itemRepository.save(itemBr);
+			}
+			List<Long> inventories = itemBr.getAddOnInven() == null ? new ArrayList<Long>() : itemBr.getAddOnInven();
+			inventories.forEach((inventory) -> {
+				ItemBranch item = itemRepository.findById(inventory).orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
+				int itembalance = saleTemporaryRepository.findItemBalanceByUserId(userProfile.getProfile().getUser().getId(), item.getId())
+						.orElse(0);
+				if (item.getItemBalance() < itembalance) {
+					String setting = branchSettingRepository
+							.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN").orElse("");
+					if (!setting.contentEquals(setting))
+						throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
+				}
+				item.setStockOut(item.getStockOut() - sales.getQuantity());
+				itemRepository.save(item);
+			});
 		});
 		return saleRepository.save(sale);
 	}
@@ -272,7 +304,6 @@ public class SaleService {
 		return saleDetailRepository.findMainBySaleId(saleId.get());
 
 	}
-
 	private SaleDetail addItem(Branch branch, User user, Sale sale, SaleTemporary saleTemporary,
 			Optional<SaleDetail> parentSaleDetail) {
 		ItemBranch itemBranch = saleTemporary.getItemBranch();

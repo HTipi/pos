@@ -1,15 +1,23 @@
 package com.spring.miniposbackend.service.dashboard;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
-
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.model.sale.SaleDetail;
@@ -24,6 +32,17 @@ import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.sale.SaleDetailRepository;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.export.JRPdfExporter;
+import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
+import net.sf.jasperreports.export.SimpleExporterInput;
+import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
+import net.sf.jasperreports.export.SimpleXlsxReportConfiguration;
+
 @Service
 public class SaleDashboardService {
 
@@ -35,6 +54,8 @@ public class SaleDashboardService {
 	private UserProfileUtil userProfile;
 	@Autowired
 	private BranchRepository branchRepository;
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
 
 	public List<BranchSummaryDetail> branchSummaryByCorpateId(Integer corporateId, Date startDate, Date startWeek,
 			Date endDate) {
@@ -258,4 +279,54 @@ public class SaleDashboardService {
 			return saleRepository.findByBranchId(branchId, from, to, pageable);
 		}).orElseThrow(() -> new ResourceNotFoundException("User does not exist"));
 	}
+	public void downloadTransactionReport(String exportType, HttpServletResponse response,String fileName) throws JRException, IOException, SQLException {
+	    
+	    exportReport(exportType, response,fileName);
+	  }
+	private void exportReport(String exportType, HttpServletResponse response,String fileName) throws JRException, IOException, SQLException {
+	    InputStream transactionReportStream =
+	        getClass()
+	            .getResourceAsStream(
+	                "/" + fileName + ".jrxml");
+	    String titleTransactionBy = "Transactions Report";
+
+	    JasperReport jasperReport = JasperCompileManager.compileReport(transactionReportStream);
+	    Connection connection = jdbcTemplate.getDataSource().getConnection();
+	   // JRBeanCollectionDataSource beanColDataSource =
+	     //   new JRBeanCollectionDataSource(beanCollection);
+	    HashMap<String, Object> parameters = new HashMap<String, Object>();
+	    parameters.put("corporateName", userProfile.getProfile().getCorporate().getNameKh());
+	    parameters.put("branchId", userProfile.getProfile().getBranch().getId());
+	    parameters.put("start", "2021-01-01");
+	    parameters.put("end", "2022-08-01");
+
+	    JasperPrint jasperPrint =
+	        JasperFillManager.fillReport(jasperReport, parameters , connection);
+	    if (exportType.equalsIgnoreCase("pdf")) {
+
+	      JRPdfExporter exporter = new JRPdfExporter();
+	      exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+	      exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(response.getOutputStream()));
+	      response.setContentType("application/pdf");
+	      response.setHeader(
+	          HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileName + ".pdf;");
+	      exporter.exportReport();
+
+	    } else {
+
+	      JRXlsxExporter exporter = new JRXlsxExporter();
+	      SimpleXlsxReportConfiguration reportConfigXLS = new SimpleXlsxReportConfiguration();
+	      reportConfigXLS.setSheetNames(new String[]{titleTransactionBy});
+	      reportConfigXLS.setDetectCellType(true);
+	      reportConfigXLS.setCollapseRowSpan(false);
+	      exporter.setConfiguration(reportConfigXLS);
+	      exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+	      exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(response.getOutputStream()));
+	      response.setHeader(
+	          HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileName + ".xlsx;");
+	      response.setContentType("application/octet-stream");
+	      exporter.exportReport();
+
+	    }
+	  }
 }

@@ -1,23 +1,29 @@
 package com.spring.miniposbackend.controller.dashboard;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.service.dashboard.SaleDashboardService;
 import com.spring.miniposbackend.util.UserProfileUtil;
+
+import net.sf.jasperreports.engine.JRException;
 
 @RestController
 @CrossOrigin
@@ -184,4 +190,18 @@ public class SaleDashboardController {
 		}
 
 	}
+	@GetMapping(value = "/download")
+	  ResponseEntity<Void> downloadTransactionReport(@RequestParam(value = "exportType") String exportType,
+	                                                 HttpServletResponse response) throws IOException,JRException, SQLException
+	  {
+		try {
+			branchDashboardService.downloadTransactionReport("pdf", response, "sale_item");
+			  return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			return ResponseEntity.ok().build();
+			// TODO: handle exception
+		}
+
+	  }
 }

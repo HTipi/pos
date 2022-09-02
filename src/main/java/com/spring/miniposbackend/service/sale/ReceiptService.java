@@ -26,4 +26,13 @@ public class ReceiptService {
 			return receiptRepository.save(receipt).getReceiptNumber();
 		}).orElseThrow(() -> new ResourceNotFoundException("Branch does not exist"));
 	}
+	
+	
+	@Transactional
+	public Long resetNumber(Integer branchId) {
+		return receiptRepository.findFirstByBranchIdOrderByIdDesc(branchId).map(receipt -> {
+			receipt.setReceiptNumber(Long.valueOf(0));
+			return receiptRepository.save(receipt).getReceiptNumber();
+		}).orElseThrow(() -> new ResourceNotFoundException("Branch does not exist"));
+	}
 }

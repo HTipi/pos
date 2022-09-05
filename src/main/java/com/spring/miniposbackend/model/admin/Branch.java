@@ -72,4 +72,5 @@ public class Branch extends AuditModel {
 	@Column(name = "enable", nullable = false)
 	@ColumnDefault("true")
 	private boolean enable;
+	
 }

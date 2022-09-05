@@ -1,16 +1,22 @@
 package com.spring.miniposbackend.service.dashboard;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Base64.Decoder;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -30,6 +36,7 @@ import com.spring.miniposbackend.modelview.dashboard.ItemTypeSummaryChart;
 import com.spring.miniposbackend.modelview.dashboard.ItemTypeSummaryDetail;
 import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.sale.SaleDetailRepository;
+import com.spring.miniposbackend.util.ImageUtil;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
 import net.sf.jasperreports.engine.JRException;
@@ -56,6 +63,10 @@ public class SaleDashboardService {
 	private BranchRepository branchRepository;
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
+	@Autowired
+	private ImageUtil imageUtil;
+	@Value("${file.path.image.branch}")
+	private String imagePath;
 
 	public List<BranchSummaryDetail> branchSummaryByCorpateId(Integer corporateId, Date startDate, Date startWeek,
 			Date endDate) {
@@ -294,39 +305,62 @@ public class SaleDashboardService {
 	    Connection connection = jdbcTemplate.getDataSource().getConnection();
 	   // JRBeanCollectionDataSource beanColDataSource =
 	     //   new JRBeanCollectionDataSource(beanCollection);
-	    HashMap<String, Object> parameters = new HashMap<String, Object>();
-	    parameters.put("corporateName", userProfile.getProfile().getCorporate().getNameKh());
-	    parameters.put("branchId", userProfile.getProfile().getBranch().getId());
-	    parameters.put("start", "2021-01-01");
-	    parameters.put("end", "2022-08-01");
+	    try {
+			Date date=new SimpleDateFormat("yyyy-MM-dd").parse("2021-01-01");
+			Date date1=new SimpleDateFormat("yyyy-MM-dd").parse("2022-08-01");
+			HashMap<String, Object> parameters = new HashMap<String, Object>();
+		    parameters.put("corporateName", userProfile.getProfile().getCorporate().getNameKh());
+		    parameters.put("branchId", userProfile.getProfile().getBranch().getId());
+		    parameters.put("start", date);
+		    parameters.put("end", date1);
+			String fileLocation = imagePath + "/" 
+					+ userProfile.getProfile().getBranch().getLogo();
+			byte[] image;
+			try {
+				image = imageUtil.getImage(fileLocation);
+			} catch (IOException e) {
+				image = null;
+			}
+			if(image != null)
+			{
+				ByteArrayInputStream bis = new ByteArrayInputStream(image);
+				parameters.put("logo", bis);
+			}
+		    
+		 
+		    
+		    JasperPrint jasperPrint =
+		        JasperFillManager.fillReport(jasperReport, parameters , connection);
+		    if (exportType.equalsIgnoreCase("pdf")) {
 
-	    JasperPrint jasperPrint =
-	        JasperFillManager.fillReport(jasperReport, parameters , connection);
-	    if (exportType.equalsIgnoreCase("pdf")) {
+		      JRPdfExporter exporter = new JRPdfExporter();
+		      exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+		      exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(response.getOutputStream()));
+		      response.setContentType("application/pdf");
+		      response.setHeader(
+		          HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileName + ".pdf;");
+		      exporter.exportReport();
 
-	      JRPdfExporter exporter = new JRPdfExporter();
-	      exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
-	      exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(response.getOutputStream()));
-	      response.setContentType("application/pdf");
-	      response.setHeader(
-	          HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileName + ".pdf;");
-	      exporter.exportReport();
+		    } else {
 
-	    } else {
+		      JRXlsxExporter exporter = new JRXlsxExporter();
+		      SimpleXlsxReportConfiguration reportConfigXLS = new SimpleXlsxReportConfiguration();
+		      reportConfigXLS.setSheetNames(new String[]{titleTransactionBy});
+		      reportConfigXLS.setDetectCellType(true);
+		      reportConfigXLS.setCollapseRowSpan(false);
+		      exporter.setConfiguration(reportConfigXLS);
+		      exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+		      exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(response.getOutputStream()));
+		      response.setHeader(
+		          HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileName + ".xlsx;");
+		      response.setContentType("application/octet-stream");
+		      exporter.exportReport();
 
-	      JRXlsxExporter exporter = new JRXlsxExporter();
-	      SimpleXlsxReportConfiguration reportConfigXLS = new SimpleXlsxReportConfiguration();
-	      reportConfigXLS.setSheetNames(new String[]{titleTransactionBy});
-	      reportConfigXLS.setDetectCellType(true);
-	      reportConfigXLS.setCollapseRowSpan(false);
-	      exporter.setConfiguration(reportConfigXLS);
-	      exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
-	      exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(response.getOutputStream()));
-	      response.setHeader(
-	          HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileName + ".xlsx;");
-	      response.setContentType("application/octet-stream");
-	      exporter.exportReport();
-
-	    }
+		    }
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+	    
 	  }
 }

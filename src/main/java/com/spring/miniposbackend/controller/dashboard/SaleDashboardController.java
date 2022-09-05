@@ -195,7 +195,7 @@ public class SaleDashboardController {
 	                                                 HttpServletResponse response) throws IOException,JRException, SQLException
 	  {
 		try {
-			branchDashboardService.downloadTransactionReport("pdf", response, "sale_item");
+			branchDashboardService.downloadTransactionReport(exportType, response, "sale_item");
 			  return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			System.out.println(e.getMessage());

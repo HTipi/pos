@@ -22,4 +22,8 @@ public interface ItemBranchRepository extends  JpaRepository<ItemBranch, Long>{
 	
 	Optional<ItemBranch> findFirstByBranchIdAndItemIdOrderByIdDesc(Integer branchId, Long itemId);
 	
+	
+	@Query(value = "select ib from ItemBranch ib where ?1 = any (ib.addOnItems)")
+	List<ItemBranch> findAnyAddOn(Long addOnId);
+	
 }

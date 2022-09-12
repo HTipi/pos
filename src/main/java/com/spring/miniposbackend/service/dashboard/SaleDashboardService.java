@@ -290,11 +290,11 @@ public class SaleDashboardService {
 			return saleRepository.findByBranchId(branchId, from, to, pageable);
 		}).orElseThrow(() -> new ResourceNotFoundException("User does not exist"));
 	}
-	public void downloadTransactionReport(String exportType, HttpServletResponse response,String fileName) throws JRException, IOException, SQLException {
+	public void downloadTransactionReport(String exportType, HttpServletResponse response,String fileName,Date from, Date to) throws JRException, IOException, SQLException {
 	    
-	    exportReport(exportType, response,fileName);
+	    exportReport(exportType, response,fileName, from,  to);
 	  }
-	private void exportReport(String exportType, HttpServletResponse response,String fileName) throws JRException, IOException, SQLException {
+	private void exportReport(String exportType, HttpServletResponse response,String fileName,Date from, Date to) throws JRException, IOException, SQLException {
 	    InputStream transactionReportStream =
 	        getClass()
 	            .getResourceAsStream(
@@ -306,13 +306,11 @@ public class SaleDashboardService {
 	   // JRBeanCollectionDataSource beanColDataSource =
 	     //   new JRBeanCollectionDataSource(beanCollection);
 	    try {
-			Date date=new SimpleDateFormat("yyyy-MM-dd").parse("2021-01-01");
-			Date date1=new SimpleDateFormat("yyyy-MM-dd").parse("2022-08-01");
 			HashMap<String, Object> parameters = new HashMap<String, Object>();
 		    parameters.put("corporateName", userProfile.getProfile().getCorporate().getNameKh());
 		    parameters.put("branchId", userProfile.getProfile().getBranch().getId());
-		    parameters.put("start", date);
-		    parameters.put("end", date1);
+		    parameters.put("start", from);
+		    parameters.put("end", to);
 			String fileLocation = imagePath + "/" 
 					+ userProfile.getProfile().getBranch().getLogo();
 			byte[] image;
@@ -357,8 +355,9 @@ public class SaleDashboardService {
 		      exporter.exportReport();
 
 		    }
-		} catch (ParseException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
 			e.printStackTrace();
 		} 
 	    

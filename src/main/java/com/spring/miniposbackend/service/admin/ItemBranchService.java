@@ -242,4 +242,25 @@ public class ItemBranchService {
 			return itemBranchRepository.save(itemBranch);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
+	public ItemBranch disable(Long itemBranchId) {
+		return itemBranchRepository.findById(itemBranchId).map(itemBranch -> {
+			if (itemBranch.getBranch().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
+				throw new UnauthorizedException("Corporate is unauthorized");
+			}
+			boolean pending = false;
+			if (itemBranch.getItemBalance() > 0) {
+				throw new ConflictException("The item is still in stock", "13");
+			}
+			pending = saleTemporaryRepository.existsByItemId(itemBranchId);
+			if (pending)
+				throw new ConflictException("The item is pending ordered", "10");
+			List<ItemBranch> itemsBranch = itemBranchRepository.findAnyAddOn(itemBranchId);
+			if(itemsBranch.size() > 0)
+			{
+				throw new ConflictException("Please remove sub item from " + itemsBranch.get(0).getNameKh(), "13");
+			}
+			itemBranch.setEnable(false);
+			return itemBranchRepository.save(itemBranch);
+		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
+	}
 }

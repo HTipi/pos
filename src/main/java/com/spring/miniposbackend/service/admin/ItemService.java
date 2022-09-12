@@ -301,6 +301,7 @@ public class ItemService {
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
 
+	@Transactional
 	public Item disable(Long itemId) {
 		return itemRepository.findById(itemId).map((item) -> {
 			if (userProfile.getProfile().getCorporate().getId() != item.getItemType().getCorporate().getId()) {

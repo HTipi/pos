@@ -190,12 +190,30 @@ public class SaleDashboardController {
 		}
 
 	}
-	@GetMapping(value = "/download")
-	  ResponseEntity<Void> downloadTransactionReport(@RequestParam(value = "exportType") String exportType,
+	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
+	@GetMapping(value = "/download/saleitemreport")
+	  ResponseEntity<Void> downloadTransactionReport(@RequestParam(value = "exportType") String exportType,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
+				@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,
 	                                                 HttpServletResponse response) throws IOException,JRException, SQLException
 	  {
 		try {
-			branchDashboardService.downloadTransactionReport(exportType, response, "sale_item");
+			branchDashboardService.downloadTransactionReport(exportType, response, "sale_item",from,to);
+			  return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			return ResponseEntity.ok().build();
+			// TODO: handle exception
+		}
+
+	  }
+	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
+	@GetMapping(value = "/download/incomestatement")
+	  ResponseEntity<Void> downloadProfitLoss(@RequestParam(value = "exportType") String exportType,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
+				@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,
+	                                                 HttpServletResponse response) throws IOException,JRException, SQLException
+	  {
+		try {
+			branchDashboardService.downloadTransactionReport(exportType, response, "profitloss",from,to);
 			  return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			System.out.println(e.getMessage());

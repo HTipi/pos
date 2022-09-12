@@ -88,6 +88,12 @@ public class ItemBranchController {
 	public ItemBranch setDiscount(@PathVariable Long itemBranchId, @RequestParam Short discount) {
 		return itemBranchService.setDiscount(itemBranchId, discount);
 	}
+	@PatchMapping("{itemBranchId}/disable")
+	@PreAuthorize("hasAnyRole('OWNER')")
+	public SuccessResponse disable(@PathVariable Long itemBranchId) {
+		return new SuccessResponse("00", "disable item",
+				itemBranchService.disable(itemBranchId));
+	}
 	/*
 	 * Admin Controller
 	 */

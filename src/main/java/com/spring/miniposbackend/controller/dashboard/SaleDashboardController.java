@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.service.dashboard.SaleDashboardService;
 import com.spring.miniposbackend.util.UserProfileUtil;
@@ -156,13 +158,14 @@ public class SaleDashboardController {
 	@GetMapping("/item-type-chart/summary")
 	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
 	public SuccessResponse itemTypeSummaryChart(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
-			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to) {
+			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,@RequestParam Optional<Integer> branchId) {
 	
 		if (userProfile.getProfile().getAuthorities()
 				.stream().anyMatch(a -> a.getAuthority().equals("ROLE_BRANCH"))) {
 			return new SuccessResponse("00", "fetch report",
-					branchDashboardService.itemTypeChartByBranchId(userProfile.getProfile().getBranch().getId(), from, to));
+					branchDashboardService.itemTypeChartByBranchId(branchId.get(),from, to));
 		} else {
+			
 			return new SuccessResponse("00", "fetch report", branchDashboardService
 					.itemTypeChartByCopId(userProfile.getProfile().getCorporate().getId(), from, to));
 		}
@@ -178,7 +181,7 @@ public class SaleDashboardController {
 		if (userProfile.getProfile().getAuthorities()
 				.stream().anyMatch(a -> a.getAuthority().equals("ROLE_BRANCH"))) {
 			return new SuccessResponse("00", "fetch report", branchDashboardService
-					.saleDetailByBranchId(userProfile.getProfile().getBranch().getId(), from, to, pageable));
+					.saleDetailByBranchId(branchId.get(), from, to, pageable));
 		} else {
 			if (branchId.isPresent()) {
 				return new SuccessResponse("00", "fetch report",
@@ -192,32 +195,32 @@ public class SaleDashboardController {
 	}
 	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
 	@GetMapping(value = "/download/saleitemreport")
-	  ResponseEntity<Void> downloadTransactionReport(@RequestParam(value = "exportType") String exportType,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
-				@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,
+	ResponseEntity<Void> downloadTransactionReport(@RequestParam(value = "exportType") String exportType,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
+				@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,@RequestParam(value = "branchId") Integer branchId,
 	                                                 HttpServletResponse response) throws IOException,JRException, SQLException
 	  {
 		try {
-			branchDashboardService.downloadTransactionReport(exportType, response, "sale_item",from,to);
-			  return ResponseEntity.ok().build();
+			branchDashboardService.downloadTransactionReport(exportType, response, "sale_item",from,to,branchId);
+			return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
-			return ResponseEntity.ok().build();
+			throw new ConflictException(e.getMessage(), "01");
 			// TODO: handle exception
 		}
 
 	  }
 	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
 	@GetMapping(value = "/download/incomestatement")
-	  ResponseEntity<Void> downloadProfitLoss(@RequestParam(value = "exportType") String exportType,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
-				@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,
+	ResponseEntity<Void> downloadProfitLoss(@RequestParam(value = "exportType") String exportType,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
+				@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to, @RequestParam(value = "branchId") Integer branchId,
 	                                                 HttpServletResponse response) throws IOException,JRException, SQLException
 	  {
 		try {
-			branchDashboardService.downloadTransactionReport(exportType, response, "profitloss",from,to);
-			  return ResponseEntity.ok().build();
+			branchDashboardService.downloadTransactionReport(exportType, response, "profitloss",from,to,branchId);
+			return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
-			return ResponseEntity.ok().build();
+			throw new ConflictException(e.getMessage(), "01");
 			// TODO: handle exception
 		}
 

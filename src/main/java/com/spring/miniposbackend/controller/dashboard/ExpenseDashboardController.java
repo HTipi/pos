@@ -2,6 +2,7 @@ package com.spring.miniposbackend.controller.dashboard;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -55,16 +56,25 @@ public class ExpenseDashboardController {
 	@GetMapping("/expense-type/summary")
 	@PreAuthorize("hasAnyRole('BRANCH','OWNER')")
 	public SuccessResponse expenseTypeSummaryDetail(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
-			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to) {
+			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,@RequestParam Optional<Integer> branchId) {
+		
+		if(branchId.isPresent()) {
+			return new SuccessResponse("00", "fetch report", expenseDashboardService
+					.expenseTypeSummaryByBranchId(branchId.get(), from, to));
+		}
 		return new SuccessResponse("00", "fetch report", expenseDashboardService
 				.expenseTypeSummaryByBranchId(userProfile.getProfile().getBranch().getId(), from, to));
+		
 	}
 	@GetMapping("/detail")
 	@PreAuthorize("hasAnyRole('BRANCH','OWNER')")
 	public SuccessResponse expenseDetail(@RequestParam Integer page, @RequestParam Integer length,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
-			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to) {
+			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,@RequestParam Optional<Integer> branchId) {
 		Pageable pageable = PageRequest.of(page, length);
+		if(branchId.isPresent())
+		return new SuccessResponse("00", "fetch report",
+				expenseDashboardService.expenseDetailByBranchId(branchId.get(), from, to, pageable));
 		return new SuccessResponse("00", "fetch report",
 				expenseDashboardService.expenseDetailByBranchId(userProfile.getProfile().getBranch().getId(), from, to, pageable));
 	}

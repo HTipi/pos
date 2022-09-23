@@ -161,9 +161,6 @@ public class SaleDashboardService {
 	}
 
 	public List<ItemTypeSummaryChart> itemTypeChartByBranchId(Integer branchId, Date startDate, Date endDate) {
-		if (userProfile.getProfile().getBranch().getId() != branchId) {
-			throw new UnauthorizedException("You are unauthorized");
-		}
 		MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource();
 		mapSqlParameterSource.addValue("startDate", startDate);
 		mapSqlParameterSource.addValue("endDate", endDate);
@@ -290,11 +287,11 @@ public class SaleDashboardService {
 			return saleRepository.findByBranchId(branchId, from, to, pageable);
 		}).orElseThrow(() -> new ResourceNotFoundException("User does not exist"));
 	}
-	public void downloadTransactionReport(String exportType, HttpServletResponse response,String fileName,Date from, Date to) throws JRException, IOException, SQLException {
+	public void downloadTransactionReport(String exportType, HttpServletResponse response,String fileName,Date from, Date to,Integer branchId) throws JRException, IOException, SQLException {
 	    
-	    exportReport(exportType, response,fileName, from,  to);
+	    exportReport(exportType, response,fileName, from,  to,branchId);
 	  }
-	private void exportReport(String exportType, HttpServletResponse response,String fileName,Date from, Date to) throws JRException, IOException, SQLException {
+	private void exportReport(String exportType, HttpServletResponse response,String fileName,Date from, Date to,Integer branchId) throws JRException, IOException, SQLException {
 	    InputStream transactionReportStream =
 	        getClass()
 	            .getResourceAsStream(
@@ -308,9 +305,10 @@ public class SaleDashboardService {
 	    try {
 			HashMap<String, Object> parameters = new HashMap<String, Object>();
 		    parameters.put("corporateName", userProfile.getProfile().getCorporate().getNameKh());
-		    parameters.put("branchId", userProfile.getProfile().getBranch().getId());
+		    parameters.put("branchId", branchId);
 		    parameters.put("start", from);
 		    parameters.put("end", to);
+		    parameters.put("branchName", userProfile.getProfile().getBranch().getNameKh());
 			String fileLocation = imagePath + "/" 
 					+ userProfile.getProfile().getBranch().getLogo();
 			byte[] image;
@@ -355,6 +353,7 @@ public class SaleDashboardService {
 		      exporter.exportReport();
 
 		    }
+		    connection.close();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			System.out.println(e.getMessage());

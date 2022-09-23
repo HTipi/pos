@@ -8,6 +8,7 @@
 	<parameter name="start" class="java.util.Date"/>
 	<parameter name="end" class="java.util.Date"/>
 	<parameter name="logo" class="java.io.InputStream"/>
+	<parameter name="branchName" class="java.lang.String"/>
 	<queryString language="SQL">
 		<![CDATA[select * from profitloss($P{branchId},$P{start},$P{end});]]>
 	</queryString>
@@ -44,7 +45,7 @@
 				<textField>
 					<reportElement x="32" y="5" width="470" height="30" uuid="90995146-7c97-434a-8095-c38b881d13ca"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font size="11" isBold="true"/>
+						<font fontName="KhmerOSContent" size="11" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{type}]]></textFieldExpression>
 				</textField>
@@ -85,7 +86,7 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="102" splitType="Stretch">
+		<band height="129" splitType="Stretch">
 			<textField>
 				<reportElement x="176" y="7" width="200" height="50" uuid="3088dec2-8de0-44fa-95e6-5beee2440f20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -94,7 +95,7 @@
 				<textFieldExpression><![CDATA[$P{corporateName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="180" y="63" width="200" height="30" uuid="0eeba98f-9614-4bc2-8029-f4fdb52cb6cf"/>
+				<reportElement x="180" y="94" width="200" height="30" uuid="0eeba98f-9614-4bc2-8029-f4fdb52cb6cf"/>
 				<textElement textAlignment="Center"/>
 				<textFieldExpression><![CDATA["From " + new SimpleDateFormat("yyyy-MM-dd").format($P{start}) + " To " + new SimpleDateFormat("yyyy-MM-dd").format($P{end})]]></textFieldExpression>
 			</textField>
@@ -102,6 +103,13 @@
 				<reportElement x="-19" y="1" width="119" height="92" uuid="e118ee00-8cba-4203-9890-e1bbea9fb630"/>
 				<imageExpression><![CDATA[$P{logo}]]></imageExpression>
 			</image>
+			<textField>
+				<reportElement x="191" y="61" width="173" height="30" uuid="3c770b18-1daf-484d-9b8d-925a83ee61dc"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Khmer OS Content"/>
+				</textElement>
+				<textFieldExpression><![CDATA["សាខា "  + $P{branchName}]]></textFieldExpression>
+			</textField>
 		</band>
 	</title>
 	<pageHeader>

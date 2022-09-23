@@ -17,6 +17,7 @@
 	<parameter name="end" class="java.util.Date"/>
 	<parameter name="branchId" class="java.lang.Integer"/>
 	<parameter name="logo" class="java.io.InputStream"/>
+	<parameter name="branchName" class="java.lang.String"/>
 	<queryString language="SQL">
 		<![CDATA[select i.name_kh,sum(quantity) quantities,sum(d.sub_total) total
 from sale_details d inner join item_branches ib on d.item_branch_id=ib.id
@@ -45,9 +46,9 @@ group by i.name_kh,i.id,i.item_type_id order by i.item_type_id,i.id]]>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="97" splitType="Stretch">
+		<band height="116" splitType="Stretch">
 			<textField>
-				<reportElement x="140" y="63" width="200" height="30" uuid="07af68c2-9479-4455-85a1-ce9c626a3ae6"/>
+				<reportElement x="140" y="83" width="200" height="30" uuid="07af68c2-9479-4455-85a1-ce9c626a3ae6"/>
 				<textElement textAlignment="Center"/>
 				<textFieldExpression><![CDATA["From " + new SimpleDateFormat("yyyy-MM-dd").format($P{start}) + " To " + new SimpleDateFormat("yyyy-MM-dd").format($P{end})]]></textFieldExpression>
 			</textField>
@@ -62,6 +63,13 @@ group by i.name_kh,i.id,i.item_type_id order by i.item_type_id,i.id]]>
 				<reportElement x="-19" y="1" width="119" height="92" uuid="0b608ee9-f680-4257-a9a1-8fdd31d21f82"/>
 				<imageExpression><![CDATA[$P{logo}]]></imageExpression>
 			</image>
+			<textField>
+				<reportElement x="158" y="51" width="155" height="30" uuid="56596a40-f511-4d55-b94c-83ec7c914c2e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Khmer OS Content"/>
+				</textElement>
+				<textFieldExpression><![CDATA["សាខា "  + $P{branchName}]]></textFieldExpression>
+			</textField>
 		</band>
 	</title>
 	<pageHeader>

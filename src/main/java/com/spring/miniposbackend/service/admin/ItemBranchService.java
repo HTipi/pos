@@ -232,6 +232,12 @@ public class ItemBranchService {
 			return itemBranchRepository.save(itemBranch);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
+	public ItemBranch setInvenQty(Long itemBranchId, Short qty) {
+		return itemBranchRepository.findById(itemBranchId).map(itemBranch -> {
+			itemBranch.setInvenQty(qty);
+			return itemBranchRepository.save(itemBranch);
+		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
+	}
 
 	public ItemBranch setEnable(Long itemBranchId, Boolean enable) {
 		return itemBranchRepository.findById(itemBranchId).map(itemBranch -> {

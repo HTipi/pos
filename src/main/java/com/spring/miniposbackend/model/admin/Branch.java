@@ -33,6 +33,9 @@ public class Branch extends AuditModel {
 
 	@Column(name = "logo", length = 64)
 	private String logo;
+	
+	@Column(name = "qr", length = 20)
+	private String qr;
 
 	@Column(name = "telephone", nullable = false, length = 20)
 	private String telephone;

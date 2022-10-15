@@ -14,11 +14,13 @@ import org.springframework.web.multipart.MultipartFile;
 import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.exception.UnauthorizedException;
+import com.spring.miniposbackend.model.admin.Item;
 import com.spring.miniposbackend.model.admin.ItemType;
 import com.spring.miniposbackend.modelview.ImageRequest;
 import com.spring.miniposbackend.modelview.ImageResponse;
 import com.spring.miniposbackend.repository.admin.CorporateRepository;
 import com.spring.miniposbackend.repository.admin.ImageRepository;
+import com.spring.miniposbackend.repository.admin.ItemRepository;
 import com.spring.miniposbackend.repository.admin.ItemTypeRepository;
 import com.spring.miniposbackend.repository.sale.SaleRepository;
 import com.spring.miniposbackend.repository.sale.SaleTemporaryRepository;
@@ -30,6 +32,8 @@ public class ItemTypeService {
 
 	@Autowired
 	private ItemTypeRepository itemTypeRepository;
+	@Autowired
+	private ItemRepository itemRepository;
 	@Autowired
 	private CorporateRepository corporateRepository;
 	@Autowired
@@ -193,6 +197,10 @@ public class ItemTypeService {
 		boolean check = saleTemporaryRepository.existsByItemTypeId(itemTypeId);
 		if (check) {
 			throw new ConflictException("សូមបញ្ចប់ការបញ្ជាទិញប្រភេទផលិតផលនេះសិនមុននឹងលុប", "14");
+		}
+		List<Item> checkItem = itemRepository.findByItemTypeId(itemTypeId, true);
+		if (checkItem.size() > 0) {
+			throw new ConflictException("Please remove items from the category first", "14");
 		}
 		return itemTypeRepository.findById(itemTypeId).map(itemType -> {
 			if (userProfile.getProfile().getCorporate().getId() != itemType.getCorporate().getId()) {

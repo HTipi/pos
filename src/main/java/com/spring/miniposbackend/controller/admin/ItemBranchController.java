@@ -94,6 +94,11 @@ public class ItemBranchController {
 		return new SuccessResponse("00", "disable item",
 				itemBranchService.disable(itemBranchId));
 	}
+	@PatchMapping("{itemBranchId}/set-inven")
+	@PreAuthorize("hasAnyRole('BRANCH','OWNER')")
+	public SuccessResponse setInvenQty(@PathVariable Long itemBranchId, @RequestParam Short qty) {
+		return new SuccessResponse("00", "fetch Image Item List",  itemBranchService.setInvenQty(itemBranchId, qty));
+	}
 	/*
 	 * Admin Controller
 	 */

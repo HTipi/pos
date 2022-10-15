@@ -80,17 +80,20 @@ public class SaleTemporaryController {
 		return new SuccessResponse("00", "remove SaleTmp", saleService.removeItem(saleTempId, seatId, invoiceId,userId));
 	}
 
-//	@PatchMapping("qty/{saleTempId}")
-//	@PreAuthorize("hasAnyRole('SALE')")
-//	public SuccessResponse updateQuantity(@PathVariable Long saleTempId,
-//			@RequestParam(value = "quantity") Short quantity,
-//			@RequestParam(name = "invoice-id") Optional<Long> invoiceId,
-//			@RequestParam(name = "seat-id") Optional<Integer> seatId,
-//			@RequestParam(name = "user-id") Integer userId) {
-//
-//		return new SuccessResponse("00", "update QTY",
-//				saleService.setQuantity(saleTempId, quantity, seatId, invoiceId,userId));
-//	}
+	@PatchMapping("print")
+	@PreAuthorize("hasAnyRole('SALE')")
+	public SuccessResponse printItem(@RequestParam(name = "seatId") Optional<Integer> seatId,@RequestParam(name = "invoiceId") Optional<Long> invoiceId) {
+
+		if(seatId.isPresent()) {
+			return new SuccessResponse("00", "Printed",
+					saleService.printBySeat(seatId.get(),invoiceId));
+		}
+		else {
+			return new SuccessResponse("00", "Printed",
+					saleService.printByUser(invoiceId));
+		}
+		
+	}
 
 	@PostMapping("move-to-pending")
 	@PreAuthorize("hasAnyRole('SALE')")
@@ -116,16 +119,6 @@ public class SaleTemporaryController {
 		}
 		
 			return new SuccessResponse("0", "Please update your list", obj);
-	}
-
-	@PatchMapping("{seatId}")
-	@PreAuthorize("hasAnyRole('SALE')")
-	public SuccessResponse printBySeat(@PathVariable Integer seatId) {
-		try {
-			return new SuccessResponse("00", "do Print", saleService.printBySeat(seatId));
-		} catch (Exception e) {
-			throw new InternalErrorException("print SaleTmp Failed", "04");
-		}
 	}
 
 }

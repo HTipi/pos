@@ -17,26 +17,28 @@ public class UserResponse {
 	private List<UserRole> userRoles;
 	private List<BranchPaymentChannel> paymentChannels;
 	private String token;
+	private byte[] imageQr;
 	
-	public UserResponse(User user, List<UserRole> userRoles, byte[] image) {
+	
+	public UserResponse(User user, List<UserRole> userRoles, byte[] image,byte[] imageQr) {
 		this.user = user;
-		branch = user.getBranch();
-		corporate = branch.getCorporate();
-		paymentChannels= branch.getBranchPaymentChannels();
+		this.branch = user.getBranch();
+		this.corporate = branch.getCorporate();
+		this.paymentChannels= branch.getBranchPaymentChannels();
 		this.userRoles = userRoles;
 		this.image = image;
+		this.imageQr = imageQr;
 	}
-	
-	public UserResponse(User user, List<UserRole> userRoles,String token, byte[] image) {
+	public UserResponse(User user, List<UserRole> userRoles,String token, byte[] image,byte[] imageQr) {
 		this.user = user;
+		this.branch = user.getBranch();
+		this.corporate = branch.getCorporate();
+		this.paymentChannels= branch.getBranchPaymentChannels();
+		this.userRoles = userRoles;
+		this.image = image;
 		this.token = token;
-		branch = user.getBranch();
-		corporate = branch.getCorporate();
-		paymentChannels= branch.getBranchPaymentChannels();
-		this.userRoles = userRoles;
-		this.image = image;
+		this.imageQr = imageQr;
 	}
-
 	public Integer getUserId() {
 		return user.getId();
 	}
@@ -89,5 +91,8 @@ public class UserResponse {
 	
 	public List<BranchPaymentChannel> getBranchPaymentChannels(){
 		return paymentChannels;
+	}
+	public byte[] getQr() {
+		return imageQr;
 	}
 }

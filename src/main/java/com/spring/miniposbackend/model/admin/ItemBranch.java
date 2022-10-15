@@ -84,6 +84,11 @@ public class ItemBranch extends AuditModel {
 	@Type(type = "list-array")
 	@Column(name = "add_on_inven", columnDefinition = "bigint[]")
 	private List<Long> addOnInven;
+	
+	
+	@Column(name = "inven_qty", nullable = true)
+	@ColumnDefault("1")
+	private Short invenQty;
 
 	public Long getId() {
 		return id;

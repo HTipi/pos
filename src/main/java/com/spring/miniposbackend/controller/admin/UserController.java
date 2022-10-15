@@ -25,7 +25,9 @@ public class UserController {
 
 	@Value("${file.path.image.branch}")
 	private String imagePath;
-
+	
+	@Value("${file.path.image.branch-channel}")
+	private String imagePathQR;
 	@GetMapping("me")
 	public SuccessResponse getProfile() {
 		String fileLocation = imagePath + "/" 
@@ -36,9 +38,17 @@ public class UserController {
 		} catch (IOException e) {
 			image = null;
 		}
+		String fileLocationQR = imagePathQR + "/" 
+				+ userProfile.getProfile().getBranch().getQr();
+		byte[] imageQR;
+		try {
+			imageQR = imageUtil.getImage(fileLocationQR);
+		} catch (IOException e) {
+			imageQR = null;
+		}
 		return new SuccessResponse("00", "fetch ME",
 				new UserResponse(userService.showByUsername(userProfile.getProfile().getUsername()),
-						userService.getRoleByUserId(userProfile.getProfile().getUser().getId()), image));
+						userService.getRoleByUserId(userProfile.getProfile().getUser().getId()), image,imageQR));
 	}
 
 	@PostMapping("reset-password")

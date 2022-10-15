@@ -106,7 +106,7 @@ public class SaleService {
 
 	@Transactional
 	public List create(Optional<Long> invoiceId, Optional<Integer> seatId, Optional<Integer> channelId, Double discount,
-			Double cashIn, Double change, Integer currencyId, Integer userId) {
+			Double cashIn, Double change, Integer currencyId, Integer userId,boolean cancel) {
 		entityManager.clear();
 		User user = userProfile.getProfile().getUser();
 		Branch branch = userProfile.getProfile().getBranch();
@@ -167,17 +167,18 @@ public class SaleService {
 		sale.setValueDate(new Date());
 		sale.setCashIn(cashIn);
 		sale.setChange(change);
+		sale.setReverse(cancel);
 		sale.setBranchCurrency(branchCurrency);
 		if (channelId.isPresent()) {
 			sale.setPaymentChannel(paymentChannelRepository.findById(channelId.get()).orElse(null));
 		}
 		Sale saleResult = saleRepository.save(sale);
 		saleTemps.forEach((saleTemp) -> {
-			SaleDetail saleDetail = addItem(branch, user, saleResult, saleTemp, Optional.empty());
+			SaleDetail saleDetail = addItem(branch, user, saleResult, saleTemp, Optional.empty(),cancel);
 			List<SaleTemporary> subItems = saleTemp.getAddOns() == null ? new ArrayList<SaleTemporary>()
 					: saleTemp.getAddOns();
 			subItems.forEach((subItem) -> {
-				addItem(branch, user, saleResult, subItem, Optional.of(saleDetail));
+				addItem(branch, user, saleResult, subItem, Optional.of(saleDetail),cancel);
 			});
 			ItemBranch itemBranch = saleTemp.getItemBranch();
 			List<Long> inventories = itemBranch.getAddOnInven() == null ? new ArrayList<Long>() : itemBranch.getAddOnInven();
@@ -191,7 +192,7 @@ public class SaleService {
 					if (!setting.contentEquals(setting))
 						throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 				}
-				item.setStockOut(item.getStockOut() + saleTemp.getQuantity());
+				item.setStockOut(item.getStockOut() + (saleTemp.getQuantity() * item.getInvenQty()));
 				itemRepository.save(item);
 			});
 		});
@@ -257,7 +258,7 @@ public class SaleService {
 					if (!setting.contentEquals(setting))
 						throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 				}
-				item.setStockOut(item.getStockOut() - sales.getQuantity());
+				item.setStockOut(item.getStockOut() - (sales.getQuantity() * item.getInvenQty()));
 				itemRepository.save(item);
 			});
 		});
@@ -305,25 +306,28 @@ public class SaleService {
 
 	}
 	private SaleDetail addItem(Branch branch, User user, Sale sale, SaleTemporary saleTemporary,
-			Optional<SaleDetail> parentSaleDetail) {
+			Optional<SaleDetail> parentSaleDetail,boolean cancel) {
 		ItemBranch itemBranch = saleTemporary.getItemBranch();
-		if (itemBranch.isStock()) {
-			int itembalance = saleTemporaryRepository.findItemBalanceByUserId(user.getId(), itemBranch.getId())
-					.orElse(0);
-			if (itemBranch.getItemBalance() < itembalance) {
-				String setting = branchSettingRepository
-						.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN").orElse("");
-				if (!setting.contentEquals(setting))
-					throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
+		if(!cancel) {
+			if (itemBranch.isStock()) {
+				int itembalance = saleTemporaryRepository.findItemBalanceByUserId(user.getId(), itemBranch.getId())
+						.orElse(0);
+				if (itemBranch.getItemBalance() < itembalance) {
+					String setting = branchSettingRepository
+							.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN").orElse("");
+					if (!setting.contentEquals(setting))
+						throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
+				}
+				itemBranch.setStockOut(itemBranch.getStockOut() + saleTemporary.getQuantity());
+				itemRepository.save(itemBranch);
 			}
-			itemBranch.setStockOut(itemBranch.getStockOut() + saleTemporary.getQuantity());
-			itemRepository.save(itemBranch);
 		}
 		SaleDetail saleDeail = new SaleDetail();
 		saleDeail.setItemBranch(itemBranch);
 		saleDeail.setBranch(branch);
 		saleDeail.setUser(user);
 		saleDeail.setSale(sale);
+		saleDeail.setReverse(cancel);
 		saleDeail.setValueDate(new Date());
 		saleDeail.setDiscountPercentage(saleTemporary.getDiscountPercentage());
 		saleDeail.setDiscountAmount(saleTemporary.getDiscountAmount());

@@ -47,8 +47,9 @@ public class SaleController {
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse create(@RequestParam Optional<Long> invoiceId, @RequestParam Optional<Integer> seatId, @RequestParam Optional<Integer> channelId,
 			@RequestParam Double discount, @RequestParam Double cashIn, @RequestParam Double change,
-			@RequestParam Integer currencyId,@RequestParam Integer userId) {
-		List list = saleService.create(invoiceId, seatId,channelId, discount, cashIn, change, currencyId,userId);
+			@RequestParam Integer currencyId,@RequestParam Integer userId,@RequestParam Optional<Boolean> cancel) {
+		boolean check = cancel.isPresent() ? cancel.get() : false;
+		List list = saleService.create(invoiceId, seatId,channelId, discount, cashIn, change, currencyId,userId,check);
 		Object obj = list.get(0);
 		if(obj instanceof SaleDetail)
 		{

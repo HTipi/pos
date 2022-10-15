@@ -183,9 +183,9 @@ public class SaleTemporaryService {
 			saleRepository.updateUserEditSeat(user.getId(), seatId.get());
 		}
 		SaleTemporary saletemp = saleRepository.findById(saleTempId).map(sale -> {
-			if (sale.isPrinted()) {
-				throw new ConflictException("Record is already printed");
-			}
+//			if (sale.isPrinted()) {
+//				throw new ConflictException("Record is already printed");
+//			}
 			ItemBranch itemBranch = sale.getItemBranch();
 			if ((itemBranch.getBranch().getId() != userProfile.getProfile().getBranch().getId())
 					|| !itemBranch.isEnable()) {
@@ -274,16 +274,29 @@ public class SaleTemporaryService {
 	}
 
 	@Transactional
-	public boolean printBySeat(Integer seatId) throws Exception {
+	public List<SaleTemporary> printBySeat(Integer seatId,Optional<Long> invoiceId) {
 		try {
-			List<SaleTemporary> list = saleRepository.findBySeatId(seatId);
+			List<SaleTemporary> list = invoiceId.isPresent() ?  saleRepository.findBySeatForPrintIdWithInvoice(invoiceId.get()) : saleRepository.findBySeatForPrintId(seatId);
 			list.forEach(saleTemporary -> {
 				saleTemporary.setPrinted(true);
 				saleRepository.save(saleTemporary);
 			});
-			return true;
+			return list;
 		} catch (Exception ex) {
-			throw new ConflictException("prin SaleTmp Failed", "04");
+			throw new ConflictException("print SaleTmp Failed", "04");
+		}
+	}
+	
+	public List<SaleTemporary> printByUser(Optional<Long> invoiceId) {
+		try {
+			List<SaleTemporary> list = invoiceId.isPresent()  ? saleRepository.findByUserIdForPrintWithInvoice(invoiceId.get()) : saleRepository.findByUserIdForPrint(userProfile.getProfile().getUser().getId());
+			list.forEach(saleTemporary -> {
+				saleTemporary.setPrinted(true);
+				saleRepository.save(saleTemporary);
+			});
+			return list;
+		} catch (Exception ex) {
+			throw new ConflictException("print SaleTmp Failed", "04");
 		}
 	}
 

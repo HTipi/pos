@@ -26,6 +26,12 @@ public interface SaleTemporaryRepository extends JpaRepository<SaleTemporary, Lo
 	@Query(value = "select s from SaleTemporary s where s.seat.id=?1 and s.parentSaleTemporary is null and s.invoice is null") // update
 	List<SaleTemporary> findBySeatId(Integer seatId);
 	
+	@Query(value = "select s from SaleTemporary s where s.seat.id=?1 and s.parentSaleTemporary is null") // update
+	List<SaleTemporary> findBySeatForPrintId(Integer seatId);
+	
+	@Query(value = "select s from SaleTemporary s where s.parentSaleTemporary is null and s.invoice.id=?1") // update
+	List<SaleTemporary> findBySeatForPrintIdWithInvoice(Long invoiceId);
+	
 	@Query(value = "select s from SaleTemporary s where s.seat.id = ?1 and s.isPrinted = ?2 and s.invoice is null and s.parentSaleTemporary is null")//update
 	List<SaleTemporary> findBySeatIdWithisPrinted(Integer seatId, boolean isPrinted); 
 	
@@ -55,6 +61,11 @@ public interface SaleTemporaryRepository extends JpaRepository<SaleTemporary, Lo
 
 	@Query(value = "select s from SaleTemporary s where s.user.id=?1 and s.parentSaleTemporary is null and s.invoice is null and s.seat.id is null") // already update
 	List<SaleTemporary> findByUserId(Integer userId);
+	
+	@Query(value = "select s from SaleTemporary s where s.user.id=?1 and s.parentSaleTemporary is null and s.seat.id is null") // already update
+	List<SaleTemporary> findByUserIdForPrint(Integer userId);
+	@Query(value = "select s from SaleTemporary s where  s.parentSaleTemporary is null and s.seat.id is null and s.invoice.id=?1") // already update
+	List<SaleTemporary> findByUserIdForPrintWithInvoice(Long invoiceId);
 	
 //	@Query(value = "select s from SaleTemporary s where s.user.id=?1 and s.seat.id=?2 and s.parentSaleTemporary is null")
 //	List<SaleTemporary> findByUserId(Integer userId, Integer seatId);

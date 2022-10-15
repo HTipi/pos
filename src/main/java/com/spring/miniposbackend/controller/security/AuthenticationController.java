@@ -47,6 +47,9 @@ public class AuthenticationController {
 
 	@Value("${file.path.image.branch}")
 	private String imagePath;
+	
+	@Value("${file.path.image.branch-channel}")
+	private String imagePathQR;
 
 	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
 	public SuccessResponse createAuthenticationToken(@RequestBody JwtRequest authenticationRequest)
@@ -66,7 +69,15 @@ public class AuthenticationController {
 		} catch (IOException e) {
 			image = null;
 		}
-		return new SuccessResponse("00", "login Successfully", new UserResponse(user, userRoles,token,image));
+		String fileLocationQR = imagePathQR + "/" 
+				+ user.getBranch().getQr();
+		byte[] imageQR;
+		try {
+			imageQR = imageUtil.getImage(fileLocationQR);
+		} catch (IOException e) {
+			imageQR = null;
+		}
+		return new SuccessResponse("00", "login Successfully", new UserResponse(user, userRoles,token,image,imageQR));
 	}
 
 	private void authenticate(String username, String password) throws AuthenticationException {

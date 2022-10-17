@@ -117,6 +117,10 @@ public class SaleDetail extends AuditModel {
 	public String getItemTypeNameKh() {
 		return itemBranch.getItemTypeNameKh();
 	}
+	
+	public Integer getItemTypeId() {
+		return itemBranch.getItem().getItemType_Id();
+	}
 
 	public String getItemCode() {
 		return itemBranch.getCode();

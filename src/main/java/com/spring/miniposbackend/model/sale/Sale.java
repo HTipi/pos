@@ -42,6 +42,10 @@ public class Sale extends AuditModel {
 
 	@Column(name = "receipt_number", nullable = false, length = 32)
 	private String receiptNumber;
+	
+	@Column(name = "bill_number", nullable = true)
+	@ColumnDefault("0")
+    private Long billNumber;
 
 	@Column(name = "seat_name", nullable = false, length = 32)
 	private String seatName;
@@ -78,7 +82,8 @@ public class Sale extends AuditModel {
 	public String getFullName() {
 		return user.getFullName();
 	}
-	
+	@Column(name = "remark", nullable = true)
+	private String remark;
 	@ManyToOne
 	@JoinColumn(name = "payment_channel_id", nullable = true)
 	@JsonIgnore

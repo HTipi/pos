@@ -12,6 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicUpdate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.AuditModel;
@@ -36,6 +37,9 @@ public class Receipt extends AuditModel{
 	@Column(name = "receipt_number", nullable = false,length = 32)
     private Long receiptNumber;
 	
+	@Column(name = "bill_number", nullable = true)
+	@ColumnDefault("0")
+    private Long billNumber;
 	
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "branch_id", unique = true, nullable = false)

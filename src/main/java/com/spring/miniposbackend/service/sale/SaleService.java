@@ -106,7 +106,7 @@ public class SaleService {
 
 	@Transactional
 	public List create(Optional<Long> invoiceId, Optional<Integer> seatId, Optional<Integer> channelId, Double discount,
-			Double cashIn, Double change, Integer currencyId, Integer userId,boolean cancel) {
+			Double cashIn, Double change, Integer currencyId, Integer userId, boolean cancel, Optional<String> remark) {
 		entityManager.clear();
 		User user = userProfile.getProfile().getUser();
 		Branch branch = userProfile.getProfile().getBranch();
@@ -168,27 +168,37 @@ public class SaleService {
 		sale.setCashIn(cashIn);
 		sale.setChange(change);
 		sale.setReverse(cancel);
+		if(saleTemps.get(0).getBillNumber() == 0) {
+			Long receiptNum = receiptService.getBillNumberByBranchId(userProfile.getProfile().getBranch().getId());
+			sale.setBillNumber(receiptNum);
+		}
+		else
+		sale.setBillNumber(saleTemps.get(0).getBillNumber());
+		if (remark.isPresent())
+			sale.setRemark(remark.get());
 		sale.setBranchCurrency(branchCurrency);
 		if (channelId.isPresent()) {
 			sale.setPaymentChannel(paymentChannelRepository.findById(channelId.get()).orElse(null));
 		}
 		Sale saleResult = saleRepository.save(sale);
 		saleTemps.forEach((saleTemp) -> {
-			SaleDetail saleDetail = addItem(branch, user, saleResult, saleTemp, Optional.empty(),cancel);
+			SaleDetail saleDetail = addItem(branch, user, saleResult, saleTemp, Optional.empty(), cancel);
 			List<SaleTemporary> subItems = saleTemp.getAddOns() == null ? new ArrayList<SaleTemporary>()
 					: saleTemp.getAddOns();
 			subItems.forEach((subItem) -> {
-				addItem(branch, user, saleResult, subItem, Optional.of(saleDetail),cancel);
+				addItem(branch, user, saleResult, subItem, Optional.of(saleDetail), cancel);
 			});
 			ItemBranch itemBranch = saleTemp.getItemBranch();
-			List<Long> inventories = itemBranch.getAddOnInven() == null ? new ArrayList<Long>() : itemBranch.getAddOnInven();
+			List<Long> inventories = itemBranch.getAddOnInven() == null ? new ArrayList<Long>()
+					: itemBranch.getAddOnInven();
 			inventories.forEach((inventory) -> {
-				ItemBranch item = itemRepository.findById(inventory).orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
-				int itembalance = saleTemporaryRepository.findItemBalanceByUserId(user.getId(), item.getId())
-						.orElse(0);
+				ItemBranch item = itemRepository.findById(inventory)
+						.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
+				int itembalance = saleTemporaryRepository.findItemBalanceByUserId(user.getId(), item.getId()).orElse(0);
 				if (item.getItemBalance() < itembalance) {
 					String setting = branchSettingRepository
-							.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN").orElse("");
+							.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN")
+							.orElse("");
 					if (!setting.contentEquals(setting))
 						throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 				}
@@ -242,19 +252,20 @@ public class SaleService {
 			saleDetailRepository.save(sales);
 			ItemBranch itemBr = itemRepository.findById(sales.getItemBranch().getId())
 					.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
-			if(itemBr.isStock())
-			{
+			if (itemBr.isStock()) {
 				itemBr.setStockOut(itemBr.getStockOut() - sales.getQuantity());
 				itemRepository.save(itemBr);
 			}
 			List<Long> inventories = itemBr.getAddOnInven() == null ? new ArrayList<Long>() : itemBr.getAddOnInven();
 			inventories.forEach((inventory) -> {
-				ItemBranch item = itemRepository.findById(inventory).orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
-				int itembalance = saleTemporaryRepository.findItemBalanceByUserId(userProfile.getProfile().getUser().getId(), item.getId())
-						.orElse(0);
+				ItemBranch item = itemRepository.findById(inventory)
+						.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
+				int itembalance = saleTemporaryRepository
+						.findItemBalanceByUserId(userProfile.getProfile().getUser().getId(), item.getId()).orElse(0);
 				if (item.getItemBalance() < itembalance) {
 					String setting = branchSettingRepository
-							.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN").orElse("");
+							.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN")
+							.orElse("");
 					if (!setting.contentEquals(setting))
 						throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 				}
@@ -305,16 +316,18 @@ public class SaleService {
 		return saleDetailRepository.findMainBySaleId(saleId.get());
 
 	}
+
 	private SaleDetail addItem(Branch branch, User user, Sale sale, SaleTemporary saleTemporary,
-			Optional<SaleDetail> parentSaleDetail,boolean cancel) {
+			Optional<SaleDetail> parentSaleDetail, boolean cancel) {
 		ItemBranch itemBranch = saleTemporary.getItemBranch();
-		if(!cancel) {
+		if (!cancel) {
 			if (itemBranch.isStock()) {
 				int itembalance = saleTemporaryRepository.findItemBalanceByUserId(user.getId(), itemBranch.getId())
 						.orElse(0);
 				if (itemBranch.getItemBalance() < itembalance) {
 					String setting = branchSettingRepository
-							.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN").orElse("");
+							.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN")
+							.orElse("");
 					if (!setting.contentEquals(setting))
 						throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 				}

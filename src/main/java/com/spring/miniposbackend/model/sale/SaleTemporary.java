@@ -27,6 +27,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.admin.BranchCurrency;
 import com.spring.miniposbackend.model.admin.ItemBranch;
+import com.spring.miniposbackend.model.admin.PaymentChannel;
 import com.spring.miniposbackend.model.admin.Seat;
 
 import lombok.Getter;
@@ -42,71 +43,80 @@ public class SaleTemporary extends AuditModel {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id", nullable = false)
 	private Long id;
-	
+
 	@Column(name = "value_date", nullable = false, updatable = false)
 	private Date valueDate;
-	
+
 	@Column(name = "price", nullable = false, precision = 10, scale = 2)
 	private BigDecimal price;
-	
+
 	@Column(name = "quantity", nullable = false)
 	@ColumnDefault("1")
 	private Short quantity;
-	
+
 	@Column(name = "discount_amount", nullable = false, precision = 10, scale = 2)
 	@ColumnDefault("0")
 	private BigDecimal discountAmount;
 	
+	@Column(name = "bill_number", nullable = true)
+	@ColumnDefault("0")
+    private Long billNumber;
+
 	@Column(name = "discount_percentage", nullable = false)
 	@Min(0)
 	@Max(100)
 	@ColumnDefault("0")
 	private Short discountPercentage;
-	
+
 	@Column(name = "is_printed", nullable = false)
 	@ColumnDefault("false")
 	private boolean isPrinted;
-	
+
 	@Column(name = "cancel", nullable = false)
 	@ColumnDefault("false")
 	private boolean cancel;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "seat_id", nullable = true)
 	@JsonIgnore
 	private Seat seat;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
 	@JsonIgnore
 	private User user;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "useredit_id", nullable = false)
 	@JsonIgnore
 	private User userEdit;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "item_branch_id", nullable = false)
 	@JsonIgnore
 	private ItemBranch itemBranch;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "invoice_id", nullable = true)
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	@JsonIgnore
 	private Invoice invoice;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "parent_sale_id", nullable = true)
 	@JsonIgnore
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private SaleTemporary parentSaleTemporary;
-	
+
 	@OneToMany(fetch = FetchType.LAZY)
 	@JoinColumn(name = "parent_sale_id", nullable = true)
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private List<SaleTemporary> addOns;
+
+	@ManyToOne
+	@JoinColumn(name = "payment_channel_id", nullable = true)
+	@JsonIgnore
+	private PaymentChannel paymentChannel;
 
 	public List<Long> getAddOnItems() {
 		return itemBranch.getAddOnItems();
@@ -149,14 +159,20 @@ public class SaleTemporary extends AuditModel {
 	}
 
 	public Long getInvoice_id() {
-		if(invoice == null) {
+		if (invoice == null) {
 			return null;
 		}
 		return invoice.getId();
 	}
-	
+
 	public Integer getItemTypeId() {
 		return itemBranch.getItemTypeId();
+	}
+
+	public Integer getPaymentChannelId() {
+		if (paymentChannel == null)
+			return 0;
+		return paymentChannel.getId();
 	}
 
 	private Integer getDecimalPlace() {

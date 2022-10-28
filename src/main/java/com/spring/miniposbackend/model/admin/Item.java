@@ -59,6 +59,14 @@ public class Item extends AuditModel{
 	@Column(name = "price", nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 	
+	@Column(name = "costing", nullable = false, precision = 10, scale = 2)
+	@ColumnDefault("0")
+    private BigDecimal costing;
+	
+	@Column(name = "whole_price", nullable = false, precision = 10, scale = 2)
+	@ColumnDefault("0")
+    private BigDecimal wholePrice;
+	
 	@Column(name = "discount", nullable = false)
 	@Min(0)
 	@Max(100)

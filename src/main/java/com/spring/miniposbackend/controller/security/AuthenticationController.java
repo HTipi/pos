@@ -71,8 +71,6 @@ public class AuthenticationController {
 		}
 		String fileLocationQR = imagePathQR + "/" 
 				+ user.getBranch().getQr();
-System.out.println(imagePathQR + "/" 
-				+ user.getBranch().getQr());
 		byte[] imageQR;
 		try {
 			imageQR = imageUtil.getImage(fileLocationQR);

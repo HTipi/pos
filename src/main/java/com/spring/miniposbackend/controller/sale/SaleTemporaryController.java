@@ -66,9 +66,18 @@ public class SaleTemporaryController {
 	public SuccessResponse create(@RequestBody List<SaleRequest> requestItem,
 			@RequestParam(name = "invoice-id") Optional<Long> invoiceId,
 			@RequestParam(name = "seat-id") Optional<Integer> seatId,
-			@RequestParam(name = "user-id") Integer userId) {
+			@RequestParam(name = "user-id") Integer userId,
+			@RequestParam(name = "channel-id") Optional<Integer> channelId) {
 
-		return new SuccessResponse("00", "add SaleTmp", saleService.addItems(requestItem, seatId, invoiceId,userId));
+		return new SuccessResponse("00", "add SaleTmp", saleService.addItems(requestItem, seatId, invoiceId,userId,channelId));
+	}
+	@PostMapping("change-seat")
+	@PreAuthorize("hasAnyRole('SALE')")
+	public SuccessResponse changeSeat(
+			@RequestParam(name = "seat-id") Integer seatId,
+			@RequestParam(name = "new-seat-id") Integer newSeatId) {
+
+		return new SuccessResponse("00", "change seat", saleService.changeSeat(seatId, newSeatId));
 	}
 
 	@DeleteMapping("item/{saleTempId}")
@@ -112,8 +121,8 @@ public class SaleTemporaryController {
 	@PostMapping("save-to-pending")
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse moveToPendingWithoutSaving(@RequestParam(name = "seatId") Optional<Integer> seatId,
-			@RequestParam String remark, @RequestBody List<SaleRequest> requestItems,@RequestParam(name = "userId") Integer userId) {
-		Object obj = saleService.moveToPending(requestItems, seatId, remark,userId);
+			@RequestParam String remark, @RequestBody List<SaleRequest> requestItems,@RequestParam(name = "userId") Integer userId,@RequestParam(name = "channel-id") Optional<Integer> channelId) {
+		Object obj = saleService.moveToPending(requestItems, seatId, remark,userId,channelId);
 		if(obj instanceof Invoice) {
 			return new SuccessResponse("00", "Sale has been move to pending", obj);
 		}

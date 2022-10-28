@@ -203,5 +203,15 @@ public class SaleDetail extends AuditModel {
 			return "";
 		return sale.getPaymentChannel().getName();
 	}
+	public String getRemark() {
+		if (sale.getRemark() == null)
+			return "";
+		return sale.getRemark();
+	}
+	public Long getBillNumber() {
+		if (sale.getBillNumber() == null)
+			return (long) 0;
+		return sale.getBillNumber();
+	}
 
 }

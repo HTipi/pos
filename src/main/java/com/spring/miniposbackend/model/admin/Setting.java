@@ -31,7 +31,7 @@ public class Setting extends AuditModel {
     @Column(name = "type", nullable = true,length = 128)
     private String type;
     
-    @Column(name = "default_value", nullable = false,length = 128)
+    @Column(name = "default_value", nullable = false)
     private String defaultValue;
 
     @Column(name = "sequence", nullable = false)

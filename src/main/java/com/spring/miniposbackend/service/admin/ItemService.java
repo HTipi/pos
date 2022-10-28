@@ -254,6 +254,7 @@ public class ItemService {
 				itemBr.setStockOut(0L);
 				itemBr.setPrice(item.getPrice());
 				itemBr.setDiscount(item.getDiscount());
+				itemBr.setInvenQty((short) 1);
 				itemBranchRepository.save(itemBr);
 
 //					else {

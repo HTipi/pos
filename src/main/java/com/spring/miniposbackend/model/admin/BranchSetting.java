@@ -34,7 +34,7 @@ public class BranchSetting extends AuditModel {
     @JsonIgnore
     Branch branch;
 
-    @Column(name = "value", nullable = false,length = 32)
+    @Column(name = "value", nullable = false)
     private String settingValue;
     
 	@Column(name = "enable", nullable = false)

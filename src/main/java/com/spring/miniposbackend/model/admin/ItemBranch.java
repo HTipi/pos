@@ -62,6 +62,14 @@ public class ItemBranch extends AuditModel {
 
 	@Column(name = "price", nullable = false, precision = 10, scale = 2)
 	private BigDecimal price;
+	
+	@Column(name = "costing", nullable = true, precision = 10, scale = 2)
+	@ColumnDefault("0")
+    private BigDecimal costing;
+	
+	@Column(name = "whole_price", nullable = true, precision = 10, scale = 2)
+	@ColumnDefault("0")
+    private BigDecimal wholePrice;
 
 	@Column(name = "discount", nullable = false)
 	@Min(0)

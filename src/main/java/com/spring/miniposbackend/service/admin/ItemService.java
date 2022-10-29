@@ -3,6 +3,7 @@ package com.spring.miniposbackend.service.admin;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -235,6 +236,8 @@ public class ItemService {
 			item.setDiscount(requestItem.getDiscount());
 			item.setStock(requestItem.isStock());
 			item.setItemType(itemType);
+			item.setCosting(BigDecimal.valueOf(0));
+			item.setWholePrice(BigDecimal.valueOf(0));
 			item.setEnable(true);
 			itemRepository.save(item);
 			List<Branch> branches = branchRepository.findByCorporateId(itemType.getCorporate().getId(), true);
@@ -252,6 +255,8 @@ public class ItemService {
 				itemBr.setAddOnItems(new ArrayList<Long>());
 				itemBr.setStockIn(0L);
 				itemBr.setStockOut(0L);
+				itemBr.setCosting(BigDecimal.valueOf(0));
+				itemBr.setWholePrice(BigDecimal.valueOf(0));
 				itemBr.setPrice(item.getPrice());
 				itemBr.setDiscount(item.getDiscount());
 				itemBr.setInvenQty((short) 1);

@@ -62,6 +62,11 @@ public class ItemTypeController {
 	public SuccessResponse disable(@PathVariable Integer itemTypeId) {
 		return new SuccessResponse("00", "Disable Item Type", itemTypeService.disable(itemTypeId));
 	}
+	@PatchMapping("invisible/{itemTypeId}")
+	@PreAuthorize("hasAnyRole('OWNER')")
+	public SuccessResponse invisible(@PathVariable Integer itemTypeId) {
+		return new SuccessResponse("00", "invisible Item Type", itemTypeService.invisible(itemTypeId));
+	}
 
 	@PatchMapping("{itemTypeId}/set-image/{imageId}")
 	@PreAuthorize("hasAnyRole('OWNER')")

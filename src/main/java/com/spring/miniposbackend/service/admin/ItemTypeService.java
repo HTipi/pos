@@ -178,6 +178,8 @@ public class ItemTypeService {
 			itemType.setName(requestItemType.getName());
 			itemType.setNameKh(requestItemType.getNameKh());
 			itemType.setEnable(true);
+			itemType.setSortOrder(requestItemType.getSortOrder());
+			itemType.setVisible(true);
 			return itemTypeRepository.save(itemType);
 		}).orElseThrow(() -> new ResourceNotFoundException("Corporate does not exist"));
 	}
@@ -207,6 +209,15 @@ public class ItemTypeService {
 				throw new UnauthorizedException("Corporate is unauthorized");
 			}
 			itemType.setEnable(false);
+			return itemTypeRepository.save(itemType);
+		}).orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
+	}
+	public ItemType invisible(Integer itemTypeId) {
+		return itemTypeRepository.findById(itemTypeId).map(itemType -> {
+			if (userProfile.getProfile().getCorporate().getId() != itemType.getCorporate().getId()) {
+				throw new UnauthorizedException("Corporate is unauthorized");
+			}
+			itemType.setVisible(!itemType.isVisible());
 			return itemTypeRepository.save(itemType);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
 	}

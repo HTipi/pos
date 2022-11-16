@@ -85,7 +85,7 @@ public class SaleTemporaryService {
 					if(newSale.getItemId() == oldSale.getItemId()) {
 						if(oldSale.getPrice().compareTo(newSale.getPrice()) == 0 && oldSale.getDiscountAmount().compareTo(newSale.getDiscountAmount()) == 0 && oldSale.getDiscountPercentage() == newSale.getDiscountPercentage())
 						{
-							newSale.setQuantity((short) (newSale.getQuantity() + oldSale.getQuantity()));
+							newSale.setQuantity(newSale.getQuantity() + oldSale.getQuantity());
 							saleRepository.save(newSale);
 							System.out.println(1);
 							check = true;
@@ -482,12 +482,12 @@ public class SaleTemporaryService {
 			Optional<SaleTemporary> parentSale,Optional<PaymentChannel> channelId) {
 		Long saleTmpId = requestItem.getSaleTmpId();
 		Long itemId = requestItem.getItemId();
-		Short quantity = requestItem.getQuantity();
+		float quantity = requestItem.getQuantity();
 		Short discountPercentage = requestItem.getDiscountPercentage();
 		Double discountAmount = requestItem.getDiscountAmount();
 		Double price = requestItem.getPrice();
-		if (quantity < 1) {
-			throw new UnprocessableEntityException("Quantity must be greater than 0");
+		if (quantity < 0.1) {
+			throw new ConflictException("Quantity must be greater than 0.1");
 		}
 		return itemBranchRepository.findById(itemId).map((item) -> {
 			if (!item.isEnable()) {

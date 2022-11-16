@@ -200,6 +200,7 @@ public class SaleDashboardController {
 	                                                 HttpServletResponse response) throws IOException,JRException, SQLException
 	  {
 		try {
+			
 			branchDashboardService.downloadTransactionReport(exportType, response, "sale_item",from,to,branchId);
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {

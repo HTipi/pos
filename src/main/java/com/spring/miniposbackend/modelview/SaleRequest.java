@@ -10,7 +10,7 @@ public class SaleRequest {
 	
 	Long saleTmpId;
 	Long itemId;
-	Short quantity;
+	float quantity;
 	Short discountPercentage;
 	Double discountAmount;
 	Double price = Double.valueOf(0);

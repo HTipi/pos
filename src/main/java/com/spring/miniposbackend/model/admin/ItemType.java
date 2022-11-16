@@ -49,6 +49,14 @@ public class ItemType extends AuditModel{
 	@Column(name ="version", nullable = false)
 	private Short version= 0;
 	
+	@Column(name ="sort_order", nullable = true)
+	@ColumnDefault("0")
+	private Short sortOrder = 0;
+	
+	@Column(name = "visible", nullable = true)
+    @ColumnDefault("true")
+    private boolean visible = true;
+	
 	@Column(name = "enable", nullable = false)
     @ColumnDefault("false")
     private boolean enable;

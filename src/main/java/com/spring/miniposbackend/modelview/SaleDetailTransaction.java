@@ -9,14 +9,14 @@ public class SaleDetailTransaction {
 
 	private Long itemId;
 	private String itemName;
-	private Integer quantity;
+	private double quantity;
 	private Double subTotal;
 	private Double discountTotal;
 	private Integer itemTypeId;
 	private boolean isStock;
 	private Integer stocks;
 
-	public SaleDetailTransaction(Long itemId, String itemName, Integer quanity, Double subTotal, Double discountTotal,Integer itemTypeId,boolean isStock,Integer stocks) {
+	public SaleDetailTransaction(Long itemId, String itemName, double quanity, Double subTotal, Double discountTotal,Integer itemTypeId,boolean isStock,Integer stocks) {
 		this.itemId = itemId;
 		this.itemName = itemName;
 		this.quantity = quanity;

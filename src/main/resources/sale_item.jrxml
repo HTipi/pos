@@ -19,19 +19,24 @@
 	<parameter name="logo" class="java.io.InputStream"/>
 	<parameter name="branchName" class="java.lang.String"/>
 	<queryString language="SQL">
-		<![CDATA[select i.name_kh,sum(quantity) quantities,sum(d.sub_total) total
+		<![CDATA[select i.name_kh,sum(quantity) quantities,sum(d.sub_total) total,(select min(receipt_number) receipt_number from sales where date_trunc('day',value_date) between $P{start} and $P{end} and branch_id=$P{branchId} and reverse=false) min_receipt,
+(select max(receipt_number) receipt_number from sales where date_trunc('day',value_date) between $P{start} and $P{end} and branch_id=$P{branchId} and reverse=false) max_receipt,
+date_trunc('day',d.value_date) value_date,
+(select sum(discount_amount+discount_sale_detail) from sales inner join branches b on sales.branch_id=b.id where date_trunc('day',value_date) 
+	between $P{start} and $P{end} and b.id=$P{branchId} and sales.reverse=false) as discount_amount
 from sale_details d inner join item_branches ib on d.item_branch_id=ib.id
+inner join sales s on s.id=d.sale_id
 inner join items i on i.id=ib.item_id
 inner join item_types t on t.id=i.item_type_id
-where ib.branch_id=$P{branchId} and d.reverse=false and date_trunc('day',d.value_date) between $P{start} and $P{end} and parent_sale_id is null
-group by i.name_kh,i.id,i.item_type_id order by i.item_type_id,i.id]]>
+where ib.branch_id=$P{branchId} and d.reverse=false and s.reverse=false and date_trunc('day',d.value_date) between $P{start} and $P{end} and parent_sale_id is null
+group by i.name_kh,i.id,i.item_type_id,date_trunc('day',d.value_date) order by value_date]]>
 	</queryString>
 	<field name="name_kh" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="name_kh"/>
 		<property name="com.jaspersoft.studio.field.label" value="name_kh"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="items"/>
 	</field>
-	<field name="quantities" class="java.lang.Long">
+	<field name="quantities" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="quantities"/>
 		<property name="com.jaspersoft.studio.field.label" value="quantities"/>
 	</field>
@@ -39,14 +44,64 @@ group by i.name_kh,i.id,i.item_type_id order by i.item_type_id,i.id]]>
 		<property name="com.jaspersoft.studio.field.name" value="total"/>
 		<property name="com.jaspersoft.studio.field.label" value="total"/>
 	</field>
-	<variable name="total" class="java.lang.Double" calculation="Sum">
+	<field name="min_receipt" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="min_receipt"/>
+		<property name="com.jaspersoft.studio.field.label" value="min_receipt"/>
+	</field>
+	<field name="max_receipt" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="max_receipt"/>
+		<property name="com.jaspersoft.studio.field.label" value="max_receipt"/>
+	</field>
+	<field name="value_date" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="value_date"/>
+		<property name="com.jaspersoft.studio.field.label" value="value_date"/>
+	</field>
+	<field name="discount_amount" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="discount_amount"/>
+		<property name="com.jaspersoft.studio.field.label" value="discount_amount"/>
+	</field>
+	<variable name="total" class="java.lang.Double" resetType="Group" resetGroup="Group1" calculation="Sum">
 		<variableExpression><![CDATA[$F{total}]]></variableExpression>
 	</variable>
+	<variable name="totalAll" class="java.lang.Double" resetType="Master" calculation="Sum">
+		<variableExpression><![CDATA[$F{total}]]></variableExpression>
+	</variable>
+	<group name="Group1">
+		<groupExpression><![CDATA[$F{value_date}]]></groupExpression>
+		<groupHeader>
+			<band height="40">
+				<rectangle>
+					<reportElement x="-20" y="0" width="505" height="40" backcolor="#FFFFCC" uuid="ea3388af-3fbd-40e2-8431-4373d0e9e4ad"/>
+				</rectangle>
+				<textField>
+					<reportElement x="-20" y="5" width="445" height="30" backcolor="#FFCC99" uuid="110e489e-b752-4594-b7e6-62d188d3dd20"/>
+					<textElement verticalAlignment="Middle">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Date: " + new SimpleDateFormat("yyyy-MM-dd").format($F{value_date})]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="38">
+				<rectangle>
+					<reportElement x="-20" y="1" width="505" height="37" backcolor="#FFCCCC" uuid="409efccc-8a4a-4eb1-ba0f-47d7bb5b0c94"/>
+				</rectangle>
+				<textField pattern="#,##0.00#;(#,##0.00#-)">
+					<reportElement x="291" y="6" width="193" height="27" uuid="59659f5a-9dac-477d-903f-4d3c421e5a18"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{total}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="116" splitType="Stretch">
+		<band height="160" splitType="Stretch">
 			<textField>
 				<reportElement x="140" y="83" width="200" height="30" uuid="07af68c2-9479-4455-85a1-ce9c626a3ae6"/>
 				<textElement textAlignment="Center"/>
@@ -69,6 +124,10 @@ group by i.name_kh,i.id,i.item_type_id order by i.item_type_id,i.id]]>
 					<font fontName="Khmer OS Content"/>
 				</textElement>
 				<textFieldExpression><![CDATA["សាខា "  + $P{branchName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="140" y="113" width="200" height="30" uuid="c6c705b0-e1a1-473e-9951-e251ff5e5940"/>
+				<textFieldExpression><![CDATA["Invoice Number: "  + $F{min_receipt}  + " - " +  $F{max_receipt}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -125,12 +184,12 @@ group by i.name_kh,i.id,i.item_type_id order by i.item_type_id,i.id]]>
 				<box>
 					<pen lineWidth="1.0"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
+				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="14"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{total}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField pattern="#,##0.###;(#,##0.###-)">
 				<reportElement x="180" y="0" width="110" height="38" uuid="d51776a9-a01d-4d8c-b0f1-c538d47131c2"/>
 				<box>
 					<pen lineWidth="1.0"/>
@@ -153,9 +212,9 @@ group by i.name_kh,i.id,i.item_type_id order by i.item_type_id,i.id]]>
 		</band>
 	</detail>
 	<columnFooter>
-		<band height="41" splitType="Stretch">
+		<band height="133" splitType="Stretch">
 			<staticText>
-				<reportElement x="180" y="5" width="111" height="36" forecolor="#FA260A" backcolor="#FF1453" uuid="1d5d0556-26c6-4c6d-8077-736a8e30e602"/>
+				<reportElement x="177" y="2" width="111" height="36" forecolor="#FA260A" backcolor="#FF1453" uuid="1d5d0556-26c6-4c6d-8077-736a8e30e602"/>
 				<box>
 					<pen lineWidth="1.5"/>
 				</box>
@@ -164,12 +223,36 @@ group by i.name_kh,i.id,i.item_type_id order by i.item_type_id,i.id]]>
 				</textElement>
 				<text><![CDATA[Total]]></text>
 			</staticText>
-			<textField pattern="#,#00.###;(#,#00.###-)">
+			<textField pattern="#,##0.00#;(#,##0.00#-)">
 				<reportElement x="291" y="3" width="194" height="35" uuid="6d377d39-4533-4340-9ba7-5c94f639c3a7"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
+				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="14"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{total}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{totalAll}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00#;(#,##0.00#-)">
+				<reportElement x="292" y="39" width="194" height="35" uuid="5863fc15-90e5-4a7c-9011-60a50ce23b00"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{discount_amount}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="177" y="38" width="111" height="36" forecolor="#FA260A" backcolor="#FF1453" uuid="a081222d-8536-4707-a22b-97b203fbf781"/>
+				<box>
+					<pen lineWidth="1.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[Discount]]></text>
+			</staticText>
+			<textField pattern="#,##0.00#;(#,##0.00#-)">
+				<reportElement x="291" y="80" width="194" height="35" uuid="a569591f-bed5-4630-ba35-6a44997fd027"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{totalAll} - Double.parseDouble( $F{discount_amount}.toString())]]></textFieldExpression>
 			</textField>
 		</band>
 	</columnFooter>

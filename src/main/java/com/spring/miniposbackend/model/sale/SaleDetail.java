@@ -50,7 +50,7 @@ public class SaleDetail extends AuditModel {
 	private BigDecimal price;
 
 	@Column(name = "quantity", nullable = false)
-	private Short quantity;
+	private float quantity;
 
 	@Column(name = "discount_amount", nullable = false, precision = 10, scale = 2)
 	@ColumnDefault("0")

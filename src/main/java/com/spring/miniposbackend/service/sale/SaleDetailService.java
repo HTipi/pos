@@ -67,7 +67,7 @@ public class SaleDetailService {
 						+ "and date_trunc('day',sale.value_date) between :startDate and :endDate " + "group by ib.id,item_type_id,is_stock,stock_in,stock_out",
 						mapSqlParameterSource,
 						(rs, rowNum) -> new SaleDetailTransaction(rs.getLong("item_id"), rs.getString("item_name"),
-								rs.getInt("quantity"), rs.getDouble("sub_total"), rs.getDouble("discount_total"),rs.getInt("item_type_id"),rs.getBoolean("is_stock"),rs.getInt("stocks")));
+								rs.getDouble("quantity"), rs.getDouble("sub_total"), rs.getDouble("discount_total"),rs.getInt("item_type_id"),rs.getBoolean("is_stock"),rs.getInt("stocks")));
 		summary.setDetails(details);
 		return summary;
 

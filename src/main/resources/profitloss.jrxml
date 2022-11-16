@@ -32,9 +32,44 @@
 		<property name="com.jaspersoft.studio.field.name" value="type"/>
 		<property name="com.jaspersoft.studio.field.label" value="type"/>
 	</field>
+	<field name="value_date" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="value_date"/>
+		<property name="com.jaspersoft.studio.field.label" value="value_date"/>
+	</field>
+	<field name="sum_expense" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="sum_expense"/>
+		<property name="com.jaspersoft.studio.field.label" value="sum_expense"/>
+	</field>
+	<field name="sum_income" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="sum_income"/>
+		<property name="com.jaspersoft.studio.field.label" value="sum_income"/>
+	</field>
 	<variable name="amount1" class="java.math.BigDecimal" resetType="Group" resetGroup="type" calculation="Sum">
 		<variableExpression><![CDATA[$F{amount}]]></variableExpression>
 	</variable>
+	<variable name="totalexpense" class="java.math.BigDecimal" calculation="Highest">
+		<variableExpression><![CDATA[$F{sum_expense}]]></variableExpression>
+	</variable>
+	<variable name="totalincome" class="java.math.BigDecimal" calculation="Highest">
+		<variableExpression><![CDATA[$F{sum_income}]]></variableExpression>
+	</variable>
+	<group name="Group1">
+		<groupExpression><![CDATA[$F{value_date}]]></groupExpression>
+		<groupHeader>
+			<band height="25">
+				<rectangle>
+					<reportElement x="12" y="0" width="500" height="25" backcolor="#FFFFCC" uuid="d7d48dea-4743-419f-862b-a9b6293fdaf6"/>
+				</rectangle>
+				<textField>
+					<reportElement x="12" y="3" width="100" height="20" uuid="3417895c-a3b0-473d-9441-782c72f26140"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new SimpleDateFormat("yyyy-MM-dd").format($F{value_date})]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
 	<group name="type">
 		<groupExpression><![CDATA[$F{type}]]></groupExpression>
 		<groupHeader>
@@ -75,7 +110,7 @@
 						<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					</box>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font size="12"/>
+						<font fontName="KhmerOSContent" size="12"/>
 					</textElement>
 					<textFieldExpression><![CDATA["Total " + $F{type}]]></textFieldExpression>
 				</textField>
@@ -100,13 +135,13 @@
 				<textFieldExpression><![CDATA["From " + new SimpleDateFormat("yyyy-MM-dd").format($P{start}) + " To " + new SimpleDateFormat("yyyy-MM-dd").format($P{end})]]></textFieldExpression>
 			</textField>
 			<image scaleImage="RetainShape" hAlign="Center" vAlign="Middle" onErrorType="Blank">
-				<reportElement x="-19" y="1" width="119" height="92" uuid="e118ee00-8cba-4203-9890-e1bbea9fb630"/>
+				<reportElement x="0" y="1" width="119" height="92" uuid="e118ee00-8cba-4203-9890-e1bbea9fb630"/>
 				<imageExpression><![CDATA[$P{logo}]]></imageExpression>
 			</image>
 			<textField>
 				<reportElement x="191" y="61" width="173" height="30" uuid="3c770b18-1daf-484d-9b8d-925a83ee61dc"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Khmer OS Content"/>
+					<font fontName="KhmerOSContent"/>
 				</textElement>
 				<textFieldExpression><![CDATA["សាខា "  + $P{branchName}]]></textFieldExpression>
 			</textField>
@@ -209,7 +244,7 @@
 					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{amount}]]></textFieldExpression>
 			</textField>
 		</band>
@@ -218,7 +253,43 @@
 		<band splitType="Stretch"/>
 	</columnFooter>
 	<pageFooter>
-		<band splitType="Stretch"/>
+		<band height="61" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField pattern="#,##0.###;(#,##0.###-)">
+				<reportElement x="362" y="3" width="150" height="30" uuid="42d10ab3-dbe7-43e9-8cad-17daa1148807"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{totalexpense}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="215" y="4" width="111" height="26" forecolor="#FA260A" backcolor="#FF1453" uuid="eefe638c-b1d1-47d5-bc19-92e49c472eea"/>
+				<box>
+					<pen lineWidth="1.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="KhmerOSContent" size="16"/>
+				</textElement>
+				<text><![CDATA[ចំណាយសរុប]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="215" y="33" width="111" height="26" forecolor="#FA260A" backcolor="#FF1453" uuid="8c44d786-e088-4661-81ab-2556de406353"/>
+				<box>
+					<pen lineWidth="1.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="KhmerOSContent" size="16"/>
+				</textElement>
+				<text><![CDATA[ចំណូលសរុប]]></text>
+			</staticText>
+			<textField pattern="#,##0.###;(#,##0.###-)">
+				<reportElement x="362" y="31" width="150" height="30" uuid="114ae857-fb64-4c1e-8502-153f7e934281"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{totalincome}]]></textFieldExpression>
+			</textField>
+		</band>
 	</pageFooter>
 	<summary>
 		<band splitType="Stretch"/>

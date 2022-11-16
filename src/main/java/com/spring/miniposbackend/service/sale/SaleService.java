@@ -202,7 +202,7 @@ public class SaleService {
 					if (!setting.contentEquals(setting))
 						throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 				}
-				item.setStockOut(item.getStockOut() + (saleTemp.getQuantity() * item.getInvenQty()));
+				item.setStockOut((long) (item.getStockOut() + (saleTemp.getQuantity() * item.getInvenQty())));
 				itemRepository.save(item);
 			});
 		});
@@ -253,7 +253,7 @@ public class SaleService {
 			ItemBranch itemBr = itemRepository.findById(sales.getItemBranch().getId())
 					.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
 			if (itemBr.isStock()) {
-				itemBr.setStockOut(itemBr.getStockOut() - sales.getQuantity());
+				itemBr.setStockOut((long) (itemBr.getStockOut() - sales.getQuantity()));
 				itemRepository.save(itemBr);
 			}
 			List<Long> inventories = itemBr.getAddOnInven() == null ? new ArrayList<Long>() : itemBr.getAddOnInven();
@@ -269,7 +269,7 @@ public class SaleService {
 					if (!setting.contentEquals(setting))
 						throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 				}
-				item.setStockOut(item.getStockOut() - (sales.getQuantity() * item.getInvenQty()));
+				item.setStockOut((long) (item.getStockOut() - (sales.getQuantity() * item.getInvenQty())));
 				itemRepository.save(item);
 			});
 		});
@@ -331,7 +331,7 @@ public class SaleService {
 					if (!setting.contentEquals(setting))
 						throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 				}
-				itemBranch.setStockOut(itemBranch.getStockOut() + saleTemporary.getQuantity());
+				itemBranch.setStockOut((long) (itemBranch.getStockOut() + saleTemporary.getQuantity()));
 				itemRepository.save(itemBranch);
 			}
 		}

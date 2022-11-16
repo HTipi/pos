@@ -52,7 +52,7 @@ public class SaleTemporary extends AuditModel {
 
 	@Column(name = "quantity", nullable = false)
 	@ColumnDefault("1")
-	private Short quantity;
+	private float quantity;
 
 	@Column(name = "discount_amount", nullable = false, precision = 10, scale = 2)
 	@ColumnDefault("0")
@@ -121,7 +121,7 @@ public class SaleTemporary extends AuditModel {
 	public List<Long> getAddOnItems() {
 		return itemBranch.getAddOnItems();
 	}
-
+	
 	public String getItemCode() {
 		return itemBranch.getCode();
 	}
@@ -163,6 +163,10 @@ public class SaleTemporary extends AuditModel {
 			return null;
 		}
 		return invoice.getId();
+	}
+	public boolean getStock() {
+		
+		return itemBranch.getItem().isStock();
 	}
 
 	public Integer getItemTypeId() {

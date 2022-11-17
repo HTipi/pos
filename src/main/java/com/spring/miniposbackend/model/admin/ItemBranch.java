@@ -186,5 +186,9 @@ public class ItemBranch extends AuditModel {
 	public String getPhoto() {
 		return item.getPhoto();
 	}
+	public boolean getVisible() {
+		
+		return item.getItemType().isVisible();
+	}
 
 }

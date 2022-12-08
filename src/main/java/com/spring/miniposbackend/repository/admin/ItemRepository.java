@@ -1,6 +1,7 @@
 package com.spring.miniposbackend.repository.admin;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,4 +19,9 @@ public interface ItemRepository extends JpaRepository<Item, Long>{
 	List<Item> findByCorporateId(Integer corporateId);
 	@Query(value = "select i from Item i where i.itemType.corporate.id = ?1 and i.enable = ?2")
 	List<Item> findByCorporateId(Integer corporateId, boolean enable);
+	
+	List<Item> findBytype(String type);
+	
+	@Query(value = "select i from Item i where i.code=?1")
+	Optional<Item> findByCode(String code);
 }

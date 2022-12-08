@@ -117,7 +117,7 @@ public class SaleDetail extends AuditModel {
 	public String getItemTypeNameKh() {
 		return itemBranch.getItemTypeNameKh();
 	}
-	
+
 	public Integer getItemTypeId() {
 		return itemBranch.getItem().getItemType_Id();
 	}
@@ -203,15 +203,22 @@ public class SaleDetail extends AuditModel {
 			return "";
 		return sale.getPaymentChannel().getName();
 	}
+
 	public String getRemark() {
 		if (sale.getRemark() == null)
 			return "";
 		return sale.getRemark();
 	}
+
 	public Long getBillNumber() {
 		if (sale.getBillNumber() == null)
 			return (long) 0;
 		return sale.getBillNumber();
 	}
 
+	public double getServiceCharge() {
+		if(sale.getServiceCharge() == null)
+			return (double) 0.00;
+		return sale.getServiceCharge();
+	}
 }

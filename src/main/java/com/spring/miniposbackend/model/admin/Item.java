@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
@@ -66,7 +67,8 @@ public class Item extends AuditModel{
 	@Column(name = "whole_price", nullable = false, precision = 10, scale = 2)
 	@ColumnDefault("0")
     private BigDecimal wholePrice;
-	
+	@Transient
+	private String sub;
 	@Column(name = "discount", nullable = false)
 	@Min(0)
 	@Max(100)

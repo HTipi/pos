@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -57,6 +58,7 @@ public class ItemController {
 	public ResponseEntity<byte[]> getImageAsResponseEntity(@PathVariable Long itemId) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setCacheControl(CacheControl.noCache().getHeaderValue());
+		headers.setContentType(MediaType.IMAGE_PNG);
 		ResponseEntity<byte[]> responseEntity = new ResponseEntity<>(itemService.getFileData(itemId), headers,
 				HttpStatus.OK);
 		return responseEntity;
@@ -112,4 +114,15 @@ public class ItemController {
 	public SuccessResponse disable(@PathVariable Long itemId) {
 		return new SuccessResponse("00", "Update Item", itemService.disable(itemId));
 	}
+	@PostMapping("uploadFile")
+	@PreAuthorize("hasAnyRole('OWNER')")
+	 public SuccessResponse uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
+		
+	  return new SuccessResponse("00", "Upload", itemService.Uploadexcel(file));
+	 }
+	
+//	@PutMapping("updatexcel")
+//	public SuccessResponse updatexcel(@RequestParam("file") MultipartFile file)throws SQLException, IOException {
+//		return new SuccessResponse("00", "Update Item", itemService.updatexcel(file));
+//	}
 }

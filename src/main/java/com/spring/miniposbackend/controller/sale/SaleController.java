@@ -1,5 +1,6 @@
 package com.spring.miniposbackend.controller.sale;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -47,9 +48,9 @@ public class SaleController {
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse create(@RequestParam Optional<Long> invoiceId, @RequestParam Optional<Integer> seatId, @RequestParam Optional<Integer> channelId,
 			@RequestParam Double discount, @RequestParam Double cashIn, @RequestParam Double change,
-			@RequestParam Integer currencyId,@RequestParam Integer userId,@RequestParam Optional<Boolean> cancel,@RequestParam Optional<String> remark) {
+			@RequestParam Integer currencyId,@RequestParam Integer userId,@RequestParam Optional<Boolean> cancel,@RequestParam Optional<String> remark,@RequestParam Optional<Double> serviceCharge) {
 		boolean check = cancel.isPresent() ? cancel.get() : false;
-		List list = saleService.create(invoiceId, seatId,channelId, discount, cashIn, change, currencyId,userId,check,remark);
+		List list = saleService.create(invoiceId, seatId,channelId, discount, cashIn, change, currencyId,userId,check,remark,serviceCharge);
 		Object obj = list.get(0);
 		if(obj instanceof SaleDetail)
 		{

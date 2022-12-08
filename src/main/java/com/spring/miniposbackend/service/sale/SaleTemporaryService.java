@@ -87,7 +87,6 @@ public class SaleTemporaryService {
 						{
 							newSale.setQuantity(newSale.getQuantity() + oldSale.getQuantity());
 							saleRepository.save(newSale);
-							System.out.println(1);
 							check = true;
 							break;
 						}
@@ -96,7 +95,6 @@ public class SaleTemporaryService {
 							oldSale.setSeat(newSale.getSeat());
 							saleRepository.save(oldSale);
 							check = true;
-							System.out.println(2);
 							break;
 						}
 						
@@ -106,7 +104,6 @@ public class SaleTemporaryService {
 				{
 					oldSale.setSeat(seat.get());
 					saleRepository.save(oldSale);
-					System.out.println(3);
 				}
 			}
 		}

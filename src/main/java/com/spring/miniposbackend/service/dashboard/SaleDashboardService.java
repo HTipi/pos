@@ -5,20 +5,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Base64.Decoder;
-
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -29,6 +25,7 @@ import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.model.sale.SaleDetail;
 import com.spring.miniposbackend.modelview.dashboard.BranchSummaryChart;
 import com.spring.miniposbackend.modelview.dashboard.BranchSummaryDetail;
+import com.spring.miniposbackend.modelview.dashboard.ChannelReceipt;
 import com.spring.miniposbackend.modelview.dashboard.ItemList;
 import com.spring.miniposbackend.modelview.dashboard.ItemSummaryChart;
 import com.spring.miniposbackend.modelview.dashboard.ItemSummaryDetail;
@@ -68,6 +65,19 @@ public class SaleDashboardService {
 	@Value("${file.path.image.branch}")
 	private String imagePath;
 
+	public List<ChannelReceipt> channelReceipt(Integer branchId,@DateTimeFormat(pattern = "yyyy-MM-dd") Date  startDate) {
+		MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource();
+		mapSqlParameterSource.addValue("value_date", startDate);
+		mapSqlParameterSource.addValue("branch_id", userProfile.getProfile().getBranch().getId());
+		return jdbc.query("select count(s.id) receipt,sum(discount_amount)+sum(discount_sale_detail) discount,sum(sub_total) total,case when p.name_kh IS NULL then concat('Cash ',cu.code) else p.name_kh end name_kh from sales s "
+				+ "inner join branch_currencies bc on bc.id=s.cur_id inner join currencies cu on cu.id=bc.currency_id left join "
+				+ "payment_channels p on s.payment_channel_id=p.id where s.reverse=false and date_trunc('day',s.value_date)=:value_date "
+				+ "and s.branch_id=:branch_id group by p.name_kh,cu.code",
+				mapSqlParameterSource,
+				(rs, rowNum) -> new ChannelReceipt(rs.getString("name_kh"),rs.getInt("receipt"),
+						rs.getDouble("total"), rs.getDouble("discount")));
+	}
+	
 	public List<BranchSummaryDetail> branchSummaryByCorpateId(Integer corporateId, Date startDate, Date startWeek,
 			Date endDate) {
 		if (userProfile.getProfile().getCorporate().getId() != corporateId) {
@@ -204,6 +214,29 @@ public class SaleDashboardService {
 	}
 
 	public List<ItemSummaryDetail> itemSummaryByBranchId(Integer branchId, Date startDate, Date startWeek,
+			Date endDate) {
+
+		return branchRepository.findById(branchId).map((branch) -> {
+			if (userProfile.getProfile().getCorporate().getId() != branch.getCorporate().getId()) {
+				throw new UnauthorizedException("Branch is unauthorized");
+			}
+			MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource();
+			mapSqlParameterSource.addValue("startDate", startDate);
+			mapSqlParameterSource.addValue("endDate", endDate);
+			mapSqlParameterSource.addValue("startWeek", startWeek);
+			mapSqlParameterSource.addValue("branchId", branchId);
+
+			return jdbc.query("select * from itemsummarybybranchid(:branchId,:startDate,:startWeek,:endDate)",
+					mapSqlParameterSource,
+					(rs, rowNum) -> new ItemSummaryDetail(rs.getLong("item_id"), rs.getString("item_name"),
+							rs.getString("item_name_kh"), rs.getInt("monthly_sale"), rs.getInt("weekly_sale"),
+							rs.getInt("daily_sale"), rs.getDouble("monthly_sale_amount"),
+							rs.getDouble("weekly_sale_amount"), rs.getDouble("daily_sale_amount"),rs.getDouble("monthly_discount_amount"),
+							rs.getDouble("weekly_discount_amount"), rs.getDouble("daily_discount_amount")));
+		}).orElseThrow(() -> new ResourceNotFoundException("User does not exist"));
+
+	}
+	public List<ItemSummaryDetail> channelummaryByBranchId(Integer branchId, Date startDate, Date startWeek,
 			Date endDate) {
 
 		return branchRepository.findById(branchId).map((branch) -> {

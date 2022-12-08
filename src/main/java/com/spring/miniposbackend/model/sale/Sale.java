@@ -106,6 +106,10 @@ public class Sale extends AuditModel {
 	@Column(name = "change", nullable = false,  precision = 10, scale = 2)
 	@ColumnDefault("0")
 	private Double change;
+	
+	@Column(name = "service_charge", nullable = true,  precision = 10, scale = 2)
+	@ColumnDefault("0")
+	private Double serviceCharge;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "cur_id", nullable = false)

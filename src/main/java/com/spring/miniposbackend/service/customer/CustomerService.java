@@ -1,10 +1,9 @@
 package com.spring.miniposbackend.service.customer;
-
-import com.spring.miniposbackend.model.admin.Branch;
+import com.spring.miniposbackend.model.admin.Sex;
 import com.spring.miniposbackend.model.customer.Customer;
-import com.spring.miniposbackend.model.customer.CustomerPoint;
+import com.spring.miniposbackend.modelview.CustomerRequest;
 import com.spring.miniposbackend.repository.admin.BranchRepository;
-import com.spring.miniposbackend.repository.customer.CustomerPointRepository;
+import com.spring.miniposbackend.repository.admin.SexRepository;
 import com.spring.miniposbackend.repository.customer.CustomerRepository;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.spring.miniposbackend.exception.BadRequestException;
+import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,19 +22,24 @@ public class CustomerService {
 
 	@Autowired
 	private CustomerRepository customerRepository;
+	@Autowired
+	private SexRepository sexRepository;
 	
 	@Autowired
 	private BranchRepository branchRepository;
 	
-	@Autowired
-	private CustomerPointRepository customerPointRepository;
 	
 	@Autowired
 	private UserProfileUtil userProfile;
 
 	@Transactional(readOnly = true)
-	public List<Customer> shows(final int count) {
-		return this.customerRepository.findAll().stream().limit(count).collect(Collectors.toList());
+	public List<Customer> shows() {
+		return this.customerRepository.findAll().stream().limit(20).collect(Collectors.toList());
+	}
+	
+	@Transactional(readOnly = true)
+	public List<Customer> showsByQuery(String query) {
+		return this.customerRepository.findByCustomerQuery(query,userProfile.getProfile().getBranch().getId()).stream().limit(20).collect(Collectors.toList());
 	}
 
 	@Transactional(readOnly = true)
@@ -70,55 +75,44 @@ public class CustomerService {
 		}).orElseThrow(() -> new ResourceNotFoundException("Customer not found with id " + id));
 	}
 	@Transactional
-	public Customer create(Customer customer) {
+	public Customer create(CustomerRequest customer) {
 
 		try {
+			Sex sex = sexRepository.findById(customer.getSexId()).orElseThrow(() -> new ResourceNotFoundException("Sex not found"));
 			Customer newCustomer = new Customer();
-			newCustomer.setCorporate(userProfile.getProfile().getCorporate());
 			newCustomer.setEnable(true);
 			newCustomer.setName(customer.getName());
 			newCustomer.setNameKh(customer.getNameKh());
-			newCustomer.setPointBranch(customer.isPointBranch());
 			newCustomer.setPrimaryPhone(customer.getPrimaryPhone());
 			newCustomer.setSecondaryPhone(customer.getSecondaryPhone());
-			newCustomer.setSex(customer.getSex());
-			
-			int point = 0;
-			if(customer.isPointBranch()) {
-				point  = 0;
-				newCustomer.setPointBalance(point);
-				CustomerPoint customerPoint = new CustomerPoint();
-				Branch branch = branchRepository.findById(customer.getBranchId()).orElseThrow(() -> new ResourceNotFoundException("branch not found"));
-				customerPoint.setBranch(branch);
-				customerPoint.setCustomer(newCustomer);
-				customerPoint.setEnable(true);
-				customerPoint.setPointBalance(customer.getPointBalance());
-				customerPointRepository.save(customerPoint);
-				return newCustomer;
-				
-				
-			}
-			else {
-				point = customer.getPointBalance();
-				newCustomer.setPointBalance(point);
+			newCustomer.setSex(sex);
+			newCustomer.setDiscount(customer.getDiscount());
+			newCustomer.setBranch(userProfile.getProfile().getBranch());
+			newCustomer.setPointBranch(true);
+			newCustomer.setPointBalance(0);
 				return customerRepository.save(newCustomer);
-			}
-	
 		
 		} catch (Exception e) {
+			System.out.println(e.getMessage());
 			throw new BadRequestException(e.getMessage());
 		}
 
 	}
-	public Customer update(Long customerId,Customer customer) {
+	public Customer update(Long customerId,CustomerRequest customer) {
 
 		try {
 			Customer newCustomer = customerRepository.findById(customerId).orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
+			if(userProfile.getProfile().getBranch().getId() != newCustomer.getBranch().getId())
+			{
+				throw new ConflictException("Customer diff branches", "09");
+			}
+			Sex sex = sexRepository.findById(customer.getSexId()).orElseThrow(() -> new ResourceNotFoundException("Sex not found"));
 			newCustomer.setName(customer.getName());
 			newCustomer.setNameKh(customer.getNameKh());
 			newCustomer.setPrimaryPhone(customer.getPrimaryPhone());
 			newCustomer.setSecondaryPhone(customer.getSecondaryPhone());
-			newCustomer.setSex(customer.getSex());
+			newCustomer.setSex(sex);
+			newCustomer.setDiscount(customer.getDiscount());
 			return customerRepository.save(newCustomer);
 		} catch (Exception e) {
 			throw new BadRequestException(e.getMessage());

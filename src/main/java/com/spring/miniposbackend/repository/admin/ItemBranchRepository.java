@@ -26,4 +26,9 @@ public interface ItemBranchRepository extends  JpaRepository<ItemBranch, Long>{
 	@Query(value = "select * from item_branches ib where ?1 = any (ib.add_on)", nativeQuery = true)
 	List<ItemBranch> findAnyAddOn(Long addOnId);
 	
+	@Query(value = "select ib from ItemBranch ib where ib.item.code = ?1")
+	  Optional<ItemBranch> findByitemCode(String code);
+	  @Query(value = "select ib from ItemBranch ib where ib.item.code = ?1")
+	  Optional<ItemBranch> findByitemCode(List<String> arrStrr);
+	
 }

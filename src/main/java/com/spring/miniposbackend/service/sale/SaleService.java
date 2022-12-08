@@ -106,7 +106,8 @@ public class SaleService {
 
 	@Transactional
 	public List create(Optional<Long> invoiceId, Optional<Integer> seatId, Optional<Integer> channelId, Double discount,
-			Double cashIn, Double change, Integer currencyId, Integer userId, boolean cancel, Optional<String> remark) {
+			Double cashIn, Double change, Integer currencyId, Integer userId, boolean cancel, Optional<String> remark,
+			Optional<Double> serviceCharge) {
 		entityManager.clear();
 		User user = userProfile.getProfile().getUser();
 		Branch branch = userProfile.getProfile().getBranch();
@@ -168,12 +169,15 @@ public class SaleService {
 		sale.setCashIn(cashIn);
 		sale.setChange(change);
 		sale.setReverse(cancel);
-		if(saleTemps.get(0).getBillNumber() == 0) {
+		if (serviceCharge.isPresent())
+			sale.setServiceCharge(serviceCharge.get());
+		else
+			sale.setServiceCharge(0.00);
+		if (saleTemps.get(0).getBillNumber() == 0) {
 			Long receiptNum = receiptService.getBillNumberByBranchId(userProfile.getProfile().getBranch().getId());
 			sale.setBillNumber(receiptNum);
-		}
-		else
-		sale.setBillNumber(saleTemps.get(0).getBillNumber());
+		} else
+			sale.setBillNumber(saleTemps.get(0).getBillNumber());
 		if (remark.isPresent())
 			sale.setRemark(remark.get());
 		sale.setBranchCurrency(branchCurrency);

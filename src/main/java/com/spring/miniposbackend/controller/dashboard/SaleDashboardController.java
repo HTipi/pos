@@ -76,6 +76,13 @@ public class SaleDashboardController {
 		}
 		
 	}
+	@GetMapping("/channel/receipt")
+	@PreAuthorize("hasAnyRole('SALE')")
+	public SuccessResponse channelReceipt(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from) {
+		
+		return new SuccessResponse("00", "fetch report", branchDashboardService
+				.channelReceipt(userProfile.getProfile().getBranch().getId(), from));
+	}
 	@GetMapping("/branch-chart/summary")
 	@PreAuthorize("hasAnyRole('OWNER')")
 	public SuccessResponse branchSummaryChart(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
@@ -83,10 +90,9 @@ public class SaleDashboardController {
 		return new SuccessResponse("00", "fetch report", branchDashboardService
 				.branchChartByCopId(userProfile.getProfile().getCorporate().getId(), from, to));
 	}
-	
 	@GetMapping("/item/summary")
 	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
-	public SuccessResponse itemSummaryDetail(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> from,
+	public SuccessResponse chhanelSummaryDetail(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> from,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> to,@RequestParam Optional<Integer> branchId) {
 		if (!from.isPresent())
 			getDate();
@@ -196,12 +202,17 @@ public class SaleDashboardController {
 	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
 	@GetMapping(value = "/download/saleitemreport")
 	ResponseEntity<Void> downloadTransactionReport(@RequestParam(value = "exportType") String exportType,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
-				@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,@RequestParam(value = "branchId") Integer branchId,
+				@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,@RequestParam(value = "branchId") Integer branchId,@RequestParam Optional<Boolean> detail,
 	                                                 HttpServletResponse response) throws IOException,JRException, SQLException
 	  {
 		try {
+			if(detail.isPresent()) {
+				branchDashboardService.downloadTransactionReport(exportType, response, "sale_matrix",from,to,branchId);
+			}
+			else {
+				branchDashboardService.downloadTransactionReport(exportType, response, "sale_item",from,to,branchId);	
+			}
 			
-			branchDashboardService.downloadTransactionReport(exportType, response, "sale_item",from,to,branchId);
 			return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			System.out.println(e.getMessage());

@@ -22,6 +22,7 @@ import com.spring.miniposbackend.model.admin.Branch;
 import com.spring.miniposbackend.model.admin.BranchCurrency;
 import com.spring.miniposbackend.model.admin.PaymentChannel;
 import com.spring.miniposbackend.model.admin.User;
+import com.spring.miniposbackend.model.customer.Customer;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -93,6 +94,11 @@ public class Sale extends AuditModel {
 	@JoinColumn(name = "branch_id", nullable = false)
 	@JsonIgnore
 	private Branch branch;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "customer_id", nullable = true)
+	@JsonIgnore
+	private Customer customer;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)

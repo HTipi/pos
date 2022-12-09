@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.model.sale.SaleDetail;
+import com.spring.miniposbackend.modelview.SpitBillItems;
 import com.spring.miniposbackend.service.sale.SaleService;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
@@ -48,9 +49,11 @@ public class SaleController {
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse create(@RequestParam Optional<Long> invoiceId, @RequestParam Optional<Integer> seatId, @RequestParam Optional<Integer> channelId,
 			@RequestParam Double discount, @RequestParam Double cashIn, @RequestParam Double change,
-			@RequestParam Integer currencyId,@RequestParam Integer userId,@RequestParam Optional<Boolean> cancel,@RequestParam Optional<String> remark,@RequestParam Optional<Double> serviceCharge) {
+			@RequestParam Integer currencyId,@RequestParam Integer userId,@RequestParam Optional<Boolean> cancel,@RequestParam Optional<String> remark,@RequestParam Optional<Double> serviceCharge,
+			@RequestParam Optional<Long> customerId,
+			@RequestBody Optional<SpitBillItems> spitBillItems) {
 		boolean check = cancel.isPresent() ? cancel.get() : false;
-		List list = saleService.create(invoiceId, seatId,channelId, discount, cashIn, change, currencyId,userId,check,remark,serviceCharge);
+		List list = saleService.create(invoiceId, seatId,channelId, discount, cashIn, change, currencyId,userId,check,remark,serviceCharge,spitBillItems,customerId);
 		Object obj = list.get(0);
 		if(obj instanceof SaleDetail)
 		{
@@ -58,7 +61,6 @@ public class SaleController {
 		}
 		return new SuccessResponse("0", "make Payment", list);
 	}
-
 	@PatchMapping("reverse/{saleId}")
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse reverseSale(@PathVariable Long saleId) {

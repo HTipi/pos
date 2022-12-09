@@ -1,11 +1,8 @@
 package com.spring.miniposbackend.model.admin;
 
-import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.ColumnDefault;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -28,8 +25,9 @@ public class ItemBranchPromotion {
 	}
 
 	@JsonIgnore
-	public Promotion getPromotion() {
-		return itemBranchPromotionIdentity.getPromotion();
+	public BranchPromotion getBranchPromotion() {
+		return itemBranchPromotionIdentity.getBranchPromotion();
 	}
+	
 
 }

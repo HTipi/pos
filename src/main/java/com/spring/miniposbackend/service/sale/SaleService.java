@@ -24,11 +24,13 @@ import com.spring.miniposbackend.model.sale.Invoice;
 import com.spring.miniposbackend.model.sale.Sale;
 import com.spring.miniposbackend.model.sale.SaleDetail;
 import com.spring.miniposbackend.model.sale.SaleTemporary;
+import com.spring.miniposbackend.modelview.SpitBillItems;
 import com.spring.miniposbackend.repository.admin.BranchCurrencyRepository;
 import com.spring.miniposbackend.repository.admin.BranchSettingRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
 import com.spring.miniposbackend.repository.admin.PaymentChannelRepository;
 import com.spring.miniposbackend.repository.admin.SeatRepository;
+import com.spring.miniposbackend.repository.customer.CustomerRepository;
 import com.spring.miniposbackend.repository.sale.InvoiceRepository;
 import com.spring.miniposbackend.repository.sale.SaleDetailRepository;
 import com.spring.miniposbackend.repository.sale.SaleRepository;
@@ -68,6 +70,8 @@ public class SaleService {
 	private BranchSettingRepository branchSettingRepository;
 	@Autowired
 	private BranchCurrencyRepository branchCurrencyRepository;
+	@Autowired
+	private CustomerRepository customerRepository;
 
 	public List<Sale> showSaleByUser(@DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> date, boolean byUser,
 			Optional<Integer> paymentId) {
@@ -107,7 +111,7 @@ public class SaleService {
 	@Transactional
 	public List create(Optional<Long> invoiceId, Optional<Integer> seatId, Optional<Integer> channelId, Double discount,
 			Double cashIn, Double change, Integer currencyId, Integer userId, boolean cancel, Optional<String> remark,
-			Optional<Double> serviceCharge) {
+			Optional<Double> serviceCharge,Optional<SpitBillItems> spitBillItems,Optional<Long> customerId) {
 		entityManager.clear();
 		User user = userProfile.getProfile().getUser();
 		Branch branch = userProfile.getProfile().getBranch();
@@ -141,7 +145,20 @@ public class SaleService {
 				throw new UnauthorizedException("Transaction is unauthorized");
 			}
 			seatName = seat.getName();
-			saleTemps = saleTemporaryRepository.findBySeatId(seatId.get());
+			if(spitBillItems.isPresent())
+			{
+				if(spitBillItems.get().getSaleTempIds().size() > 0)
+				{
+					saleTemps = saleTemporaryRepository.findSplitBySeatId(seatId.get(),spitBillItems.get().getSaleTempIds());
+				}
+				else {
+					throw new ConflictException("No Items to Split Bill");
+				}
+			}
+			else
+			{
+				saleTemps = saleTemporaryRepository.findBySeatId(seatId.get());	
+			}
 			if (saleTemps.size() == 0) {
 				throw new ConflictException("វិក័យប័ត្រនេះបានគិតរួចហើយ", "16");
 			} else if (saleTemps.size() > 0 && !saleTemps.get(0).getUserEdit().getId().equals(userId)) {
@@ -183,6 +200,10 @@ public class SaleService {
 		sale.setBranchCurrency(branchCurrency);
 		if (channelId.isPresent()) {
 			sale.setPaymentChannel(paymentChannelRepository.findById(channelId.get()).orElse(null));
+		}
+		if(customerId.isPresent())
+		{
+			sale.setCustomer(customerRepository.findById(customerId.get()).orElse(null));
 		}
 		Sale saleResult = saleRepository.save(sale);
 		saleTemps.forEach((saleTemp) -> {

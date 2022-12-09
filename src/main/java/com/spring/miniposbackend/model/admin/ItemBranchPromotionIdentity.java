@@ -25,18 +25,18 @@ public class ItemBranchPromotionIdentity implements Serializable{
 	private ItemBranch itemBranch;
 
 	@ManyToOne
-	@JoinColumn(name = "promotion_id", nullable = false)
+	@JoinColumn(name = "branch_promotion_id", nullable = false)
 	@JsonIgnore
-	private Promotion promotion;
+	private BranchPromotion branchPromotion;
 
 	public ItemBranchPromotionIdentity() {
 		itemBranch = null;
-		promotion = null;
+		branchPromotion = null;
 	}
 
-	public ItemBranchPromotionIdentity(ItemBranch itemBranch, Promotion promotion) {
+	public ItemBranchPromotionIdentity(ItemBranch itemBranch, BranchPromotion branchPromotion) {
 		this.itemBranch = itemBranch;
-		this.promotion = promotion;
+		this.branchPromotion = branchPromotion;
 	}
 	
 	@Override
@@ -45,11 +45,11 @@ public class ItemBranchPromotionIdentity implements Serializable{
         if (!(obj instanceof ItemBranchPromotionIdentity)) return false;
         ItemBranchPromotionIdentity that = (ItemBranchPromotionIdentity) obj;
         return Objects.equals(getItemBranch(), that.getItemBranch()) &&
-                Objects.equals(getPromotion(), that.getPromotion());
+                Objects.equals(getBranchPromotion(), that.getBranchPromotion());
     }
  
     @Override
     public int hashCode() {
-        return Objects.hash(getItemBranch(), getPromotion());
+        return Objects.hash(getItemBranch(), getBranchPromotion());
     }
 }

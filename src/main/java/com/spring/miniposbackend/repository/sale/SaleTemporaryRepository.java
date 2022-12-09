@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.spring.miniposbackend.model.sale.SaleTemporary;
@@ -25,6 +26,9 @@ public interface SaleTemporaryRepository extends JpaRepository<SaleTemporary, Lo
 	
 	@Query(value = "select s from SaleTemporary s where s.seat.id=?1 and s.parentSaleTemporary is null and s.invoice is null") // update
 	List<SaleTemporary> findBySeatId(Integer seatId);
+	
+	@Query(value = "select s from SaleTemporary s where s.seat.id=:seatId and s.parentSaleTemporary is null and s.invoice is null and s.id in (:items)") // update
+	List<SaleTemporary> findSplitBySeatId(@Param("seatId") Integer seatId,@Param("items") List<Long> items);
 	
 	@Query(value = "select s from SaleTemporary s where s.seat.id=?1 and s.parentSaleTemporary is null") // update
 	List<SaleTemporary> findBySeatForPrintId(Integer seatId);

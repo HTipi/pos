@@ -39,22 +39,13 @@ public class Promotion extends AuditModel{
 	@Column(name = "name", nullable = false,length = 128)
     private String name;
 	
-	@Column(name = "start_date", nullable = false)
-	private Date startDate;
-	
-	@Column(name = "_date", nullable = false)
-	private Date endDate;
+	@Column(name = "name_kh", nullable = false,length = 128)
+    private String nameKh;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "corporate_id",nullable = false)
     @JsonIgnore
     private Corporate corporate;
-	
-	@Column(name = "discount", nullable = false)
-	@Min(0)
-	@Max(100)
-	@ColumnDefault("0")
-    private Short discount;
 	
 	@Column(name = "enable", nullable = false)
     @ColumnDefault("true")

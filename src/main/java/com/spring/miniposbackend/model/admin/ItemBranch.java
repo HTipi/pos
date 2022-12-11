@@ -11,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Max;
@@ -97,6 +98,10 @@ public class ItemBranch extends AuditModel {
 	@Column(name = "inven_qty", nullable = true)
 	@ColumnDefault("1")
 	private Short invenQty;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "itemBranchPromotionIdentity.itemBranch", fetch = FetchType.LAZY)
+	List<ItemBranchPromotion> itemBranchPromotions;
 
 	public Long getId() {
 		return id;
@@ -189,6 +194,10 @@ public class ItemBranch extends AuditModel {
 	public boolean getVisible() {
 		
 		return item.getItemType().isVisible();
+	}
+	public List<ItemBranchPromotion> getItemBranchPromotion(){
+		
+		return itemBranchPromotions;
 	}
 
 }

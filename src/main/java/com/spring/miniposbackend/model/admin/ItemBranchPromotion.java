@@ -29,5 +29,18 @@ public class ItemBranchPromotion {
 		return itemBranchPromotionIdentity.getBranchPromotion();
 	}
 	
-
+	public Integer getBranchPromotionId() {
+		return itemBranchPromotionIdentity.getBranchPromotion().getId();
+	}
+	
+	public String getPromotionCode() {
+		return itemBranchPromotionIdentity.getBranchPromotion().getCode();
+	}
+	
+	public Short getPromotionDiscount() {
+		return itemBranchPromotionIdentity.getBranchPromotion().getDiscount();
+	}
+	public String getPromotionName() {
+		return itemBranchPromotionIdentity.getBranchPromotion().getPromotion().getName();
+	}
 }

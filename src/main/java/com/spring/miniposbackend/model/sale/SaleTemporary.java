@@ -23,6 +23,7 @@ import com.spring.miniposbackend.model.admin.User;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Type;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.admin.BranchCurrency;
@@ -117,6 +118,11 @@ public class SaleTemporary extends AuditModel {
 	@JoinColumn(name = "payment_channel_id", nullable = true)
 	@JsonIgnore
 	private PaymentChannel paymentChannel;
+	
+	
+	@Type(type = "list-array")
+	@Column(name = "add_promo", columnDefinition = "int[]")
+	private List<Integer> addPromo;
 
 	public List<Long> getAddOnItems() {
 		return itemBranch.getAddOnItems();

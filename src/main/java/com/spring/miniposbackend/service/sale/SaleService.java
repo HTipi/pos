@@ -17,21 +17,26 @@ import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.model.admin.Branch;
 import com.spring.miniposbackend.model.admin.BranchCurrency;
+import com.spring.miniposbackend.model.admin.BranchPromotion;
 import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.model.admin.Seat;
 import com.spring.miniposbackend.model.admin.User;
 import com.spring.miniposbackend.model.sale.Invoice;
 import com.spring.miniposbackend.model.sale.Sale;
 import com.spring.miniposbackend.model.sale.SaleDetail;
+import com.spring.miniposbackend.model.sale.SaleDetailPromotion;
+import com.spring.miniposbackend.model.sale.SaleDetailPromotionIdentity;
 import com.spring.miniposbackend.model.sale.SaleTemporary;
 import com.spring.miniposbackend.modelview.SpitBillItems;
 import com.spring.miniposbackend.repository.admin.BranchCurrencyRepository;
+import com.spring.miniposbackend.repository.admin.BranchPromotionRepository;
 import com.spring.miniposbackend.repository.admin.BranchSettingRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
 import com.spring.miniposbackend.repository.admin.PaymentChannelRepository;
 import com.spring.miniposbackend.repository.admin.SeatRepository;
 import com.spring.miniposbackend.repository.customer.CustomerRepository;
 import com.spring.miniposbackend.repository.sale.InvoiceRepository;
+import com.spring.miniposbackend.repository.sale.SaleDetailPromotionRepository;
 import com.spring.miniposbackend.repository.sale.SaleDetailRepository;
 import com.spring.miniposbackend.repository.sale.SaleRepository;
 import com.spring.miniposbackend.repository.sale.SaleTemporaryRepository;
@@ -72,6 +77,10 @@ public class SaleService {
 	private BranchCurrencyRepository branchCurrencyRepository;
 	@Autowired
 	private CustomerRepository customerRepository;
+	@Autowired
+	private BranchPromotionRepository branchPromotionRepository;
+	@Autowired
+	private SaleDetailPromotionRepository saleDetailPromotionRepository;
 
 	public List<Sale> showSaleByUser(@DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> date, boolean byUser,
 			Optional<Integer> paymentId) {
@@ -376,6 +385,19 @@ public class SaleService {
 		if (parentSaleDetail.isPresent()) {
 			saleDeail.setParentSaleDetail(parentSaleDetail.get());
 		}
-		return saleDetailRepository.save(saleDeail);
+		SaleDetail details = saleDetailRepository.save(saleDeail);
+		if(saleTemporary.getAddPromo().size() > 0)
+		{
+			List<Integer> list = saleTemporary.getAddPromo();
+			SaleDetailPromotion salePromo = null;
+			for (int i = 0; i < list.size(); i++) {
+				salePromo = new SaleDetailPromotion();
+				BranchPromotion branchPro = branchPromotionRepository.findById(list.get(i)).orElseThrow(() -> new ResourceNotFoundException("Promotion does not exist"));
+				salePromo.setSaleDetailPromotionIdentity(new SaleDetailPromotionIdentity(details, branchPro));
+				salePromo.setDiscount(BigDecimal.valueOf(saleTemporary.getDiscountTotal()));
+				saleDetailPromotionRepository.save(salePromo);
+				}
+		}
+		return details;
 	}
 }

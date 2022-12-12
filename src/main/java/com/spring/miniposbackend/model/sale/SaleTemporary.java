@@ -1,6 +1,7 @@
 package com.spring.miniposbackend.model.sale;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import com.spring.miniposbackend.model.AuditModel;
 import com.spring.miniposbackend.model.admin.User;
+import com.spring.miniposbackend.modelview.dashboard.ItemPromotion;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
@@ -28,6 +30,7 @@ import org.hibernate.annotations.Type;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.admin.BranchCurrency;
 import com.spring.miniposbackend.model.admin.ItemBranch;
+import com.spring.miniposbackend.model.admin.ItemBranchPromotion;
 import com.spring.miniposbackend.model.admin.PaymentChannel;
 import com.spring.miniposbackend.model.admin.Seat;
 
@@ -58,10 +61,10 @@ public class SaleTemporary extends AuditModel {
 	@Column(name = "discount_amount", nullable = false, precision = 10, scale = 2)
 	@ColumnDefault("0")
 	private BigDecimal discountAmount;
-	
+
 	@Column(name = "bill_number", nullable = true)
 	@ColumnDefault("0")
-    private Long billNumber;
+	private Long billNumber;
 
 	@Column(name = "discount_percentage", nullable = false)
 	@Min(0)
@@ -118,8 +121,7 @@ public class SaleTemporary extends AuditModel {
 	@JoinColumn(name = "payment_channel_id", nullable = true)
 	@JsonIgnore
 	private PaymentChannel paymentChannel;
-	
-	
+
 	@Type(type = "list-array")
 	@Column(name = "add_promo", columnDefinition = "int[]")
 	private List<Integer> addPromo;
@@ -127,7 +129,7 @@ public class SaleTemporary extends AuditModel {
 	public List<Long> getAddOnItems() {
 		return itemBranch.getAddOnItems();
 	}
-	
+
 	public String getItemCode() {
 		return itemBranch.getCode();
 	}
@@ -170,8 +172,9 @@ public class SaleTemporary extends AuditModel {
 		}
 		return invoice.getId();
 	}
+
 	public boolean getStock() {
-		
+
 		return itemBranch.getItem().isStock();
 	}
 
@@ -183,6 +186,29 @@ public class SaleTemporary extends AuditModel {
 		if (paymentChannel == null)
 			return 0;
 		return paymentChannel.getId();
+	}
+
+	public List<ItemPromotion> getItemPromotion() {
+		List<ItemPromotion> items = new ArrayList<ItemPromotion>();
+		ItemPromotion pro = null;
+		List<Integer> proList = addPromo == null ? new ArrayList<Integer>() : addPromo;
+		List<ItemBranchPromotion> itemPro = itemBranch.getItemBranchPromotions();
+		for (int i = 0; i < proList.size(); i++) {
+			for (int j = 0; j < itemPro.size(); j++) {
+
+				if (proList.get(i) == itemBranch.getItemBranchPromotions().get(j).getBranchPromotionId()) {
+					pro = new ItemPromotion();
+					pro.setBranchPromotionId(itemPro.get(j).getBranchPromotionId());
+					pro.setPromotionCode(itemPro.get(j).getPromotionCode());
+					pro.setPromotionDiscount(itemPro.get(j).getPromotionDiscount());
+					pro.setPromotionName(itemPro.get(j).getPromotionName());
+					items.add(pro);
+					break;
+				}
+			}
+
+		}
+		return items;
 	}
 
 	private Integer getDecimalPlace() {

@@ -1,5 +1,6 @@
 package com.spring.miniposbackend.modelview;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;
@@ -15,5 +16,6 @@ public class SaleRequest {
 	Double discountAmount;
 	Double price = Double.valueOf(0);
 	List<SaleRequest> addOns;
+	List<Integer> addPromo = new ArrayList<Integer>();
 
 }

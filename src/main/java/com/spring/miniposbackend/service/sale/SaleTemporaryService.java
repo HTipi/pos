@@ -511,6 +511,7 @@ public class SaleTemporaryService {
 				saleTmp.setDiscountAmount(BigDecimal.valueOf(discountAmount));
 				saleTmp.setPrice(BigDecimal.valueOf(price));
 				saleTmp.setUserEdit(user);
+				saleTmp.setAddPromo(requestItem.getAddPromo());
 				if (invoice.isPresent()) {
 					saleTmp.setInvoice(invoice.get());
 				} else if (seat.isPresent()) {
@@ -543,6 +544,7 @@ public class SaleTemporaryService {
 				saleTmp.setBillNumber((long)0);
 				saleTmp.setUser(user);
 				saleTmp.setUserEdit(user);
+				saleTmp.setAddPromo(requestItem.getAddPromo());
 				if(channelId.isPresent())
 				{
 					saleTmp.setPaymentChannel(channelId.get());

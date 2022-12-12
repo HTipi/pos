@@ -19,8 +19,8 @@
 	<parameter name="logo" class="java.io.InputStream"/>
 	<parameter name="branchName" class="java.lang.String"/>
 	<queryString language="SQL">
-		<![CDATA[select i.name_kh,sum(quantity) quantities,sum(d.sub_total) total,(select min(receipt_number) receipt_number from sales where date_trunc('day',value_date) between $P{start} and $P{end} and branch_id=$P{branchId} and reverse=false) min_receipt,
-(select max(receipt_number) receipt_number from sales where date_trunc('day',value_date) between $P{start} and $P{end} and branch_id=$P{branchId} and reverse=false) max_receipt,
+		<![CDATA[select i.name_kh,sum(quantity) quantities,sum(d.sub_total) total,(select min(receipt_number::INTEGER) receipt_number from sales where date_trunc('day',value_date) between $P{start} and $P{end} and branch_id=$P{branchId} and reverse=false) min_receipt,
+(select max(receipt_number::INTEGER) receipt_number from sales where date_trunc('day',value_date) between $P{start} and $P{end} and branch_id=$P{branchId} and reverse=false) max_receipt,
 date_trunc('day',d.value_date) value_date,
 (select sum(discount_amount+discount_sale_detail) from sales inner join branches b on sales.branch_id=b.id where date_trunc('day',value_date) 
 	between $P{start} and $P{end} and b.id=$P{branchId} and sales.reverse=false) as discount_amount
@@ -44,11 +44,11 @@ group by i.name_kh,i.id,i.item_type_id,date_trunc('day',d.value_date) order by v
 		<property name="com.jaspersoft.studio.field.name" value="total"/>
 		<property name="com.jaspersoft.studio.field.label" value="total"/>
 	</field>
-	<field name="min_receipt" class="java.lang.String">
+	<field name="min_receipt" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="min_receipt"/>
 		<property name="com.jaspersoft.studio.field.label" value="min_receipt"/>
 	</field>
-	<field name="max_receipt" class="java.lang.String">
+	<field name="max_receipt" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="max_receipt"/>
 		<property name="com.jaspersoft.studio.field.label" value="max_receipt"/>
 	</field>

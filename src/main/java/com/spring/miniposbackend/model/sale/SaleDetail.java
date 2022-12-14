@@ -28,6 +28,7 @@ import com.spring.miniposbackend.model.admin.BranchPromotion;
 import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.model.admin.ItemBranchPromotion;
 import com.spring.miniposbackend.model.admin.User;
+import com.spring.miniposbackend.model.customer.Customer;
 import com.spring.miniposbackend.modelview.dashboard.ItemPromotion;
 
 import lombok.Getter;
@@ -109,6 +110,11 @@ public class SaleDetail extends AuditModel {
 	@OneToMany(fetch = FetchType.EAGER)
 	@JoinColumn(name = "parent_sale_id", nullable = true)
 	private List<SaleDetail> addOns;
+	
+	public Customer getCustomer() {
+		
+		return sale.getCustomer();
+	}
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "saleDetailPromotionIdentity.saleDetail", fetch = FetchType.LAZY)

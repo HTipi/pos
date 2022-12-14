@@ -20,6 +20,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import com.spring.miniposbackend.model.AuditModel;
 import com.spring.miniposbackend.model.admin.User;
+import com.spring.miniposbackend.model.customer.Customer;
 import com.spring.miniposbackend.modelview.dashboard.ItemPromotion;
 
 import org.hibernate.annotations.ColumnDefault;
@@ -121,6 +122,10 @@ public class SaleTemporary extends AuditModel {
 	@JoinColumn(name = "payment_channel_id", nullable = true)
 	@JsonIgnore
 	private PaymentChannel paymentChannel;
+	
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "customer_id", nullable = true)
+	private Customer customer;
 
 	@Type(type = "list-array")
 	@Column(name = "add_promo", columnDefinition = "int[]")
@@ -187,7 +192,6 @@ public class SaleTemporary extends AuditModel {
 			return 0;
 		return paymentChannel.getId();
 	}
-
 	public List<ItemPromotion> getItemPromotion() {
 		List<ItemPromotion> items = new ArrayList<ItemPromotion>();
 		ItemPromotion pro = null;

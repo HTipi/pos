@@ -1,6 +1,7 @@
 package com.spring.miniposbackend.model.sale;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -23,8 +24,11 @@ import org.hibernate.annotations.DynamicUpdate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.AuditModel;
 import com.spring.miniposbackend.model.admin.Branch;
+import com.spring.miniposbackend.model.admin.BranchPromotion;
 import com.spring.miniposbackend.model.admin.ItemBranch;
+import com.spring.miniposbackend.model.admin.ItemBranchPromotion;
 import com.spring.miniposbackend.model.admin.User;
+import com.spring.miniposbackend.modelview.dashboard.ItemPromotion;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -105,6 +109,10 @@ public class SaleDetail extends AuditModel {
 	@OneToMany(fetch = FetchType.EAGER)
 	@JoinColumn(name = "parent_sale_id", nullable = true)
 	private List<SaleDetail> addOns;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "saleDetailPromotionIdentity.saleDetail", fetch = FetchType.LAZY)
+	List<SaleDetailPromotion> saleDetailPromotions;
 
 	public String getItemTypeName() {
 		return itemBranch.getItemTypeName();
@@ -220,5 +228,19 @@ public class SaleDetail extends AuditModel {
 		if(sale.getServiceCharge() == null)
 			return (double) 0.00;
 		return sale.getServiceCharge();
+	}
+	public List<ItemPromotion> getItemPromotion() {
+		List<ItemPromotion> items = new ArrayList<ItemPromotion>();
+		ItemPromotion pro = null;	
+		for (int i = 0; i < saleDetailPromotions.size(); i++) {
+			BranchPromotion itemPro = saleDetailPromotions.get(i).getBranchPromotion();
+					pro = new ItemPromotion();
+					pro.setBranchPromotionId(itemPro.getId());
+					pro.setPromotionCode(itemPro.getCode());
+					pro.setPromotionDiscount(itemPro.getDiscount());
+					pro.setPromotionName(itemPro.getPromotion().getName());
+					items.add(pro);
+		}
+		return items;
 	}
 }

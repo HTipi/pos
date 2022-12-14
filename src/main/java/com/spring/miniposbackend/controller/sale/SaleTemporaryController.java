@@ -67,9 +67,9 @@ public class SaleTemporaryController {
 			@RequestParam(name = "invoice-id") Optional<Long> invoiceId,
 			@RequestParam(name = "seat-id") Optional<Integer> seatId,
 			@RequestParam(name = "user-id") Integer userId,
-			@RequestParam(name = "channel-id") Optional<Integer> channelId) {
+			@RequestParam(name = "channel-id") Optional<Integer> channelId,@RequestParam(name = "customer-id") Optional<Long> customerId) {
 
-		return new SuccessResponse("00", "add SaleTmp", saleService.addItems(requestItem, seatId, invoiceId,userId,channelId));
+		return new SuccessResponse("00", "add SaleTmp", saleService.addItems(requestItem, seatId, invoiceId,userId,channelId,customerId));
 	}
 	@PostMapping("change-seat")
 	@PreAuthorize("hasAnyRole('SALE')")
@@ -91,15 +91,15 @@ public class SaleTemporaryController {
 
 	@PatchMapping("print")
 	@PreAuthorize("hasAnyRole('SALE')")
-	public SuccessResponse printItem(@RequestParam(name = "seatId") Optional<Integer> seatId,@RequestParam(name = "invoiceId") Optional<Long> invoiceId) {
-
+	public SuccessResponse printItem(@RequestParam(name = "seatId") Optional<Integer> seatId,@RequestParam(name = "invoiceId") Optional<Long> invoiceId,
+			@RequestParam(name = "customerId") Optional<Long> customerId) {
 		if(seatId.isPresent()) {
 			return new SuccessResponse("00", "Printed",
-					saleService.printBySeat(seatId.get(),invoiceId));
+					saleService.printBySeat(seatId.get(),invoiceId,customerId));
 		}
 		else {
 			return new SuccessResponse("00", "Printed",
-					saleService.printByUser(invoiceId));
+					saleService.printByUser(invoiceId,customerId));
 		}
 		
 	}
@@ -121,8 +121,9 @@ public class SaleTemporaryController {
 	@PostMapping("save-to-pending")
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse moveToPendingWithoutSaving(@RequestParam(name = "seatId") Optional<Integer> seatId,
-			@RequestParam String remark, @RequestBody List<SaleRequest> requestItems,@RequestParam(name = "userId") Integer userId,@RequestParam(name = "channel-id") Optional<Integer> channelId) {
-		Object obj = saleService.moveToPending(requestItems, seatId, remark,userId,channelId);
+			@RequestParam String remark, @RequestBody List<SaleRequest> requestItems,@RequestParam(name = "userId") Integer userId,@RequestParam(name = "channel-id") Optional<Integer> channelId,
+			@RequestParam(name = "customer-id") Optional<Long> customerId) {
+		Object obj = saleService.moveToPending(requestItems, seatId, remark,userId,channelId,customerId);
 		if(obj instanceof Invoice) {
 			return new SuccessResponse("00", "Sale has been move to pending", obj);
 		}

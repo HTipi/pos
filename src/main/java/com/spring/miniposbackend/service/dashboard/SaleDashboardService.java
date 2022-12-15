@@ -68,11 +68,24 @@ public class SaleDashboardService {
 	public List<ChannelReceipt> channelReceipt(Integer branchId,@DateTimeFormat(pattern = "yyyy-MM-dd") Date  startDate) {
 		MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource();
 		mapSqlParameterSource.addValue("value_date", startDate);
-		mapSqlParameterSource.addValue("branch_id", userProfile.getProfile().getBranch().getId());
+		mapSqlParameterSource.addValue("user_id", userProfile.getProfile().getUser().getId());
 		return jdbc.query("select count(s.id) receipt,sum(discount_amount)+sum(discount_sale_detail) discount,sum(sub_total) total,case when p.name_kh IS NULL then concat('Cash ',cu.code) else p.name_kh end name_kh from sales s "
 				+ "inner join branch_currencies bc on bc.id=s.cur_id inner join currencies cu on cu.id=bc.currency_id left join "
 				+ "payment_channels p on s.payment_channel_id=p.id where s.reverse=false and date_trunc('day',s.value_date)=:value_date "
-				+ "and s.branch_id=:branch_id group by p.name_kh,cu.code",
+				+ "and s.user_id=:user_id group by p.name_kh,cu.code",
+				mapSqlParameterSource,
+				(rs, rowNum) -> new ChannelReceipt(rs.getString("name_kh"),rs.getInt("receipt"),
+						rs.getDouble("total"), rs.getDouble("discount")));
+	}
+	
+	public List<ChannelReceipt> promotionReceipt(Integer branchId,@DateTimeFormat(pattern = "yyyy-MM-dd") Date  startDate) {
+		MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource();
+		mapSqlParameterSource.addValue("value_date", startDate);
+		mapSqlParameterSource.addValue("user_id", userProfile.getProfile().getUser().getId());
+		return jdbc.query("select count(s.id) receipt,sum(discount_amount)+sum(discount_sale_detail) discount,sum(sub_total) total,case when p.name_kh IS NULL then concat('Cash ',cu.code) else p.name_kh end name_kh from sales s "
+				+ "inner join branch_currencies bc on bc.id=s.cur_id inner join currencies cu on cu.id=bc.currency_id left join "
+				+ "payment_channels p on s.payment_channel_id=p.id where s.reverse=false and date_trunc('day',s.value_date)=:value_date "
+				+ "and s.user_id=:user_id group by p.name_kh,cu.code",
 				mapSqlParameterSource,
 				(rs, rowNum) -> new ChannelReceipt(rs.getString("name_kh"),rs.getInt("receipt"),
 						rs.getDouble("total"), rs.getDouble("discount")));

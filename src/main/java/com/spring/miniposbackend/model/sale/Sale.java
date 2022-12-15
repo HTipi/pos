@@ -95,9 +95,8 @@ public class Sale extends AuditModel {
 	@JsonIgnore
 	private Branch branch;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "customer_id", nullable = true)
-	@JsonIgnore
 	private Customer customer;
 
 	@ManyToOne(fetch = FetchType.LAZY)

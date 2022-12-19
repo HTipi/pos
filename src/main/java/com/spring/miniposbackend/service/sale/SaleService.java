@@ -386,7 +386,8 @@ public class SaleService {
 			saleDeail.setParentSaleDetail(parentSaleDetail.get());
 		}
 		SaleDetail details = saleDetailRepository.save(saleDeail);
-		if(saleTemporary.getAddPromo().size() > 0)
+		List<Integer> listPromo = saleTemporary.getAddPromo() == null ? new ArrayList<Integer>() : saleTemporary.getAddPromo();
+		if(listPromo.size() > 0)
 		{
 			List<Integer> list = saleTemporary.getAddPromo();
 			SaleDetailPromotion salePromo = null;

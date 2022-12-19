@@ -83,6 +83,13 @@ public class SaleDashboardController {
 		return new SuccessResponse("00", "fetch report", branchDashboardService
 				.channelReceipt(userProfile.getProfile().getBranch().getId(), from));
 	}
+	@GetMapping("/promotion/receipt")
+	@PreAuthorize("hasAnyRole('SALE')")
+	public SuccessResponse promotionReceipt(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from) {
+		
+		return new SuccessResponse("00", "fetch report", branchDashboardService
+				.promotionReceipt(userProfile.getProfile().getBranch().getId(), from));
+	}
 	@GetMapping("/branch-chart/summary")
 	@PreAuthorize("hasAnyRole('OWNER')")
 	public SuccessResponse branchSummaryChart(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,

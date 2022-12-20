@@ -195,9 +195,18 @@ public class SaleDetail extends AuditModel {
 	public String getCurrencyCode() {
 		return sale.getBranchCurrency().getCode();
 	}
-
+	
 	public double getGrandDiscountAmount() {
 		return sale.getDiscountAmount().doubleValue();
+	}
+	
+	public double getDiscountSaleDetail() {
+		return sale.getDiscountSaleDetail().doubleValue();
+	}
+	public double getDiscountPercentages() {
+		if(sale.getDiscountSaleDetail().doubleValue() <= 0)
+			return 0;
+		return sale.getDiscountAmount().doubleValue() / (sale.getSubTotal().doubleValue() - sale.getDiscountSaleDetail().doubleValue());
 	}
 
 	public double getGrandDiscountTotal() {

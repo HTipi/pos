@@ -204,7 +204,7 @@ public class SaleDetail extends AuditModel {
 		return sale.getDiscountSaleDetail().doubleValue();
 	}
 	public double getDiscountPercentages() {
-		if(sale.getDiscountSaleDetail().doubleValue() <= 0)
+		if(sale.getDiscountAmount().doubleValue() <= 0)
 			return 0;
 		return sale.getDiscountAmount().doubleValue() / (sale.getSubTotal().doubleValue() - sale.getDiscountSaleDetail().doubleValue());
 	}

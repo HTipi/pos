@@ -128,7 +128,7 @@ public class SaleTemporary extends AuditModel {
 	private Customer customer;
 
 	@Type(type = "list-array")
-	@Column(name = "add_promo", columnDefinition = "int[]")
+	@Column(name = "add_promo", columnDefinition = "int[]",nullable = true)
 	private List<Integer> addPromo;
 
 	public List<Long> getAddOnItems() {

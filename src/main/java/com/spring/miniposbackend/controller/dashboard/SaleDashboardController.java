@@ -184,6 +184,24 @@ public class SaleDashboardController {
 		}
 
 	}
+	
+	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
+	@GetMapping("/channel/summary")
+	public SuccessResponse ChannelSummaryDetail(@RequestParam Optional<Integer> branchId) {
+		getDate();
+		return new SuccessResponse("00", "fetch report", branchDashboardService.SummaryByBranchId(
+				userProfile.getProfile().getBranch().getId(),today,"channel"));
+
+	}
+	
+	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
+	@GetMapping("/user/summary")
+	public SuccessResponse UserSummaryDetail(@RequestParam Optional<Integer> branchId) {
+		getDate();
+		return new SuccessResponse("00", "fetch report", branchDashboardService.SummaryByBranchId(
+				userProfile.getProfile().getBranch().getId(),today,"user"));
+
+	}
 
 	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
 	@GetMapping("/detail")

@@ -32,6 +32,7 @@ import com.spring.miniposbackend.modelview.dashboard.ItemSummaryDetail;
 import com.spring.miniposbackend.modelview.dashboard.ItemTypeSummaryChart;
 import com.spring.miniposbackend.modelview.dashboard.ItemTypeSummaryDetail;
 import com.spring.miniposbackend.modelview.dashboard.PromotionReceipt;
+import com.spring.miniposbackend.modelview.dashboard.SummaryDetail;
 import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.sale.SaleDetailRepository;
 import com.spring.miniposbackend.util.ImageUtil;
@@ -163,6 +164,27 @@ public class SaleDashboardService {
 						rs.getInt("daily_sale"), rs.getDouble("monthly_sale_amount"),
 						rs.getDouble("weekly_sale_amount"), rs.getDouble("daily_sale_amount"),rs.getDouble("monthly_discount_amount"),
 						rs.getDouble("weekly_discount_amount"), rs.getDouble("daily_discount_amount")));
+
+	}
+	public List<SummaryDetail> SummaryByBranchId(Integer branchId, Date startDate,String reportName) {
+
+		MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource();
+		mapSqlParameterSource.addValue("startDate", startDate);
+		mapSqlParameterSource.addValue("branchId", branchId);
+		
+		if(reportName.equalsIgnoreCase("channel")){
+			
+			return jdbc.query("select * from channelsummarybybranchid(:branchId,:startDate)",
+					mapSqlParameterSource,
+					(rs, rowNum) -> new SummaryDetail(rs.getLong("id"), rs.getString("name"),rs.getDouble("total")));
+		}
+		else
+		{
+			return jdbc.query("select * from usersummarybybranchid(:branchId,:startDate)",
+					mapSqlParameterSource,
+					(rs, rowNum) -> new SummaryDetail(rs.getLong("id"), rs.getString("name"),rs.getDouble("total")));
+		}
+		
 
 	}
 

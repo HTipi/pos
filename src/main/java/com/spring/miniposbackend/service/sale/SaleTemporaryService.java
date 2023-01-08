@@ -119,7 +119,7 @@ public class SaleTemporaryService {
 	}
 	@Transactional
 	public Object moveToPending(List<SaleRequest> requestItems, Optional<Integer> seatId, String remark,
-			Integer userId,Optional<Integer> channelId,Optional<Long> customerId) {
+			Integer userId,Optional<Integer> channelId) {
 		entityManager.clear();
 		Optional<Seat> seat = Optional.empty();
 		Optional<PaymentChannel> channel = Optional.empty();
@@ -128,10 +128,6 @@ public class SaleTemporaryService {
 		if(channelId.isPresent())
 		{
 			channel = paymentChannelRepository.findById(channelId.get());
-		}
-		if(customerId.isPresent())
-		{
-			customer = customerRepository.findById(customerId.get());
 		}
 		List<SaleTemporary> saletmps = new ArrayList<SaleTemporary>();
 		if (seatId.isPresent()) {
@@ -438,33 +434,33 @@ public class SaleTemporaryService {
 
 	public List<SaleTemporary> showByUserId(Integer userId, Optional<Boolean> isPrinted, Optional<Boolean> cancel) {
 		List<SaleTemporary> saleTmps = new ArrayList<SaleTemporary>();
-		if (isPrinted.isPresent()) {
-			if (cancel.isPresent()) {
-				saleTmps = saleRepository.findByUserIdWithIsPrintedCancel(userId, isPrinted.get(), cancel.get());
-			} else {
-				saleTmps = saleRepository.findByUserIdWithisPrinted(userId, isPrinted.get());
-			}
-		} else {
-			saleTmps = saleRepository.findByUserId(userId);
-		}
-
-		if (saleTmps.size() == 0) {
-			if (isPrinted.isPresent()) {
-				if (cancel.isPresent()) {
-					saleTmps = saleRepository.findByUserIdSeatWithIsPrintedCancel(userId, isPrinted.get(),
-							cancel.get());
-				} else {
-					saleTmps = saleRepository.findByUserIdSeatWithisPrinted(userId, isPrinted.get());
-				}
-			} else {
-				saleTmps = saleRepository.findBySeatUserId(userId);
-			}
-		}
+//		if (isPrinted.isPresent()) {
+//			if (cancel.isPresent()) {
+//				saleTmps = saleRepository.findByUserIdWithIsPrintedCancel(userId, isPrinted.get(), cancel.get());
+//			} else {
+//				saleTmps = saleRepository.findByUserIdWithisPrinted(userId, isPrinted.get());
+//			}
+//		} else {
+//			saleTmps = saleRepository.findByUserId(userId);
+//		}
+		saleTmps = saleRepository.findByUserId(userId);
+//		if (saleTmps.size() == 0) {
+//			if (isPrinted.isPresent()) {
+//				if (cancel.isPresent()) {
+//					saleTmps = saleRepository.findByUserIdSeatWithIsPrintedCancel(userId, isPrinted.get(),
+//							cancel.get());
+//				} else {
+//					saleTmps = saleRepository.findByUserIdSeatWithisPrinted(userId, isPrinted.get());
+//				}
+//			} else {
+//				saleTmps = saleRepository.findBySeatUserId(userId);
+//			}
+//		}
 		return saleTmps;
 	}
 
 	@Transactional
-	public Object moveToPendingOrder(Optional<Integer> seatId, String remark, Integer userId) {
+	public Object moveToPendingOrder(Optional<Integer> seatId, String remark, Integer userId,Optional<Long> customerId) {
 		Invoice invoice = new Invoice();
 		invoice.setRemark(remark);
 		invoice.setUser(userProfile.getProfile().getUser());
@@ -485,10 +481,25 @@ public class SaleTemporaryService {
 				throw new ConflictException("ប្រតិបតិ្តការនេះបានបម្រុងដោយអ្នកផ្សេងរួចហើយ", "15");
 			}
 			invoice = invoiceRepository.save(invoice);
-			saleRepository.updateInvoiceBySeatId(invoice.getId(), seatId.get());
+			if(customerId.isPresent())
+			{
+				saleRepository.updateInvoiceBySeatId(invoice.getId(), seatId.get(),customerId.get());
+			}
+			else
+			{
+				saleRepository.updateInvoiceBySeatId(invoice.getId(), seatId.get());
+			}
+			
 		} else {
 			invoice = invoiceRepository.save(invoice);
-			saleRepository.updateInvoiceByUserId(invoice.getId(), userProfile.getProfile().getUser().getId());
+			if(customerId.isPresent())
+			{
+				saleRepository.updateInvoiceByUserId(invoice.getId(), userProfile.getProfile().getUser().getId(),customerId.get());
+			}
+			else
+			{
+				saleRepository.updateInvoiceByUserId(invoice.getId(), userProfile.getProfile().getUser().getId());
+			}
 		}
 		invoice.setSaleTemporaries(saleRepository.findByInvoiceId(invoice.getId()));
 		return invoice;
@@ -551,6 +562,7 @@ public class SaleTemporaryService {
 					saleTmp.setCustomer(customerId.get());
 				}
 				else {
+		
 					saleTmp.setCustomer(null);
 				}
 				return saleRepository.save(saleTmp);
@@ -573,6 +585,7 @@ public class SaleTemporaryService {
 				saleTmp.setAddPromo(requestItem.getAddPromo());
 				if(channelId.isPresent())
 				{
+				
 					saleTmp.setPaymentChannel(channelId.get());
 				}
 				else {

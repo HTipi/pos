@@ -81,6 +81,10 @@ public class SaleDetail extends AuditModel {
 	@Column(name = "sub_total", nullable = false, precision = 10, scale = 2)
 	@ColumnDefault("0")
 	private BigDecimal subTotal;
+	
+	@Column(name = "costing", nullable = true, precision = 10, scale = 2)
+	@ColumnDefault("0")
+    private BigDecimal costing;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "sale_id", nullable = false)

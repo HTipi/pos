@@ -1,7 +1,5 @@
 package com.spring.miniposbackend.service.admin;
 
-import com.spring.miniposbackend.exception.ConflictException;
-import com.spring.miniposbackend.exception.InternalErrorException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.model.admin.BranchSetting;
@@ -29,8 +27,6 @@ public class BranchSettingService {
 	private BranchRepository branchRepository;
 	@Autowired
 	private UserProfileUtil userProfile;
-	@Autowired
-	private SaleTemporaryRepository saleTemporaryRepository;
 
 	@Transactional
 	public BranchSetting delete(Integer branchSettingId, Integer branchId, Integer settingId) {

@@ -63,6 +63,8 @@ public class Printer {
 	private boolean separatePrinter;
 	
 	public List<Integer> getItemTypes(){
+		if(printerItemTypes == null)
+			return new ArrayList<Integer>();
 		List<Integer> tmp = new ArrayList<Integer>();
 		for (int i = 0; i < printerItemTypes.size(); i++) {
 			tmp.add(printerItemTypes.get(i).getItemTypeId());

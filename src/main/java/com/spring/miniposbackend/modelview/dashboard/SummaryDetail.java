@@ -6,19 +6,25 @@ import lombok.Setter;
 @Getter
 @Setter
 public class SummaryDetail {
-	private Long id;
+	private Integer id;
 	private String name;
+	private Integer receipt;
 	private Double total;
+	private Double disAmt;
 
 	public SummaryDetail() {
-		id = null;
-		name = "";
-		total = null;
+		this.id = null;
+		this.name = "";
+		this.receipt = null;
+		this.total = null;
+		this.disAmt = null;
 	}
 
-	public SummaryDetail(Long id, String name, Double dailySaleAmout) {
+	public SummaryDetail(Integer id, String name,Integer receipt, Double total,Double disAmt) {
 		this.id = id;
 		this.name = name;
-		this.total = dailySaleAmout;
+		this.receipt = receipt;
+		this.total = total;
+		this.disAmt = disAmt;
 	}
 }

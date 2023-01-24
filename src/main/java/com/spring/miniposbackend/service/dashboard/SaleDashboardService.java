@@ -74,7 +74,7 @@ public class SaleDashboardService {
 		return jdbc.query("select p.name_kh promotion,sum(sp.discount) discount_amt,sum(s.quantity) qty from sale_detail_promotion sp inner join sale_details s on sp.sale_detail_id=s.id "
 				+ "inner join item_branches ib on ib.id=s.item_branch_id inner join items i on i.id=ib.item_id "
 				+ "inner join branch_promotions bp on bp.id=sp.branch_promotion_id "
-				+ "inner join promotions p on p.id=bp.promotion_id where s.reverse=false and date_trunc('day',s.value_date)=:value_date and s.user_id=:user_id "
+				+ "inner join promotions p on p.id=bp.promotion_id where s.reverse=false and date_trunc('day',s.value_date)=:value_date and s.user_id=:user_id and i.type='MAINITEM'"
 				+ "group by p.name_kh,p.id order by p.id",
 				mapSqlParameterSource,
 				(rs, rowNum) -> new PromotionReceipt(rs.getString("promotion"),
@@ -85,10 +85,7 @@ public class SaleDashboardService {
 		MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource();
 		mapSqlParameterSource.addValue("value_date", startDate);
 		mapSqlParameterSource.addValue("user_id", userProfile.getProfile().getUser().getId());
-		return jdbc.query("select count(s.id) receipt,sum(discount_amount)+sum(discount_sale_detail) discount,sum(sub_total) total,case when p.name_kh IS NULL then concat('Cash ',cu.code) else p.name_kh end name_kh from sales s "
-				+ "inner join branch_currencies bc on bc.id=s.cur_id inner join currencies cu on cu.id=bc.currency_id left join "
-				+ "payment_channels p on s.payment_channel_id=p.id where s.reverse=false and date_trunc('day',s.value_date)=:value_date "
-				+ "and s.user_id=:user_id group by p.name_kh,cu.code",
+		return jdbc.query("select * from channelbyuser(:user_id,:value_date)",
 				mapSqlParameterSource,
 				(rs, rowNum) -> new ChannelReceipt(rs.getString("name_kh"),rs.getInt("receipt"),
 						rs.getDouble("total"), rs.getDouble("discount")));
@@ -166,23 +163,26 @@ public class SaleDashboardService {
 						rs.getDouble("weekly_discount_amount"), rs.getDouble("daily_discount_amount")));
 
 	}
-	public List<SummaryDetail> SummaryByBranchId(Integer branchId, Date startDate,String reportName) {
+	public List<SummaryDetail> SummaryByBranchId(Integer branchId, Date startDate,Date enddate,String reportName) {
 
 		MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource();
 		mapSqlParameterSource.addValue("startDate", startDate);
+		mapSqlParameterSource.addValue("enddate", enddate);
 		mapSqlParameterSource.addValue("branchId", branchId);
 		
 		if(reportName.equalsIgnoreCase("channel")){
 			
-			return jdbc.query("select * from channelsummarybybranchid(:branchId,:startDate)",
+			return jdbc.query("select * from channelbybranches(:branchId,:startDate,:enddate)",
 					mapSqlParameterSource,
-					(rs, rowNum) -> new SummaryDetail(rs.getLong("id"), rs.getString("name"),rs.getDouble("total")));
+					(rs, rowNum) -> new SummaryDetail(rs.getInt("id"),rs.getString("name_kh"),rs.getInt("receipt"),
+							rs.getDouble("total"), rs.getDouble("discount")));
 		}
 		else
 		{
-			return jdbc.query("select * from usersummarybybranchid(:branchId,:startDate)",
+			return jdbc.query("select * from userbybranches(:branchId,:startDate,:enddate)",
 					mapSqlParameterSource,
-					(rs, rowNum) -> new SummaryDetail(rs.getLong("id"), rs.getString("name"),rs.getDouble("total")));
+					(rs, rowNum) -> new SummaryDetail(rs.getInt("id"),rs.getString("name_kh"),rs.getInt("receipt"),
+							rs.getDouble("total"), rs.getDouble("discount")));
 		}
 		
 

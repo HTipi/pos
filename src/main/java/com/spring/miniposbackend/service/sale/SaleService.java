@@ -161,7 +161,7 @@ public class SaleService {
 					saleTemps = saleTemporaryRepository.findSplitBySeatId(seatId.get(),spitBillItems.get().getSaleTempIds());
 				}
 				else {
-					throw new ConflictException("No Items to Split Bill");
+					saleTemps = saleTemporaryRepository.findBySeatId(seatId.get());	
 				}
 			}
 			else
@@ -244,6 +244,15 @@ public class SaleService {
 			saleTemporaryRepository.deleteByInvoiceId(invoiceId.get());
 			invoiceRepository.deleteById(invoiceId.get());
 		} else if (seatId.isPresent()) {
+			if(spitBillItems.isPresent()) {
+				if(spitBillItems.get().getSaleTempIds().size() > 0)
+				{
+					saleTemporaryRepository.deleteByListId(spitBillItems.get().getSaleTempIds());
+				}
+				else
+					saleTemporaryRepository.deleteBySeatId(seatId.get());
+			}
+			else
 			saleTemporaryRepository.deleteBySeatId(seatId.get());
 		} else {
 			saleTemporaryRepository.deleteByUserId(user.getId());
@@ -382,6 +391,7 @@ public class SaleService {
 		saleDeail.setQuantity(saleTemporary.getQuantity());
 		saleDeail.setSubTotal(BigDecimal.valueOf(saleTemporary.getSubTotal()));
 		saleDeail.setDiscountTotal(BigDecimal.valueOf(saleTemporary.getDiscountTotal()));
+		saleDeail.setCosting(itemBranch.getCosting());
 		if (parentSaleDetail.isPresent()) {
 			saleDeail.setParentSaleDetail(parentSaleDetail.get());
 		}

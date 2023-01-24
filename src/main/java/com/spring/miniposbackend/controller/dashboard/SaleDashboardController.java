@@ -190,7 +190,7 @@ public class SaleDashboardController {
 	public SuccessResponse ChannelSummaryDetail(@RequestParam Optional<Integer> branchId) {
 		getDate();
 		return new SuccessResponse("00", "fetch report", branchDashboardService.SummaryByBranchId(
-				userProfile.getProfile().getBranch().getId(),today,"channel"));
+				userProfile.getProfile().getBranch().getId(),today,today,"channel"));
 
 	}
 	
@@ -199,7 +199,7 @@ public class SaleDashboardController {
 	public SuccessResponse UserSummaryDetail(@RequestParam Optional<Integer> branchId) {
 		getDate();
 		return new SuccessResponse("00", "fetch report", branchDashboardService.SummaryByBranchId(
-				userProfile.getProfile().getBranch().getId(),today,"user"));
+				userProfile.getProfile().getBranch().getId(),today,today,"user"));
 
 	}
 

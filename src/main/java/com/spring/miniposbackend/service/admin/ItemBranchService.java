@@ -218,10 +218,11 @@ public class ItemBranchService {
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
 
-	public ItemBranch setPrice(Long itemBranchId, BigDecimal price, Short discount) {
+	public ItemBranch setPrice(Long itemBranchId, BigDecimal price, Short discount,BigDecimal costing) {
 		return itemBranchRepository.findById(itemBranchId).map(itemBranch -> {
 			itemBranch.setPrice(price);
 			itemBranch.setDiscount(discount);
+			itemBranch.setCosting(costing);
 			return itemBranchRepository.save(itemBranch);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}

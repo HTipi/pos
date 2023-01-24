@@ -38,7 +38,7 @@ public class BranchSetting extends AuditModel {
     private String settingValue;
     
 	@Column(name = "enable", nullable = false)
-    @ColumnDefault("false")
+    @ColumnDefault("true")
     private boolean enable;
 
     public String getSettingCode() {

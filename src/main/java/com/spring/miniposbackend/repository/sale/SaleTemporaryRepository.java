@@ -36,6 +36,9 @@ public interface SaleTemporaryRepository extends JpaRepository<SaleTemporary, Lo
 	@Query(value = "select s from SaleTemporary s where s.parentSaleTemporary is null and s.invoice.id=?1") // update
 	List<SaleTemporary> findBySeatForPrintIdWithInvoice(Long invoiceId);
 	
+	@Query(value = "select s from SaleTemporary s where s.seat.id=?1 and s.parentSaleTemporary is null and s.id in (?2)") // update
+	List<SaleTemporary> findBySeatForPrintByItems(@Param("seatId") Integer seatId,@Param("saleTempIds") List<Long> saleTempIds);
+	
 	@Query(value = "select s from SaleTemporary s where s.seat.id = ?1 and s.isPrinted = ?2 and s.invoice is null and s.parentSaleTemporary is null")//update
 	List<SaleTemporary> findBySeatIdWithisPrinted(Integer seatId, boolean isPrinted); 
 	

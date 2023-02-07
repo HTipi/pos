@@ -12,6 +12,7 @@ import javax.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
@@ -25,6 +26,7 @@ import com.spring.miniposbackend.model.customer.Customer;
 import com.spring.miniposbackend.model.sale.Invoice;
 import com.spring.miniposbackend.model.sale.SaleTemporary;
 import com.spring.miniposbackend.modelview.SaleRequest;
+import com.spring.miniposbackend.modelview.SpitBillItems;
 import com.spring.miniposbackend.repository.admin.BranchSettingRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
 import com.spring.miniposbackend.repository.admin.PaymentChannelRepository;
@@ -60,52 +62,46 @@ public class SaleTemporaryService {
 	@Autowired
 	private CustomerRepository customerRepository;
 
-	
 	@Transactional
-	public List<SaleTemporary> changeSeat(Integer seatId,Integer newSeatId){
+	public List<SaleTemporary> changeSeat(Integer seatId, Integer newSeatId) {
 		Optional<Seat> seat = seatRepository.findById(newSeatId);
-		if(!seat.isPresent())
-		{
+		if (!seat.isPresent()) {
 			throw new ResourceNotFoundException("Seat does not exist");
 		}
 		List<SaleTemporary> oldList = saleRepository.findBySeatId(seatId);
-		if(oldList.size() == 0) {
+		if (oldList.size() == 0) {
 			throw new ResourceNotFoundException("Item not found in the old seat");
 		}
 		List<SaleTemporary> newList = saleRepository.findBySeatId(newSeatId);
-		if(newList.size() == 0)
-		{
+		if (newList.size() == 0) {
 			for (int i = 0; i < oldList.size(); i++) {
 				oldList.get(i).setSeat(seat.get());
 				saleRepository.save(oldList.get(i));
 			}
-		}
-		else {
-			for (int i = 0; i < oldList.size(); i++) {	
+		} else {
+			for (int i = 0; i < oldList.size(); i++) {
 				boolean check = false;
 				SaleTemporary oldSale = oldList.get(i);
 				for (int j = 0; j < newList.size(); j++) {
 					SaleTemporary newSale = newList.get(j);
-					if(newSale.getItemId() == oldSale.getItemId()) {
-						if(oldSale.getPrice().compareTo(newSale.getPrice()) == 0 && oldSale.getDiscountAmount().compareTo(newSale.getDiscountAmount()) == 0 && oldSale.getDiscountPercentage() == newSale.getDiscountPercentage())
-						{
+					if (newSale.getItemId() == oldSale.getItemId()) {
+						if (oldSale.getPrice().compareTo(newSale.getPrice()) == 0
+								&& oldSale.getDiscountAmount().compareTo(newSale.getDiscountAmount()) == 0
+								&& oldSale.getDiscountPercentage() == newSale.getDiscountPercentage()) {
 							newSale.setQuantity(newSale.getQuantity() + oldSale.getQuantity());
 							saleRepository.save(newSale);
 							check = true;
 							break;
-						}
-						else
-						{
+						} else {
 							oldSale.setSeat(newSale.getSeat());
 							saleRepository.save(oldSale);
 							check = true;
 							break;
 						}
-						
+
 					}
 				}
-				if(check == false)
-				{
+				if (check == false) {
 					oldSale.setSeat(seat.get());
 					saleRepository.save(oldSale);
 				}
@@ -115,18 +111,18 @@ public class SaleTemporaryService {
 		entityManager.flush();
 		entityManager.clear();
 		return saleRepository.findBySeatId(newSeatId);
-		
+
 	}
+
 	@Transactional
-	public Object moveToPending(List<SaleRequest> requestItems, Optional<Integer> seatId, String remark,
-			Integer userId,Optional<Integer> channelId) {
+	public Object moveToPending(List<SaleRequest> requestItems, Optional<Integer> seatId, String remark, Integer userId,
+			Optional<Integer> channelId) {
 		entityManager.clear();
 		Optional<Seat> seat = Optional.empty();
 		Optional<PaymentChannel> channel = Optional.empty();
 		Optional<Customer> customer = Optional.empty();
 		User user = userProfile.getProfile().getUser();
-		if(channelId.isPresent())
-		{
+		if (channelId.isPresent()) {
 			channel = paymentChannelRepository.findById(channelId.get());
 		}
 		List<SaleTemporary> saletmps = new ArrayList<SaleTemporary>();
@@ -151,11 +147,13 @@ public class SaleTemporaryService {
 		Optional<PaymentChannel> finChannel = channel;
 		Optional<Customer> finCustomer = customer;
 		requestItems.forEach((requestItem) -> {
-			SaleTemporary saleTemporary = addItem(requestItem, user, finSeat, finInvoice, Optional.empty(),finChannel,finCustomer);
+			SaleTemporary saleTemporary = addItem(requestItem, user, finSeat, finInvoice, Optional.empty(), finChannel,
+					finCustomer);
 			List<SaleRequest> subItems = requestItem.getAddOns() == null ? new ArrayList<SaleRequest>()
 					: requestItem.getAddOns();
 			subItems.forEach((subItem) -> {
-				SaleTemporary addOnItem = addItem(subItem, user, finSeat, finInvoice, Optional.of(saleTemporary),finChannel,finCustomer);
+				SaleTemporary addOnItem = addItem(subItem, user, finSeat, finInvoice, Optional.of(saleTemporary),
+						finChannel, finCustomer);
 				saleTemporary.setPrice(saleTemporary.getPrice().add(addOnItem.getPrice()));
 			});
 			if (requestItem.getAddOns() != null) {
@@ -170,7 +168,7 @@ public class SaleTemporaryService {
 
 	@Transactional
 	public List<SaleTemporary> addItems(List<SaleRequest> requestItems, Optional<Integer> seatId,
-			Optional<Long> invoiceId, Integer userId,Optional<Integer> channelId,Optional<Long> customerId) {
+			Optional<Long> invoiceId, Integer userId, Optional<Integer> channelId, Optional<Long> customerId) {
 		entityManager.clear();
 		Optional<Seat> seat = Optional.empty();
 		Optional<Invoice> invoice = Optional.empty();
@@ -178,11 +176,10 @@ public class SaleTemporaryService {
 		Optional<Customer> customer = Optional.empty();
 		List<SaleTemporary> saletmps = new ArrayList<SaleTemporary>();
 		User user = userProfile.getProfile().getUser();
-		if(channelId.isPresent())
-		{
+		if (channelId.isPresent()) {
 			channel = paymentChannelRepository.findById(channelId.get());
 		}
-		if(customerId.isPresent()) {
+		if (customerId.isPresent()) {
 			customer = customerRepository.findById(customerId.get());
 		}
 		if (invoiceId.isPresent()) {
@@ -211,11 +208,13 @@ public class SaleTemporaryService {
 		Optional<PaymentChannel> finChannel = channel;
 		Optional<Customer> finCustomer = customer;
 		requestItems.forEach((requestItem) -> {
-			SaleTemporary saleTemporary = addItem(requestItem, user, finSeat, finInvoice, Optional.empty(),finChannel,finCustomer);
+			SaleTemporary saleTemporary = addItem(requestItem, user, finSeat, finInvoice, Optional.empty(), finChannel,
+					finCustomer);
 			List<SaleRequest> subItems = requestItem.getAddOns() == null ? new ArrayList<SaleRequest>()
 					: requestItem.getAddOns();
 			subItems.forEach((subItem) -> {
-				SaleTemporary addOnItem = addItem(subItem, user, finSeat, finInvoice, Optional.of(saleTemporary),finChannel,finCustomer);
+				SaleTemporary addOnItem = addItem(subItem, user, finSeat, finInvoice, Optional.of(saleTemporary),
+						finChannel, finCustomer);
 				saleTemporary.setPrice(saleTemporary.getPrice().add(addOnItem.getPrice()));
 			});
 			if (requestItem.getAddOns() != null) {
@@ -358,28 +357,53 @@ public class SaleTemporaryService {
 	}
 
 	@Transactional
-	public List<SaleTemporary> printBySeat(Integer seatId,Optional<Long> invoiceId,Optional<Long> customerId) {
+	public List<SaleTemporary> printBySeat(Integer seatId, Optional<Long> invoiceId, Optional<Long> customerId,
+			@RequestBody Optional<SpitBillItems> spitBillItems) {
 		try {
-			List<SaleTemporary> list = invoiceId.isPresent() ?  saleRepository.findBySeatForPrintIdWithInvoice(invoiceId.get()) : saleRepository.findBySeatForPrintId(seatId);
+			boolean check = false;
+			List<SaleTemporary> list = new ArrayList<SaleTemporary>();
+			if (invoiceId.isPresent()) {
+				list = saleRepository.findBySeatForPrintIdWithInvoice(invoiceId.get());
+			} else {
+				if (spitBillItems.isPresent()) {
+					if (spitBillItems.get().getSaleTempIds().size() > 0) {
+						list = saleRepository.findBySeatForPrintByItems(seatId, spitBillItems.get().getSaleTempIds());
+						check = true;
+					} else {
+						list = saleRepository.findBySeatForPrintId(seatId);
+					}
+				}
+				else {
+					list = saleRepository.findBySeatForPrintId(seatId);
+				}
+			}
 			Long receiptNum = receiptService.getBillNumberByBranchId(userProfile.getProfile().getBranch().getId());
-			Customer customer = customerId.isPresent() ? customerRepository.findById(customerId.get()).orElse(null) : null;
+			Customer customer = customerId.isPresent() ? customerRepository.findById(customerId.get()).orElse(null)
+					: null;
 			list.forEach(saleTemporary -> {
 				saleTemporary.setPrinted(true);
 				saleTemporary.setBillNumber(receiptNum);
 				saleTemporary.setCustomer(customer);
 				saleRepository.save(saleTemporary);
 			});
-			return list;
+			//entityManager.flush();
+			//entityManager.clear();
+			return check ? saleRepository.findBySeatForPrintId(seatId) : list;
 		} catch (Exception ex) {
+			System.out.println(ex.getMessage());
 			throw new ConflictException("print SaleTmp Failed", "04");
 		}
 	}
+
 	@Transactional
-	public List<SaleTemporary> printByUser(Optional<Long> invoiceId,Optional<Long> customerId) {
+	public List<SaleTemporary> printByUser(Optional<Long> invoiceId, Optional<Long> customerId) {
 		try {
-			List<SaleTemporary> list = invoiceId.isPresent()  ? saleRepository.findByUserIdForPrintWithInvoice(invoiceId.get()) : saleRepository.findByUserIdForPrint(userProfile.getProfile().getUser().getId());
+			List<SaleTemporary> list = invoiceId.isPresent()
+					? saleRepository.findByUserIdForPrintWithInvoice(invoiceId.get())
+					: saleRepository.findByUserIdForPrint(userProfile.getProfile().getUser().getId());
 			Long receiptNum = receiptService.getBillNumberByBranchId(userProfile.getProfile().getBranch().getId());
-			Customer customer = customerId.isPresent() ? customerRepository.findById(customerId.get()).orElse(null) : null;
+			Customer customer = customerId.isPresent() ? customerRepository.findById(customerId.get()).orElse(null)
+					: null;
 			list.forEach(saleTemporary -> {
 				saleTemporary.setPrinted(true);
 				saleTemporary.setBillNumber(receiptNum);
@@ -460,7 +484,8 @@ public class SaleTemporaryService {
 	}
 
 	@Transactional
-	public Object moveToPendingOrder(Optional<Integer> seatId, String remark, Integer userId,Optional<Long> customerId) {
+	public Object moveToPendingOrder(Optional<Integer> seatId, String remark, Integer userId,
+			Optional<Long> customerId) {
 		Invoice invoice = new Invoice();
 		invoice.setRemark(remark);
 		invoice.setUser(userProfile.getProfile().getUser());
@@ -481,23 +506,18 @@ public class SaleTemporaryService {
 				throw new ConflictException("ប្រតិបតិ្តការនេះបានបម្រុងដោយអ្នកផ្សេងរួចហើយ", "15");
 			}
 			invoice = invoiceRepository.save(invoice);
-			if(customerId.isPresent())
-			{
-				saleRepository.updateInvoiceBySeatId(invoice.getId(), seatId.get(),customerId.get());
-			}
-			else
-			{
+			if (customerId.isPresent()) {
+				saleRepository.updateInvoiceBySeatId(invoice.getId(), seatId.get(), customerId.get());
+			} else {
 				saleRepository.updateInvoiceBySeatId(invoice.getId(), seatId.get());
 			}
-			
+
 		} else {
 			invoice = invoiceRepository.save(invoice);
-			if(customerId.isPresent())
-			{
-				saleRepository.updateInvoiceByUserId(invoice.getId(), userProfile.getProfile().getUser().getId(),customerId.get());
-			}
-			else
-			{
+			if (customerId.isPresent()) {
+				saleRepository.updateInvoiceByUserId(invoice.getId(), userProfile.getProfile().getUser().getId(),
+						customerId.get());
+			} else {
 				saleRepository.updateInvoiceByUserId(invoice.getId(), userProfile.getProfile().getUser().getId());
 			}
 		}
@@ -506,7 +526,7 @@ public class SaleTemporaryService {
 	}
 
 	private SaleTemporary addItem(SaleRequest requestItem, User user, Optional<Seat> seat, Optional<Invoice> invoice,
-			Optional<SaleTemporary> parentSale,Optional<PaymentChannel> channelId,Optional<Customer> customerId) {
+			Optional<SaleTemporary> parentSale, Optional<PaymentChannel> channelId, Optional<Customer> customerId) {
 		Long saleTmpId = requestItem.getSaleTmpId();
 		Long itemId = requestItem.getItemId();
 		float quantity = requestItem.getQuantity();
@@ -550,19 +570,15 @@ public class SaleTemporaryService {
 				if (parentSale.isPresent() && item.getType().contentEquals("SUBITEM")) {
 					saleTmp.setParentSaleTemporary(parentSale.get());
 				}
-				if(channelId.isPresent())
-				{
+				if (channelId.isPresent()) {
 					saleTmp.setPaymentChannel(channelId.get());
-				}
-				else {
+				} else {
 					saleTmp.setPaymentChannel(null);
 				}
-				if(customerId.isPresent())
-				{
+				if (customerId.isPresent()) {
 					saleTmp.setCustomer(customerId.get());
-				}
-				else {
-		
+				} else {
+
 					saleTmp.setCustomer(null);
 				}
 				return saleRepository.save(saleTmp);
@@ -579,16 +595,14 @@ public class SaleTemporaryService {
 				saleTmp.setDiscountAmount(BigDecimal.valueOf(discountAmount));
 				saleTmp.setPrinted(false);
 				saleTmp.setCancel(false);
-				saleTmp.setBillNumber((long)0);
+				saleTmp.setBillNumber((long) 0);
 				saleTmp.setUser(user);
 				saleTmp.setUserEdit(user);
 				saleTmp.setAddPromo(requestItem.getAddPromo());
-				if(channelId.isPresent())
-				{
-				
+				if (channelId.isPresent()) {
+
 					saleTmp.setPaymentChannel(channelId.get());
-				}
-				else {
+				} else {
 					saleTmp.setPaymentChannel(null);
 				}
 				if (invoice.isPresent()) {

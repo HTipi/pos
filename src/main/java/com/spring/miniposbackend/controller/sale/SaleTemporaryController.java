@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -19,6 +20,7 @@ import com.spring.miniposbackend.exception.InternalErrorException;
 import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.model.sale.Invoice;
 import com.spring.miniposbackend.modelview.SaleRequest;
+import com.spring.miniposbackend.modelview.SpitBillItems;
 import com.spring.miniposbackend.service.sale.SaleTemporaryService;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
@@ -92,10 +94,10 @@ public class SaleTemporaryController {
 	@PatchMapping("print")
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse printItem(@RequestParam(name = "seatId") Optional<Integer> seatId,@RequestParam(name = "invoiceId") Optional<Long> invoiceId,
-			@RequestParam(name = "customerId") Optional<Long> customerId) {
+			@RequestParam(name = "customerId") Optional<Long> customerId,@RequestBody Optional<SpitBillItems> spitBillItems) {
 		if(seatId.isPresent()) {
 			return new SuccessResponse("00", "Printed",
-					saleService.printBySeat(seatId.get(),invoiceId,customerId));
+					saleService.printBySeat(seatId.get(),invoiceId,customerId,spitBillItems));
 		}
 		else {
 			return new SuccessResponse("00", "Printed",

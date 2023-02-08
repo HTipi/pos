@@ -381,7 +381,11 @@ public class SaleTemporaryService {
 			Customer customer = customerId.isPresent() ? customerRepository.findById(customerId.get()).orElse(null)
 					: null;
 			list.forEach(saleTemporary -> {
-				saleTemporary.setPrinted(true);
+				boolean settings = true;
+				if(userProfile.getProfile().getBranch().getId() == 23 || userProfile.getProfile().getBranch().getId() == 47)
+					settings =false;
+				saleTemporary.setPrinted(settings);
+				saleTemporary.setPrinted(settings);
 				saleTemporary.setBillNumber(receiptNum);
 				saleTemporary.setCustomer(customer);
 				saleRepository.save(saleTemporary);
@@ -405,7 +409,11 @@ public class SaleTemporaryService {
 			Customer customer = customerId.isPresent() ? customerRepository.findById(customerId.get()).orElse(null)
 					: null;
 			list.forEach(saleTemporary -> {
-				saleTemporary.setPrinted(true);
+
+				boolean settings = true;
+				if(userProfile.getProfile().getBranch().getId() == 23 || userProfile.getProfile().getBranch().getId() == 47)
+					settings =false;
+				saleTemporary.setPrinted(settings);
 				saleTemporary.setBillNumber(receiptNum);
 				saleTemporary.setCustomer(customer);
 				saleRepository.save(saleTemporary);

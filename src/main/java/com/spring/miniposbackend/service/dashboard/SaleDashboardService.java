@@ -177,6 +177,13 @@ public class SaleDashboardService {
 					(rs, rowNum) -> new SummaryDetail(rs.getInt("id"),rs.getString("name_kh"),rs.getInt("receipt"),
 							rs.getDouble("total"), rs.getDouble("discount")));
 		}
+		else if(reportName.equalsIgnoreCase("table")){
+			
+			return jdbc.query("select * from seatbybranches(:branchId,:startDate,:enddate)",
+					mapSqlParameterSource,
+					(rs, rowNum) -> new SummaryDetail(rs.getInt("id"),rs.getString("name_kh"),rs.getInt("receipt"),
+							rs.getDouble("total"), rs.getDouble("discount")));
+		}
 		else
 		{
 			return jdbc.query("select * from userbybranches(:branchId,:startDate,:enddate)",
@@ -360,7 +367,7 @@ public class SaleDashboardService {
 	public void downloadTransactionReport(String exportType, HttpServletResponse response,String fileName,Date from, Date to,Integer branchId) throws JRException, IOException, SQLException {
 	    
 	    exportReport(exportType, response,fileName, from,  to,branchId);
-	  }
+	}
 	private void exportReport(String exportType, HttpServletResponse response,String fileName,Date from, Date to,Integer branchId) throws JRException, IOException, SQLException {
 	    InputStream transactionReportStream =
 	        getClass()

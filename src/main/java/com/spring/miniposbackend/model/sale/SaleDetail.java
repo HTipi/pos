@@ -248,6 +248,11 @@ public class SaleDetail extends AuditModel {
 			return (double) 0.00;
 		return sale.getServiceCharge();
 	}
+	public double getVat() {
+		if(sale.getVat() == null)
+			return (double) 0.00;
+		return sale.getVat();
+	}
 	public List<ItemPromotion> getItemPromotion() {
 		List<ItemPromotion> items = new ArrayList<ItemPromotion>();
 		ItemPromotion pro = null;	

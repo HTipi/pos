@@ -37,6 +37,15 @@ public class SaleController {
 			@RequestParam boolean byUser,@RequestParam Optional<Integer> paymentId) {
 		return new SuccessResponse("00", "fetch Sale Sum By User", saleService.showSaleByUser(date, byUser,paymentId));
 	}
+	
+	@GetMapping("summary/by-user-range")
+	@PreAuthorize("hasAnyRole('SALE')")
+	public SuccessResponse getSaleRangeByUserId(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Optional<Date> date,
+			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Optional<Date> end,
+			@RequestParam boolean byUser,@RequestParam Optional<Integer> paymentId) {
+		return new SuccessResponse("00", "fetch Sale Sum By User", saleService.showSaleRangeByUser(date, byUser,paymentId,end));
+	}
+
 
 	@GetMapping("by-branch")
 	@PreAuthorize("hasAnyRole('SALE')")

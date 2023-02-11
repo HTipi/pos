@@ -112,6 +112,36 @@ public class SaleService {
 		return saleRepository.findByUserId(userProfile.getProfile().getUser().getId());
 
 	}
+	public List<Sale> showSaleRangeByUser(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Optional<Date> date, boolean byUser,
+			Optional<Integer> paymentId,@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Optional<Date> end) {
+		if (date.isPresent()) {
+			if (byUser) {
+				if (paymentId.isPresent()) {
+					if (paymentId.get() == 0)
+						return saleRepository.findByIdWithValueDateRangeAndPaymentNullId(
+								userProfile.getProfile().getUser().getId(), date.get(),end.get());
+					else
+						return saleRepository.findByIdWithValueDateRangeAndPaymentId(
+								userProfile.getProfile().getUser().getId(), date.get(), paymentId.get(),end.get());
+				} else
+					return saleRepository.findByIdWithValueDateRange(userProfile.getProfile().getUser().getId(), date.get(),end.get());
+
+			} else {
+				if (paymentId.isPresent()) {
+					if (paymentId.get() == 0)
+						return saleRepository.findByBranchIdWithValueDateRangeAndPaymentNullId(
+								userProfile.getProfile().getBranch().getId(), date.get(),end.get());
+					else
+						return saleRepository.findByBranchIdWithValueDateRangeAndPaymentId(
+								userProfile.getProfile().getBranch().getId(), date.get(), paymentId.get(),end.get());
+				} else
+					return saleRepository.findByBranchIdWithValueDateRange(userProfile.getProfile().getBranch().getId(),
+							date.get(),end.get());
+			}
+		}
+		return saleRepository.findByUserId(userProfile.getProfile().getUser().getId());
+
+	}
 
 	public List<Sale> showSaleByBranch(Integer branchId) {
 		return saleRepository.findByBranchId(branchId);

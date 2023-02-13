@@ -80,9 +80,10 @@ group by i.name_kh,i.id,t.name_kh,date_trunc('day',d.value_date) order by value_
 	<parameter name="start" class="java.util.Date"/>
 	<parameter name="end" class="java.util.Date"/>
 	<queryString language="SQL">
-		<![CDATA[select 0 id,count(s.id) quantities,sum(sub_total) - sum(discount_amount)+sum(discount_sale_detail) total,case when seat_name='' then 'Takeaway' else seat_name end name_kh,date_trunc('day',s.value_date) value_date from sales s  
+		<![CDATA[select c.id id,count(s.id) quantities,sum(sub_total) - sum(discount_amount)+sum(discount_sale_detail) total,c.name name_kh,date_trunc('day',s.value_date) value_date from sales s
+		inner join customers c on c.id=s.customer_id  
 where s.reverse=false and date_trunc('day',s.value_date) between $P{start} and $P{end}
-and s.branch_id=$P{branchId} group by seat_name,date_trunc('day',s.value_date);]]>
+and s.branch_id=$P{branchId} group by c.id,c.name,date_trunc('day',s.value_date);]]>
 	</queryString>
 	<field name="id" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="id"/>

@@ -46,7 +46,7 @@ public class SaleDetailService {
 		SaleDetailSummary summary = jdbc.queryForObject(
 				"select count(case when sale.reverse = true then 1 else null end) as void_invoice, "
 						+ "count(case when sale.reverse = false then 1 else null end) as paid_invoice, "
-						+ "min(value_date) as start_date, " + "max(value_date) as end_date, "
+						+ "min(value_date) as start_date, " + "max(value_date) as end_date,sum(vat) vat,sum(service_charge) service_charge, "
 						+ "sum(case when sale.reverse = false then sale.sub_total else 0 end) as sub_total, "
 						+ "sum(case when sale.reverse = false then sale.discount_amount else 0 end) as discount_amount, "
 						+ "sum(case when sale.reverse = false then sale.discount_sale_detail else 0 end) as discount_sale_detail "
@@ -55,7 +55,7 @@ public class SaleDetailService {
 				mapSqlParameterSource,
 				(rs, rowNum) -> new SaleDetailSummary(rs.getInt("void_invoice"), rs.getInt("paid_invoice"),
 						rs.getString("start_date"), rs.getString("end_date"), rs.getDouble("sub_total"),
-						rs.getDouble("discount_amount"), rs.getDouble("discount_sale_detail")));
+						rs.getDouble("discount_amount"), rs.getDouble("discount_sale_detail"),rs.getDouble("vat"),rs.getDouble("service_charge")));
 		List<SaleDetailTransaction> details = jdbc
 				.query("select ib.id as item_id, " + "max(i.name) as item_name, " + "sum(sale.quantity) as quantity, "
 						+ "sum(sub_total) as sub_total, " + "sum(sale.discount_total) as discount_total, i.item_type_id,is_stock,stock_in-stock_out stocks "

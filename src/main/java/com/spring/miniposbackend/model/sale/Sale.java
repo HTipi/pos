@@ -80,6 +80,9 @@ public class Sale extends AuditModel {
 	public Double getTotal() {
 		return subTotal.doubleValue() - getDiscountTotal();
 	}
+	public Double getTotalVS() {
+		return subTotal.doubleValue() - getDiscountTotal() + vat + serviceCharge;
+	}
 	public String getFullName() {
 		return user.getFullName();
 	}

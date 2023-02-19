@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fontFamilies>
+
+
+	<fontFamily name="KhmerOSContent">
+		<normal><![CDATA[fonts/KHMEROSCONTENT.ttf]]></normal>
+		<pdfEncoding><![CDATA[Identity-H]]></pdfEncoding>
+		<pdfEmbedded><![CDATA[true]]></pdfEmbedded>
+		<exportFonts/>
+	</fontFamily>
+	<fontFamily name="KhmerOSMoul">
+		<normal><![CDATA[fonts/KHMEROSMUOL.ttf]]></normal>
+		<pdfEncoding><![CDATA[Identity-H]]></pdfEncoding>
+		<pdfEmbedded><![CDATA[true]]></pdfEmbedded>
+		<exportFonts/>
+	</fontFamily>
+	<fontFamily name="KhmerOSMoulLight">
+		<normal><![CDATA[fonts/KHMEROSMUOLLIGHT.ttf]]></normal>
+		<pdfEncoding><![CDATA[Identity-H]]></pdfEncoding>
+		<pdfEmbedded><![CDATA[true]]></pdfEmbedded>
+		<exportFonts/>
+	</fontFamily>
+		<fontFamily name="Khmer OS Content">
+		<normal><![CDATA[fonts/KHMEROSCONTENT.ttf]]></normal>
+		<pdfEncoding><![CDATA[Identity-H]]></pdfEncoding>
+		<pdfEmbedded><![CDATA[true]]></pdfEmbedded>
+		<exportFonts/>
+	</fontFamily>
+	<fontFamily name="Khmer OS Moul">
+		<normal><![CDATA[fonts/KHMEROSMUOL.ttf]]></normal>
+		<pdfEncoding><![CDATA[Identity-H]]></pdfEncoding>
+		<pdfEmbedded><![CDATA[true]]></pdfEmbedded>
+		<exportFonts/>
+	</fontFamily>
+	<fontFamily name="Khmer OS Moul Light">
+		<normal><![CDATA[fonts/KHMEROSMUOLLIGHT.ttf]]></normal>
+		<pdfEncoding><![CDATA[Identity-H]]></pdfEncoding>
+		<pdfEmbedded><![CDATA[true]]></pdfEmbedded>
+		<exportFonts/>
+	</fontFamily>
+
+</fontFamilies>

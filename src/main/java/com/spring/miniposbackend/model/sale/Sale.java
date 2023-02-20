@@ -73,6 +73,10 @@ public class Sale extends AuditModel {
 	@ColumnDefault("0")
 	private BigDecimal discountSaleDetail;
 	
+		public Double getTotalVS() {
+				return subTotal.doubleValue() - getDiscountTotal() + vat + serviceCharge;
+			}
+	
 	public Double getDiscountTotal() {
 		return discountSaleDetail.doubleValue() + discountAmount.doubleValue();
 	}

@@ -27,4 +27,11 @@ public class SaleDeailController {
 		return new SuccessResponse("00", "fetch transaction",
 				saleDetailService.getTransactionSummary(from, to,byUser));
 	}
+	@GetMapping("by-range")
+	@PreAuthorize("hasAnyRole('SALE')")
+	public SuccessResponse showTransactionRangeSummary(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date from,
+			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date to,@RequestParam boolean byUser) {
+		return new SuccessResponse("00", "fetch transaction",
+				saleDetailService.getTransactionRangeSummary(from, to,byUser));
+	}
 }

@@ -72,6 +72,7 @@ public class InitService {
 			Integer corporateId = userProfile.getProfile().getCorporate().getId();
 			List<BranchSetting> settings = getSettings(branchId);
 			List<BranchCurrency> currencies = getCurrencies(branchId, true, true);
+			System.out.println(currencies.size());
 			//List<BranchPaymentChannel> branchPaymentChannels = getChannels(branchId);
 			List<ItemBranch> itemBranch = getItemBranch(branchId);
 			List<ItemType> itemType = getItemTypes(corporateId);

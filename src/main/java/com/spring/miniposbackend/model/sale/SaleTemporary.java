@@ -234,6 +234,10 @@ public class SaleTemporary extends AuditModel {
 		return Math.round(price.doubleValue() * quantity * Math.pow(10, getDecimalPlace()))
 				/ Math.pow(10, getDecimalPlace());
 	}
+	public Double getSubTotalNoDis() {
+		return Math.round(price.doubleValue() * quantity * Math.pow(10, getDecimalPlace()))
+				/ Math.pow(10, getDecimalPlace());
+	}
 
 	public double getTotal() {
 		return getSubTotal() - getDiscountTotal();

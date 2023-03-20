@@ -80,12 +80,12 @@ group by i.name_kh,i.id,t.name_kh,date_trunc('day',d.value_date) order by value_
 	<parameter name="start" class="java.util.Date"/>
 	<parameter name="end" class="java.util.Date"/>
 	<queryString language="SQL">
-		<![CDATA[select 0 id,count(s.id) quantities,sum(sub_total) - sum(discount_amount)+sum(discount_sale_detail) total,concat('Cash ',cu.code) name_kh,date_trunc('day',s.value_date) value_date from sales s  
+		<![CDATA[select 0 id,count(s.id) quantities,sum(sub_total)+sum(vat)+sum(service_charge) - sum(discount_amount)+sum(discount_sale_detail) total,concat('Cash ',cu.code) name_kh,date_trunc('day',s.value_date) value_date from sales s  
 inner join branch_currencies bc on bc.id=s.cur_id inner join currencies cu on cu.id=bc.currency_id
 where s.reverse=false and date_trunc('day',s.value_date) between $P{start} and $P{end}
 and s.branch_id=$P{branchId} and s.payment_channel_id is null group by cu.code,date_trunc('day',s.value_date)
 union all
-select p.id,count(s.id) receipt,sum(sub_total) - sum(discount_amount)+sum(discount_sale_detail) total,p.name_kh name_kh,date_trunc('day',s.value_date) value_date from sales s  
+select p.id,count(s.id) receipt,sum(sub_total)+sum(vat)+sum(service_charge) - sum(discount_amount)+sum(discount_sale_detail) total,p.name_kh name_kh,date_trunc('day',s.value_date) value_date from sales s  
 inner join payment_channels p on s.payment_channel_id=p.id
 where s.reverse=false and date_trunc('day',s.value_date) between $P{start} and $P{end}
 and s.branch_id=$P{branchId} group by p.name_kh,p.id,date_trunc('day',s.value_date);]]>

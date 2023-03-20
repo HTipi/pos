@@ -90,6 +90,16 @@ public class SaleDashboardService {
 				(rs, rowNum) -> new ChannelReceipt(rs.getString("name_kh"),rs.getInt("receipt"),
 						rs.getDouble("total"), rs.getDouble("discount")));
 	}
+	public List<ChannelReceipt> channelReceipts(Integer branchId,@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date  startDate,@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date  end) {
+		MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource();
+		mapSqlParameterSource.addValue("value_date", startDate);
+		mapSqlParameterSource.addValue("end_date", end);
+		mapSqlParameterSource.addValue("user_id", userProfile.getProfile().getUser().getId());
+		return jdbc.query("select * from channelbyusers(:user_id,:value_date,:end_date)",
+				mapSqlParameterSource,
+				(rs, rowNum) -> new ChannelReceipt(rs.getString("name_kh"),rs.getInt("receipt"),
+						rs.getDouble("total"), rs.getDouble("discount")));
+	}
 	
 	public List<BranchSummaryDetail> branchSummaryByCorpateId(Integer corporateId, Date startDate, Date startWeek,
 			Date endDate) {

@@ -18,11 +18,11 @@ public class SaleDetailSummary {
 	private Double discountSaleDetail;
 	private Double vat;
 	private Double serviceCharge;
-	
+
 	private List<SaleDetailTransaction> details;
 
-	public SaleDetailSummary(Integer voidInvoice, Integer paidInvoice, String startDate,String endDate, Double subTotal, Double discountAmount,
-			Double discountSaleDetail,Double vat,Double serviceCharge) {
+	public SaleDetailSummary(Integer voidInvoice, Integer paidInvoice, String startDate, String endDate,
+			Double subTotal, Double discountAmount, Double discountSaleDetail, Double vat, Double serviceCharge) {
 		this.voidInvoice = voidInvoice;
 		this.paidInvoice = paidInvoice;
 		this.startDate = startDate;
@@ -31,7 +31,7 @@ public class SaleDetailSummary {
 		this.discountAmount = discountAmount;
 		this.discountSaleDetail = discountSaleDetail;
 		this.vat = vat;
-				this.serviceCharge = serviceCharge;
+		this.serviceCharge = serviceCharge;
 	}
 
 	public Double getDiscountTotal() {
@@ -41,11 +41,12 @@ public class SaleDetailSummary {
 	public Double getTotal() {
 		return subTotal - getDiscountTotal();
 	}
+
 	public Double getTotalVS() {
-				return subTotal - getDiscountTotal() + vat + serviceCharge;
-			}
-			
-			public Double getTotalVat() {
-				return subTotal - getDiscountTotal() + vat;
-			}
+		return subTotal - getDiscountTotal() + vat + serviceCharge;
+	}
+
+	public Double getTotalVat() {
+		return subTotal - getDiscountTotal() + vat;
+	}
 }

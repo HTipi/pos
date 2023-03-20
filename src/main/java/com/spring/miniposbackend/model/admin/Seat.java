@@ -43,6 +43,14 @@ public class Seat extends AuditModel{
     @ColumnDefault("false")
     private boolean enable;
 	
+	@Column(name = "free", nullable = true)
+    @ColumnDefault("false")
+    private boolean free;
+	
+	@Column(name = "printed", nullable = true)
+    @ColumnDefault("false")
+    private boolean printed;
+	
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "branch_id")
     @JsonIgnore

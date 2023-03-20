@@ -270,7 +270,7 @@ public class SaleService {
 					if (!setting.contentEquals(setting))
 						throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 				}
-				item.setStockOut((long) (item.getStockOut() + (saleTemp.getQuantity() * item.getInvenQty())));
+				item.setStockOut((long) (item.getStockOut() + (saleTemp.getQuantity() * itemBranch.getInvenQty())));
 				itemRepository.save(item);
 			});
 		});
@@ -346,7 +346,7 @@ public class SaleService {
 					if (!setting.contentEquals(setting))
 						throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 				}
-				item.setStockOut((long) (item.getStockOut() - (sales.getQuantity() * item.getInvenQty())));
+				item.setStockOut((long) (item.getStockOut() - (sales.getQuantity() * itemBr.getInvenQty())));
 				itemRepository.save(item);
 			});
 		});

@@ -30,5 +30,8 @@ public interface ItemBranchRepository extends  JpaRepository<ItemBranch, Long>{
 	  Optional<ItemBranch> findByitemCode(String code);
 	  @Query(value = "select ib from ItemBranch ib where ib.item.code = ?1")
 	  Optional<ItemBranch> findByitemCode(List<String> arrStrr);
+	  
+	  @Query(value="select ib from ItemBranch ib where ib.item.id=?1 and ib.item.type='INVENTORY'")
+	  Optional<ItemBranch> findbyinventory(Long inventoryId);
 	
 }

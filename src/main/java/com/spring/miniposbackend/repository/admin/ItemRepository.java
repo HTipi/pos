@@ -24,4 +24,10 @@ public interface ItemRepository extends JpaRepository<Item, Long>{
 	
 	@Query(value = "select i from Item i where i.code=?1")
 	Optional<Item> findByCode(String code);
+	
+	
+	@Query(value = "select i from Item i where i.id=?1 and i.type='INVENTORY' ")
+	Optional<Item> findByitemId(Long inventoryId);
+
+	
 }

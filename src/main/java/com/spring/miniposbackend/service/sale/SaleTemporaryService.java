@@ -3,7 +3,6 @@ package com.spring.miniposbackend.service.sale;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.exception.UnauthorizedException;
-import com.spring.miniposbackend.exception.UnprocessableEntityException;
 import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.model.admin.PaymentChannel;
 import com.spring.miniposbackend.model.admin.Seat;
@@ -231,7 +229,152 @@ public class SaleTemporaryService {
 			return saleRepository.findByUserId(user.getId());
 		}
 	}
+	@Transactional
+	public List<SaleTemporary> updateDiscountAmount(Long saleTempId, Optional<Integer> seatId, Optional<Long> invoiceId,
+			Integer userId,double amount) {
+		List<SaleTemporary> list = new ArrayList<SaleTemporary>();
+		List<SaleTemporary> saletmps = new ArrayList<SaleTemporary>();
+		User user = userProfile.getProfile().getUser();
+		if (invoiceId.isPresent()) {
+			Optional<Invoice> invoice = invoiceRepository.findById(invoiceId.get());
+			if (!invoice.isPresent()) {
+				throw new ResourceNotFoundException("វិក័យប័ត្រនេះបានគិតរួចហើយ", "16");
+			}
+			saletmps = saleRepository.findByInvoiceId(invoiceId.get());
+			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(userId)) {
+				saleRepository.updateUserEditInvoice(user.getId(), invoiceId.get());
+				return saletmps;
+			}
+			saleRepository.updateUserEditInvoice(user.getId(), invoiceId.get());
+		} else if (seatId.isPresent()) {
+			Optional<Seat> seat = seatRepository.findById(seatId.get());
+			if (!seat.isPresent()) {
+				throw new ResourceNotFoundException("Seat does not exist");
+			}
 
+			saletmps = saleRepository.findBySeatId(seatId.get());
+			if (saletmps.size() == 0) {
+				throw new ConflictException("វិក័យប័ត្រនេះបានគិតរួចហើយ", "16");
+			}
+			if (!saletmps.get(0).getUserEdit().getId().equals(userId)) {
+				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
+				return saletmps;
+			}
+			saleRepository.updateUserEditSeat(user.getId(), seatId.get());
+		}
+		SaleTemporary saletemp = saleRepository.findById(saleTempId).map(sale -> {
+			ItemBranch itemBranch = sale.getItemBranch();
+			if ((itemBranch.getBranch().getId() != userProfile.getProfile().getBranch().getId())
+					|| !itemBranch.isEnable()) {
+				throw new UnauthorizedException("Item is unauthorized");
+			}
+			sale.setDiscountAmount(BigDecimal.valueOf(amount));
+			sale.setDiscountPercentage((short) 0);
+			return sale;
+		}).orElseThrow(
+				() -> new ResourceNotFoundException("ប្រតិបត្តិការនេះត្រូវបានលុបដោយអ្នកប្រើប្រាស់ម្នាក់ទៀត", "17"));
+		list.add(saletemp);
+
+		return list;
+
+	}
+	@Transactional
+	public List<SaleTemporary> updateDiscountPercentage(Long saleTempId, Optional<Integer> seatId, Optional<Long> invoiceId,
+			Integer userId,short amount) {
+		List<SaleTemporary> list = new ArrayList<SaleTemporary>();
+		List<SaleTemporary> saletmps = new ArrayList<SaleTemporary>();
+		User user = userProfile.getProfile().getUser();
+		if (invoiceId.isPresent()) {
+			Optional<Invoice> invoice = invoiceRepository.findById(invoiceId.get());
+			if (!invoice.isPresent()) {
+				throw new ResourceNotFoundException("វិក័យប័ត្រនេះបានគិតរួចហើយ", "16");
+			}
+			saletmps = saleRepository.findByInvoiceId(invoiceId.get());
+			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(userId)) {
+				saleRepository.updateUserEditInvoice(user.getId(), invoiceId.get());
+				return saletmps;
+			}
+			saleRepository.updateUserEditInvoice(user.getId(), invoiceId.get());
+		} else if (seatId.isPresent()) {
+			Optional<Seat> seat = seatRepository.findById(seatId.get());
+			if (!seat.isPresent()) {
+				throw new ResourceNotFoundException("Seat does not exist");
+			}
+
+			saletmps = saleRepository.findBySeatId(seatId.get());
+			if (saletmps.size() == 0) {
+				throw new ConflictException("វិក័យប័ត្រនេះបានគិតរួចហើយ", "16");
+			}
+			if (!saletmps.get(0).getUserEdit().getId().equals(userId)) {
+				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
+				return saletmps;
+			}
+			saleRepository.updateUserEditSeat(user.getId(), seatId.get());
+		}
+		SaleTemporary saletemp = saleRepository.findById(saleTempId).map(sale -> {
+			ItemBranch itemBranch = sale.getItemBranch();
+			if ((itemBranch.getBranch().getId() != userProfile.getProfile().getBranch().getId())
+					|| !itemBranch.isEnable()) {
+				throw new UnauthorizedException("Item is unauthorized");
+			}
+			sale.setDiscountAmount(BigDecimal.valueOf(0));
+			sale.setDiscountPercentage(amount);
+			return sale;
+		}).orElseThrow(
+				() -> new ResourceNotFoundException("ប្រតិបត្តិការនេះត្រូវបានលុបដោយអ្នកប្រើប្រាស់ម្នាក់ទៀត", "17"));
+		list.add(saletemp);
+
+		return list;
+
+	}
+	@Transactional
+	public List<SaleTemporary> updateQty(Long saleTempId, Optional<Integer> seatId, Optional<Long> invoiceId,
+			Integer userId,double qty) {
+		List<SaleTemporary> list = new ArrayList<SaleTemporary>();
+		List<SaleTemporary> saletmps = new ArrayList<SaleTemporary>();
+		User user = userProfile.getProfile().getUser();
+		if (invoiceId.isPresent()) {
+			Optional<Invoice> invoice = invoiceRepository.findById(invoiceId.get());
+			if (!invoice.isPresent()) {
+				throw new ResourceNotFoundException("វិក័យប័ត្រនេះបានគិតរួចហើយ", "16");
+			}
+			saletmps = saleRepository.findByInvoiceId(invoiceId.get());
+			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(userId)) {
+				saleRepository.updateUserEditInvoice(user.getId(), invoiceId.get());
+				return saletmps;
+			}
+			saleRepository.updateUserEditInvoice(user.getId(), invoiceId.get());
+		} else if (seatId.isPresent()) {
+			Optional<Seat> seat = seatRepository.findById(seatId.get());
+			if (!seat.isPresent()) {
+				throw new ResourceNotFoundException("Seat does not exist");
+			}
+
+			saletmps = saleRepository.findBySeatId(seatId.get());
+			if (saletmps.size() == 0) {
+				throw new ConflictException("វិក័យប័ត្រនេះបានគិតរួចហើយ", "16");
+			}
+			if (!saletmps.get(0).getUserEdit().getId().equals(userId)) {
+				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
+				return saletmps;
+			}
+			saleRepository.updateUserEditSeat(user.getId(), seatId.get());
+		}
+		SaleTemporary saletemp = saleRepository.findById(saleTempId).map(sale -> {
+			ItemBranch itemBranch = sale.getItemBranch();
+			if ((itemBranch.getBranch().getId() != userProfile.getProfile().getBranch().getId())
+					|| !itemBranch.isEnable()) {
+				throw new UnauthorizedException("Item is unauthorized");
+			}
+			sale.setQuantity((float) qty);
+			return sale;
+		}).orElseThrow(
+				() -> new ResourceNotFoundException("ប្រតិបត្តិការនេះត្រូវបានលុបដោយអ្នកប្រើប្រាស់ម្នាក់ទៀត", "17"));
+		list.add(saletemp);
+
+		return list;
+
+	}
 	@Transactional
 	public List<SaleTemporary> removeItem(Long saleTempId, Optional<Integer> seatId, Optional<Long> invoiceId,
 			Integer userId) {
@@ -282,7 +425,7 @@ public class SaleTemporaryService {
 				SaleTemporary parentSale = saleRepository.findById(sale.getParentSaleTemporary().getId())
 						.orElseThrow(() -> new ResourceNotFoundException("item not found", "17"));
 				parentSale.setPrice(parentSale.getPrice().subtract(itemBranch.getPrice()));
-				saleRepository.save(parentSale);
+				return saleRepository.save(parentSale);
 			}
 			return sale;
 		}).orElseThrow(
@@ -292,69 +435,66 @@ public class SaleTemporaryService {
 		return list;
 
 	}
-
-	@Transactional
-	public List<SaleTemporary> setQuantity(Long saleTempId, Short quantity, Optional<Integer> seatId,
-			Optional<Long> invoiceId, Integer userId) {
-		List<SaleTemporary> list = new ArrayList<SaleTemporary>();
-		User user = userProfile.getProfile().getUser();
-		List<SaleTemporary> saletmps = new ArrayList<SaleTemporary>();
-		if (invoiceId.isPresent()) {
-			Optional<Invoice> invoice = invoiceRepository.findById(invoiceId.get());
-			if (!invoice.isPresent()) {
-				throw new ResourceNotFoundException("Invoice does not exit");
-			}
-			saletmps = saleRepository.findByInvoiceId(invoiceId.get());
-			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(userId)) {
-				saleRepository.updateUserEditInvoice(user.getId(), invoiceId.get());
-				return saletmps;
-			}
-		} else if (seatId.isPresent()) {
-			Optional<Seat> seat = seatRepository.findById(seatId.get());
-			if (!seat.isPresent()) {
-				throw new ResourceNotFoundException("Seat does not exist");
-			}
-			saletmps = saleRepository.findBySeatId(seatId.get());
-			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(userId)) {
-				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
-				return saletmps;
-			}
-		}
-		SaleTemporary saletemp = saleRepository.findById(saleTempId).map(sale -> {
-			if (sale.isPrinted()) {
-				if (sale.getQuantity() > quantity)
-					throw new ConflictException("Record is already printed");
-			}
-			if (sale.getQuantity() < 1) {
-				throw new ConflictException("Qty must be greater than one");
-			}
-			if (sale.getItemBranch().isStock()) {
-				// int itembalance = saleRepository.findItemBalanceByUserId(userId,
-				// sale.getItemBranch().getId())
-				// .orElse(0);
-				if (sale.getItemBranch().getItemBalance() < quantity) {
-					String setting = branchSettingRepository
-							.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN")
-							.orElse("");
-					if (setting != "true")
-						throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
-				}
-			}
-			ItemBranch itemBranch = sale.getItemBranch();
-			if ((itemBranch.getBranch().getId() != userProfile.getProfile().getBranch().getId())
-					|| !itemBranch.isEnable()) {
-				throw new UnauthorizedException("Item is unauthorized");
-			}
-
-			sale.setQuantity(quantity);
-			sale.setValueDate(new Date());
-			sale.setUser(user);
-			sale.setUserEdit(user);
-			return saleRepository.save(sale);
-		}).orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
-		list.add(saletemp);
-		return list;
-	}
+//	@Transactional
+//	public List<SaleTemporary> addSub(SaleRequest request, Optional<Integer> seatId, Optional<Long> invoiceId,
+//			Integer userId) {
+//		List<SaleTemporary> list = new ArrayList<SaleTemporary>();
+//		List<SaleTemporary> saletmps = new ArrayList<SaleTemporary>();
+//		User user = userProfile.getProfile().getUser();
+//		if (invoiceId.isPresent()) {
+//			Optional<Invoice> invoice = invoiceRepository.findById(invoiceId.get());
+//			if (!invoice.isPresent()) {
+//				throw new ResourceNotFoundException("វិក័យប័ត្រនេះបានគិតរួចហើយ", "16");
+//			}
+//			saletmps = saleRepository.findByInvoiceId(invoiceId.get());
+//			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(userId)) {
+//				saleRepository.updateUserEditInvoice(user.getId(), invoiceId.get());
+//				return saletmps;
+//			}
+//			saleRepository.updateUserEditInvoice(user.getId(), invoiceId.get());
+//		} else if (seatId.isPresent()) {
+//			Optional<Seat> seat = seatRepository.findById(seatId.get());
+//			if (!seat.isPresent()) {
+//				throw new ResourceNotFoundException("Seat does not exist");
+//			}
+//
+//			saletmps = saleRepository.findBySeatId(seatId.get());
+//			if (saletmps.size() == 0) {
+//				throw new ConflictException("វិក័យប័ត្រនេះបានគិតរួចហើយ", "16");
+//			}
+//			if (!saletmps.get(0).getUserEdit().getId().equals(userId)) {
+//				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
+//				return saletmps;
+//			}
+//			saleRepository.updateUserEditSeat(user.getId(), seatId.get());
+//		}
+//		SaleTemporary saletemp = saleRepository.findById(saleTempId).map(sale -> {
+////			if (sale.isPrinted()) {
+////				throw new ConflictException("Record is already printed");
+////			}
+//			ItemBranch itemBranch = sale.getItemBranch();
+//			if ((itemBranch.getBranch().getId() != userProfile.getProfile().getBranch().getId())
+//					|| !itemBranch.isEnable()) {
+//				throw new UnauthorizedException("Item is unauthorized");
+//			}
+//			if (sale.getParentSaleTemporary() != null) {
+//				saleRepository.deductPriceBySaleTempId(sale.getParentSaleTemporary().getId(), sale.getPrice());
+//			}
+//			saleRepository.deleteBySaleTempId(saleTempId);
+//			if (itemBranch.getItem().getType().equalsIgnoreCase("SUBITEM")) {
+//				SaleTemporary parentSale = saleRepository.findById(sale.getParentSaleTemporary().getId())
+//						.orElseThrow(() -> new ResourceNotFoundException("item not found", "17"));
+//				parentSale.setPrice(parentSale.getPrice().subtract(itemBranch.getPrice()));
+//				saleRepository.save(parentSale);
+//			}
+//			return sale;
+//		}).orElseThrow(
+//				() -> new ResourceNotFoundException("ប្រតិបត្តិការនេះត្រូវបានលុបដោយអ្នកប្រើប្រាស់ម្នាក់ទៀត", "17"));
+//		list.add(saletemp);
+//
+//		return list;
+//
+//	}
 
 	@Transactional
 	public List<SaleTemporary> printBySeat(Integer seatId, Optional<Long> invoiceId, Optional<Long> customerId,
@@ -376,6 +516,9 @@ public class SaleTemporaryService {
 				else {
 					list = saleRepository.findBySeatForPrintId(seatId);
 				}
+				Seat seat = seatRepository.findById(seatId).orElseThrow(() -> new ResourceNotFoundException("Seat does not exist"));
+				seat.setPrinted(true);
+				seatRepository.save(seat);
 			}
 			Long receiptNum = receiptService.getBillNumberByBranchId(userProfile.getProfile().getBranch().getId());
 			Customer customer = customerId.isPresent() ? customerRepository.findById(customerId.get()).orElse(null)
@@ -519,6 +662,8 @@ public class SaleTemporaryService {
 			} else {
 				saleRepository.updateInvoiceBySeatId(invoice.getId(), seatId.get());
 			}
+			seat.setFree(true);
+			seatRepository.save(seat);
 
 		} else {
 			invoice = invoiceRepository.save(invoice);
@@ -574,6 +719,9 @@ public class SaleTemporaryService {
 					saleTmp.setInvoice(invoice.get());
 				} else if (seat.isPresent()) {
 					saleTmp.setSeat(seat.get());
+					Seat newSeat = seat.get();
+					newSeat.setFree(false);
+					seatRepository.save(newSeat);
 				}
 				if (parentSale.isPresent() && item.getType().contentEquals("SUBITEM")) {
 					saleTmp.setParentSaleTemporary(parentSale.get());
@@ -618,6 +766,9 @@ public class SaleTemporaryService {
 				}
 				if (seat.isPresent()) {
 					saleTmp.setSeat(seat.get());
+					Seat newSeat = seat.get();
+					newSeat.setFree(false);
+					seatRepository.save(newSeat);
 				}
 				if (parentSale.isPresent() && item.getType().contentEquals("SUBITEM")) {
 					saleTmp.setParentSaleTemporary(parentSale.get());

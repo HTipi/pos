@@ -53,6 +53,9 @@ public class Sale extends AuditModel {
 
 	@Column(name = "value_date", nullable = false)
 	private Date valueDate;
+	
+	@Column(name = "end_date", nullable = true)
+	private Date endDate;
 
 	@Column(name = "reverse", nullable = false)
 	@ColumnDefault("false")

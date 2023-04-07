@@ -29,7 +29,7 @@ public class ItemBranchInventory {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "item_branch_inventory_id", nullable = false)
 	@JsonIgnore
-	private ItemBranch inventoryId;
+	private ItemBranch inventories;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "item_branch_id", nullable = false)
@@ -44,8 +44,10 @@ public class ItemBranchInventory {
 	@Column(name = "qty", nullable = false)
 	private int qty;
 	
-	public Long getItembranchId() {
+	public Long getItemBranchId() {
 		return itembranch.getId();
 	}
-	
+	public Long getInvenId() {
+		return inventories.getId();
+	}
 }

@@ -19,10 +19,10 @@
 	<parameter name="logo" class="java.io.InputStream"/>
 	<parameter name="branchName" class="java.lang.String"/>
 	<queryString language="SQL">
-		<![CDATA[select i.name_kh,sum(quantity) quantities,sum(d.sub_total) total,sum(coalesce(d.costing,0) * quantity) costing,(select min(receipt_number::INTEGER) receipt_number from sales where date_trunc('day',value_date) between $P{start} and $P{end} and branch_id=$P{branchId} and reverse=false) min_receipt,
-(select max(receipt_number::INTEGER) receipt_number from sales where date_trunc('day',value_date) between $P{start} and $P{end} and branch_id=$P{branchId} and reverse=false) max_receipt,
+		<![CDATA[select i.name_kh,sum(quantity) quantities,sum(d.sub_total) total,sum(coalesce(d.costing,0) * quantity) costing,(select min(receipt_number::INTEGER) receipt_number from sales where date_trunc('day',end_date) between $P{start} and $P{end} and branch_id=$P{branchId} and reverse=false) min_receipt,
+(select max(receipt_number::INTEGER) receipt_number from sales where date_trunc('day',end_date) between $P{start} and $P{end} and branch_id=$P{branchId} and reverse=false) max_receipt,
 date_trunc('day',d.value_date) value_date,
-(select sum(discount_amount+discount_sale_detail) from sales inner join branches b on sales.branch_id=b.id where date_trunc('day',value_date) 
+(select sum(discount_amount+discount_sale_detail) from sales inner join branches b on sales.branch_id=b.id where date_trunc('day',end_date) 
 	between $P{start} and $P{end} and b.id=$P{branchId} and sales.reverse=false) as discount_amount
 from sale_details d inner join item_branches ib on d.item_branch_id=ib.id
 inner join sales s on s.id=d.sale_id

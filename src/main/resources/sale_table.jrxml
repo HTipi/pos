@@ -80,9 +80,9 @@ group by i.name_kh,i.id,t.name_kh,date_trunc('day',d.value_date) order by value_
 	<parameter name="start" class="java.util.Date"/>
 	<parameter name="end" class="java.util.Date"/>
 	<queryString language="SQL">
-		<![CDATA[select 0 id,count(s.id) quantities,sum(sub_total) - sum(discount_amount)+sum(discount_sale_detail) total,case when seat_name='' then 'Takeaway' else seat_name end name_kh,date_trunc('day',s.value_date) value_date from sales s  
-where s.reverse=false and date_trunc('day',s.value_date) between $P{start} and $P{end}
-and s.branch_id=$P{branchId} group by seat_name,date_trunc('day',s.value_date);]]>
+		<![CDATA[select 0 id,count(s.id) quantities,sum(sub_total) - sum(discount_amount)+sum(discount_sale_detail) total,case when seat_name='' then 'Takeaway' else seat_name end name_kh,date_trunc('day',s.end_date) value_date from sales s  
+where s.reverse=false and date_trunc('day',s.end_date) between $P{start} and $P{end}
+and s.branch_id=$P{branchId} group by seat_name,date_trunc('day',s.end_date);]]>
 	</queryString>
 	<field name="id" class="java.lang.Integer">
 		<property name="com.jaspersoft.studio.field.name" value="id"/>
@@ -173,7 +173,7 @@ and s.branch_id=$P{branchId} group by seat_name,date_trunc('day',s.value_date);]
 						</cellContents>
 					</crosstabTotalColumnHeader>
 				</columnGroup>
-				<measure name="quantities_MEASURE" class="java.lang.Integer" calculation="Count">
+				<measure name="quantities_MEASURE" class="java.lang.Integer" calculation="Sum">
 					<measureExpression><![CDATA[$F{quantities}]]></measureExpression>
 				</measure>
 				<measure name="total_MEASURE" class="java.lang.Double" calculation="Sum">

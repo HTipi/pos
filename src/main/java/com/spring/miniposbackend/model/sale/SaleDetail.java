@@ -127,7 +127,9 @@ public class SaleDetail extends AuditModel {
 	public String getItemTypeName() {
 		return itemBranch.getItemTypeName();
 	}
-
+	public Date getEndDate() {
+		return sale.getEndDate();
+	}
 	public Long getItemId() {
 		return itemBranch.getId();
 	}

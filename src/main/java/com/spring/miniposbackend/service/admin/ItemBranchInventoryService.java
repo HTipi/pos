@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
+import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.model.admin.Item;
 import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.model.admin.ItemBranchInventory;
@@ -34,28 +35,30 @@ public class ItemBranchInventoryService {
 		List<ItemBranchInventory> list = new ArrayList<>();
 		ItemBranch itemBranch = itembranchRepository.findById(itembranchid)
 				.orElseThrow(() -> new ResourceAccessException("you're branch doesn't has this item"));
-		itembranchinventoryRepository.deleteBybranchId(userProfile.getProfile().getBranch().getId());
+		itembranchinventoryRepository.deleteByitembranchId(itembranchid);
 		for (int i = 0; i < inventoryView.size(); i++) {
-		ItemBranch inventory = itembranchRepository.findById(inventoryView.get(i).getInventoryId())
-				.orElseThrow(() -> new ResourceAccessException("you're branch doesn't has this item"));
-			
-			if(inventory.getItem().getType().equalsIgnoreCase("INVENTORY"))
-			{
+			ItemBranch inventory = itembranchRepository.findById(inventoryView.get(i).getInventoryId())
+					.orElseThrow(() -> new ResourceAccessException("you're branch doesn't has this item"));
+
+			if (inventory.getItem().getType().equalsIgnoreCase("INVENTORY")) {
 				ItemBranchInventory inventoryDb = new ItemBranchInventory();
-				inventoryDb.setInventoryId(inventory);
+				inventoryDb.setInventories(inventory);
 				inventoryDb.setItembranch(itemBranch);
 				inventoryDb.setQty(inventoryView.get(i).getQty());
 				inventoryDb.setBranch(userProfile.getProfile().getBranch());
 				list.add(inventoryDb);
-				
+
 				itembranchinventoryRepository.save(inventoryDb);
-			}
-			else {
+			} else {
 				throw new ResourceNotFoundException("not inventory");
 			}
-				
+
 		}
 		return list;
+	}
+
+	public List<ItemBranchInventory> showByBranchId() {
+		return itembranchinventoryRepository.findByBranchId(userProfile.getProfile().getBranch().getId());
 	}
 
 }

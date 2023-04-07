@@ -11,6 +11,7 @@ import com.spring.miniposbackend.model.admin.BranchPaymentChannel;
 import com.spring.miniposbackend.model.admin.BranchSetting;
 import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.model.admin.ItemType;
+import com.spring.miniposbackend.model.admin.Printer;
 import com.spring.miniposbackend.model.admin.User;
 import com.spring.miniposbackend.model.admin.UserRole;
 import com.spring.miniposbackend.model.security.ClientApplication;
@@ -22,6 +23,7 @@ import com.spring.miniposbackend.repository.admin.BranchPaymentChannelRepository
 import com.spring.miniposbackend.repository.admin.BranchSettingRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
 import com.spring.miniposbackend.repository.admin.ItemTypeRepository;
+import com.spring.miniposbackend.repository.admin.PrinterRepository;
 import com.spring.miniposbackend.repository.admin.UserRepository;
 import com.spring.miniposbackend.repository.admin.UserRoleRepository;
 import com.spring.miniposbackend.repository.security.ClientApplicationRepository;
@@ -52,6 +54,8 @@ public class InitService {
 	private UserRoleRepository userRoleRepository;
 	@Autowired
 	private ClientApplicationRepository clientApplicationRepository;
+	@Autowired
+	private PrinterRepository printerRepository;
 
 	@Autowired
 	private ImageUtil imageUtil;
@@ -80,9 +84,10 @@ public class InitService {
 			List<ImageResponse> imageItem = getImagesFromListItem(itemBranch);
 			UserResponse user = getUsers();
 			ClientApplication clientApp = getClientApp("SALE");
+			List<Printer> printers = getPrinters(branchId);
 
 			return new InitViewModel(settings, itemBranch, itemType, currencies, imageItem, imageItemType, user,
-					clientApp);
+					clientApp,printers);
 		} catch (Exception e) {
 			throw new Exception(e.getMessage());
 		}
@@ -193,6 +198,9 @@ public class InitService {
 	private ClientApplication getClientApp(String name) {
 		return clientApplicationRepository.findFirstByName(name)
 				.orElseThrow(() -> new ResourceNotFoundException("Record does not exist", "01"));
+	}
+	private List<Printer> getPrinters(int branchId) {
+		return printerRepository.findByBranchId(branchId);
 	}
 
 }

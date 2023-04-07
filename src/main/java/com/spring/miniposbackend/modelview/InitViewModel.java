@@ -7,6 +7,7 @@ import com.spring.miniposbackend.model.admin.BranchPaymentChannel;
 import com.spring.miniposbackend.model.admin.BranchSetting;
 import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.model.admin.ItemType;
+import com.spring.miniposbackend.model.admin.Printer;
 import com.spring.miniposbackend.model.security.ClientApplication;
 
 import lombok.Getter;
@@ -23,10 +24,11 @@ public class InitViewModel {
 	private List<ImageResponse> itemTypeImages;
 	private UserResponse userResponse;
 	private ClientApplication clientApplication;
+	private List<Printer> printers;
 
 	public InitViewModel(List<BranchSetting> settings, List<ItemBranch> items, List<ItemType> itemTypes,
 			List<BranchCurrency> currencies, List<ImageResponse> imageItem, List<ImageResponse> imageItemType,
-			UserResponse userResponse, ClientApplication clientApplication) {
+			UserResponse userResponse, ClientApplication clientApplication,List<Printer> printers) {
 		this.settings = settings;
 		this.items = items;
 		this.itemTypes = itemTypes;
@@ -35,5 +37,6 @@ public class InitViewModel {
 		this.itemTypeImages = imageItemType;
 		this.userResponse = userResponse;
 		this.clientApplication = clientApplication;
+		this.printers = printers;
 	}
 }

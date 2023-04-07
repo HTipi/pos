@@ -19,6 +19,7 @@ import com.spring.miniposbackend.model.admin.Branch;
 import com.spring.miniposbackend.model.admin.BranchCurrency;
 import com.spring.miniposbackend.model.admin.BranchPromotion;
 import com.spring.miniposbackend.model.admin.ItemBranch;
+import com.spring.miniposbackend.model.admin.ItemBranchInventory;
 import com.spring.miniposbackend.model.admin.Seat;
 import com.spring.miniposbackend.model.admin.User;
 import com.spring.miniposbackend.model.sale.Invoice;
@@ -32,6 +33,7 @@ import com.spring.miniposbackend.repository.admin.BranchCurrencyRepository;
 import com.spring.miniposbackend.repository.admin.BranchPromotionRepository;
 import com.spring.miniposbackend.repository.admin.BranchSettingRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
+import com.spring.miniposbackend.repository.admin.ItemBranchinventoryRepository;
 import com.spring.miniposbackend.repository.admin.PaymentChannelRepository;
 import com.spring.miniposbackend.repository.admin.SeatRepository;
 import com.spring.miniposbackend.repository.customer.CustomerRepository;
@@ -81,6 +83,8 @@ public class SaleService {
 	private BranchPromotionRepository branchPromotionRepository;
 	@Autowired
 	private SaleDetailPromotionRepository saleDetailPromotionRepository;
+	@Autowired
+	private ItemBranchinventoryRepository itemBranchinventoryRepository;
 
 	public List<Sale> showSaleByUser(@DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> date, boolean byUser,
 			Optional<Integer> paymentId) {
@@ -112,31 +116,34 @@ public class SaleService {
 		return saleRepository.findByUserId(userProfile.getProfile().getUser().getId());
 
 	}
-	public List<Sale> showSaleRangeByUser(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Optional<Date> date, boolean byUser,
-			Optional<Integer> paymentId,@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Optional<Date> end) {
+
+	public List<Sale> showSaleRangeByUser(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Optional<Date> date,
+			boolean byUser, Optional<Integer> paymentId,
+			@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Optional<Date> end) {
 		if (date.isPresent()) {
 			if (byUser) {
 				if (paymentId.isPresent()) {
 					if (paymentId.get() == 0)
 						return saleRepository.findByIdWithValueDateRangeAndPaymentNullId(
-								userProfile.getProfile().getUser().getId(), date.get(),end.get());
+								userProfile.getProfile().getUser().getId(), date.get(), end.get());
 					else
 						return saleRepository.findByIdWithValueDateRangeAndPaymentId(
-								userProfile.getProfile().getUser().getId(), date.get(), paymentId.get(),end.get());
+								userProfile.getProfile().getUser().getId(), date.get(), paymentId.get(), end.get());
 				} else
-					return saleRepository.findByIdWithValueDateRange(userProfile.getProfile().getUser().getId(), date.get(),end.get());
+					return saleRepository.findByIdWithValueDateRange(userProfile.getProfile().getUser().getId(),
+							date.get(), end.get());
 
 			} else {
 				if (paymentId.isPresent()) {
 					if (paymentId.get() == 0)
 						return saleRepository.findByBranchIdWithValueDateRangeAndPaymentNullId(
-								userProfile.getProfile().getBranch().getId(), date.get(),end.get());
+								userProfile.getProfile().getBranch().getId(), date.get(), end.get());
 					else
 						return saleRepository.findByBranchIdWithValueDateRangeAndPaymentId(
-								userProfile.getProfile().getBranch().getId(), date.get(), paymentId.get(),end.get());
+								userProfile.getProfile().getBranch().getId(), date.get(), paymentId.get(), end.get());
 				} else
 					return saleRepository.findByBranchIdWithValueDateRange(userProfile.getProfile().getBranch().getId(),
-							date.get(),end.get());
+							date.get(), end.get());
 			}
 		}
 		return saleRepository.findByUserId(userProfile.getProfile().getUser().getId());
@@ -150,7 +157,8 @@ public class SaleService {
 	@Transactional
 	public List create(Optional<Long> invoiceId, Optional<Integer> seatId, Optional<Integer> channelId, Double discount,
 			Double cashIn, Double change, Integer currencyId, Integer userId, boolean cancel, Optional<String> remark,
-			Optional<Double> serviceCharge,Optional<SpitBillItems> spitBillItems,Optional<Long> customerId,Optional<Double> vat) {
+			Optional<Double> serviceCharge, Optional<SpitBillItems> spitBillItems, Optional<Long> customerId,
+			Optional<Double> vat) {
 		entityManager.clear();
 		User user = userProfile.getProfile().getUser();
 		Branch branch = userProfile.getProfile().getBranch();
@@ -184,19 +192,15 @@ public class SaleService {
 				throw new UnauthorizedException("Transaction is unauthorized");
 			}
 			seatName = seat.getName();
-			if(spitBillItems.isPresent())
-			{
-				if(spitBillItems.get().getSaleTempIds().size() > 0)
-				{
-					saleTemps = saleTemporaryRepository.findSplitBySeatId(seatId.get(),spitBillItems.get().getSaleTempIds());
+			if (spitBillItems.isPresent()) {
+				if (spitBillItems.get().getSaleTempIds().size() > 0) {
+					saleTemps = saleTemporaryRepository.findSplitBySeatId(seatId.get(),
+							spitBillItems.get().getSaleTempIds());
+				} else {
+					saleTemps = saleTemporaryRepository.findBySeatId(seatId.get());
 				}
-				else {
-					saleTemps = saleTemporaryRepository.findBySeatId(seatId.get());	
-				}
-			}
-			else
-			{
-				saleTemps = saleTemporaryRepository.findBySeatId(seatId.get());	
+			} else {
+				saleTemps = saleTemporaryRepository.findBySeatId(seatId.get());
 			}
 			if (saleTemps.size() == 0) {
 				throw new ConflictException("វិក័យប័ត្រនេះបានគិតរួចហើយ", "16");
@@ -221,10 +225,11 @@ public class SaleService {
 		sale.setDiscountSaleDetail(BigDecimal.valueOf(0.00));
 		sale.setDiscountAmount(BigDecimal.valueOf(discount));
 		sale.setReceiptNumber("0");
-		sale.setValueDate(new Date());
+		sale.setValueDate(saleTemps.get(0).getValueDate());
 		sale.setCashIn(cashIn);
 		sale.setChange(change);
 		sale.setReverse(cancel);
+		sale.setEndDate(new Date());
 		if (serviceCharge.isPresent())
 			sale.setServiceCharge(serviceCharge.get());
 		else
@@ -244,8 +249,7 @@ public class SaleService {
 		if (channelId.isPresent()) {
 			sale.setPaymentChannel(paymentChannelRepository.findById(channelId.get()).orElse(null));
 		}
-		if(customerId.isPresent())
-		{
+		if (customerId.isPresent()) {
 			sale.setCustomer(customerRepository.findById(customerId.get()).orElse(null));
 		}
 		Sale saleResult = saleRepository.save(sale);
@@ -257,37 +261,55 @@ public class SaleService {
 				addItem(branch, user, saleResult, subItem, Optional.of(saleDetail), cancel);
 			});
 			ItemBranch itemBranch = saleTemp.getItemBranch();
-			List<Long> inventories = itemBranch.getAddOnInven() == null ? new ArrayList<Long>()
-					: itemBranch.getAddOnInven();
-			inventories.forEach((inventory) -> {
-				ItemBranch item = itemRepository.findById(inventory)
-						.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
-				int itembalance = saleTemporaryRepository.findItemBalanceByUserId(user.getId(), item.getId()).orElse(0);
-				if (item.getItemBalance() < itembalance) {
-					String setting = branchSettingRepository
-							.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN")
-							.orElse("");
-					if (!setting.contentEquals(setting))
-						throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
-				}
-				item.setStockOut((long) (item.getStockOut() + (saleTemp.getQuantity() * itemBranch.getInvenQty())));
-				itemRepository.save(item);
-			});
+			List<ItemBranchInventory> itemInventories = itemBranchinventoryRepository
+					.findByItemBranchId(itemBranch.getId());
+			if (itemInventories.size() > 0) {
+				itemInventories.forEach((inventory) -> {
+					ItemBranch item = itemRepository.findById(inventory.getInvenId())
+							.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
+					int itembalance = saleTemporaryRepository.findItemBalanceByUserId(user.getId(), item.getId())
+							.orElse(0);
+					if (item.getItemBalance() < itembalance) {
+						String setting = branchSettingRepository
+								.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN")
+								.orElse("");
+						if (!setting.contentEquals(setting))
+							throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
+					}
+					item.setStockOut((long) (item.getStockOut() + (saleTemp.getQuantity() * inventory.getQty())));
+					itemRepository.save(item);
+				});
+			} else {
+				List<Long> inventories = itemBranch.getAddOnInven() == null ? new ArrayList<Long>()
+						: itemBranch.getAddOnInven();
+				inventories.forEach((inventory) -> {
+					ItemBranch item = itemRepository.findById(inventory)
+							.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
+					int itembalance = saleTemporaryRepository.findItemBalanceByUserId(user.getId(), item.getId())
+							.orElse(0);
+					if (item.getItemBalance() < itembalance) {
+						String setting = branchSettingRepository
+								.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN")
+								.orElse("");
+						if (!setting.contentEquals(setting))
+							throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
+					}
+					item.setStockOut((long) (item.getStockOut() + (saleTemp.getQuantity() * itemBranch.getInvenQty())));
+					itemRepository.save(item);
+				});
+			}
 		});
 		if (invoiceId.isPresent()) {
 			saleTemporaryRepository.deleteByInvoiceId(invoiceId.get());
 			invoiceRepository.deleteById(invoiceId.get());
 		} else if (seatId.isPresent()) {
-			if(spitBillItems.isPresent()) {
-				if(spitBillItems.get().getSaleTempIds().size() > 0)
-				{
+			if (spitBillItems.isPresent()) {
+				if (spitBillItems.get().getSaleTempIds().size() > 0) {
 					saleTemporaryRepository.deleteByListId(spitBillItems.get().getSaleTempIds());
-				}
-				else
+				} else
 					saleTemporaryRepository.deleteBySeatId(seatId.get());
-			}
-			else
-			saleTemporaryRepository.deleteBySeatId(seatId.get());
+			} else
+				saleTemporaryRepository.deleteBySeatId(seatId.get());
 		} else {
 			saleTemporaryRepository.deleteByUserId(user.getId());
 		}
@@ -333,22 +355,45 @@ public class SaleService {
 				itemBr.setStockOut((long) (itemBr.getStockOut() - sales.getQuantity()));
 				itemRepository.save(itemBr);
 			}
-			List<Long> inventories = itemBr.getAddOnInven() == null ? new ArrayList<Long>() : itemBr.getAddOnInven();
-			inventories.forEach((inventory) -> {
-				ItemBranch item = itemRepository.findById(inventory)
-						.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
-				int itembalance = saleTemporaryRepository
-						.findItemBalanceByUserId(userProfile.getProfile().getUser().getId(), item.getId()).orElse(0);
-				if (item.getItemBalance() < itembalance) {
-					String setting = branchSettingRepository
-							.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN")
-							.orElse("");
-					if (!setting.contentEquals(setting))
-						throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
-				}
-				item.setStockOut((long) (item.getStockOut() - (sales.getQuantity() * itemBr.getInvenQty())));
-				itemRepository.save(item);
-			});
+			List<ItemBranchInventory> itemInventories = itemBranchinventoryRepository
+					.findByItemBranchId(itemBr.getId());
+			if (itemInventories.size() > 0) {
+				itemInventories.forEach((inventory) -> {
+					ItemBranch item = itemRepository.findById(inventory.getInvenId())
+							.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
+					int itembalance = saleTemporaryRepository
+							.findItemBalanceByUserId(userProfile.getProfile().getUser().getId(), item.getId())
+							.orElse(0);
+					if (item.getItemBalance() < itembalance) {
+						String setting = branchSettingRepository
+								.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN")
+								.orElse("");
+						if (!setting.contentEquals(setting))
+							throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
+					}
+					item.setStockOut((long) (item.getStockOut() - (sales.getQuantity() * inventory.getQty())));
+					itemRepository.save(item);
+				});
+			} else {
+				List<Long> inventories = itemBr.getAddOnInven() == null ? new ArrayList<Long>()
+						: itemBr.getAddOnInven();
+				inventories.forEach((inventory) -> {
+					ItemBranch item = itemRepository.findById(inventory)
+							.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
+					int itembalance = saleTemporaryRepository
+							.findItemBalanceByUserId(userProfile.getProfile().getUser().getId(), item.getId())
+							.orElse(0);
+					if (item.getItemBalance() < itembalance) {
+						String setting = branchSettingRepository
+								.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN")
+								.orElse("");
+						if (!setting.contentEquals(setting))
+							throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
+					}
+					item.setStockOut((long) (item.getStockOut() - (sales.getQuantity() * itemBr.getInvenQty())));
+					itemRepository.save(item);
+				});
+			}
 		});
 		return saleRepository.save(sale);
 	}
@@ -430,18 +475,19 @@ public class SaleService {
 			saleDeail.setParentSaleDetail(parentSaleDetail.get());
 		}
 		SaleDetail details = saleDetailRepository.save(saleDeail);
-		List<Integer> listPromo = saleTemporary.getAddPromo() == null ? new ArrayList<Integer>() : saleTemporary.getAddPromo();
-		if(listPromo.size() > 0)
-		{
+		List<Integer> listPromo = saleTemporary.getAddPromo() == null ? new ArrayList<Integer>()
+				: saleTemporary.getAddPromo();
+		if (listPromo.size() > 0) {
 			List<Integer> list = saleTemporary.getAddPromo();
 			SaleDetailPromotion salePromo = null;
 			for (int i = 0; i < list.size(); i++) {
 				salePromo = new SaleDetailPromotion();
-				BranchPromotion branchPro = branchPromotionRepository.findById(list.get(i)).orElseThrow(() -> new ResourceNotFoundException("Promotion does not exist"));
+				BranchPromotion branchPro = branchPromotionRepository.findById(list.get(i))
+						.orElseThrow(() -> new ResourceNotFoundException("Promotion does not exist"));
 				salePromo.setSaleDetailPromotionIdentity(new SaleDetailPromotionIdentity(details, branchPro));
 				salePromo.setDiscount(BigDecimal.valueOf(saleTemporary.getDiscountTotal()));
 				saleDetailPromotionRepository.save(salePromo);
-				}
+			}
 		}
 		return details;
 	}

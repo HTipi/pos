@@ -69,12 +69,12 @@ public class SaleDashboardService {
 
 	public List<PromotionReceipt> promotionReceipt(Integer branchId,@DateTimeFormat(pattern = "yyyy-MM-dd") Date  startDate) {
 		MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource();
-		mapSqlParameterSource.addValue("value_date", startDate);
+		mapSqlParameterSource.addValue("end_date", startDate);
 		mapSqlParameterSource.addValue("user_id", userProfile.getProfile().getUser().getId());
 		return jdbc.query("select p.name_kh promotion,sum(sp.discount) discount_amt,sum(s.quantity) qty from sale_detail_promotion sp inner join sale_details s on sp.sale_detail_id=s.id "
 				+ "inner join item_branches ib on ib.id=s.item_branch_id inner join items i on i.id=ib.item_id "
 				+ "inner join branch_promotions bp on bp.id=sp.branch_promotion_id "
-				+ "inner join promotions p on p.id=bp.promotion_id where s.reverse=false and date_trunc('day',s.value_date)=:value_date and s.user_id=:user_id and i.type='MAINITEM'"
+				+ "inner join promotions p on p.id=bp.promotion_id where s.reverse=false and date_trunc('day',s.value_date)=:end_date and s.user_id=:user_id and i.type='MAINITEM'"
 				+ "group by p.name_kh,p.id order by p.id",
 				mapSqlParameterSource,
 				(rs, rowNum) -> new PromotionReceipt(rs.getString("promotion"),
@@ -83,19 +83,19 @@ public class SaleDashboardService {
 	
 	public List<ChannelReceipt> channelReceipt(Integer branchId,@DateTimeFormat(pattern = "yyyy-MM-dd") Date  startDate) {
 		MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource();
-		mapSqlParameterSource.addValue("value_date", startDate);
+		mapSqlParameterSource.addValue("end_date", startDate);
 		mapSqlParameterSource.addValue("user_id", userProfile.getProfile().getUser().getId());
-		return jdbc.query("select * from channelbyuser(:user_id,:value_date)",
+		return jdbc.query("select * from channelbyuser(:user_id,:end_date)",
 				mapSqlParameterSource,
 				(rs, rowNum) -> new ChannelReceipt(rs.getString("name_kh"),rs.getInt("receipt"),
 						rs.getDouble("total"), rs.getDouble("discount")));
 	}
 	public List<ChannelReceipt> channelReceipts(Integer branchId,@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date  startDate,@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date  end) {
 		MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource();
-		mapSqlParameterSource.addValue("value_date", startDate);
+		mapSqlParameterSource.addValue("startDate", startDate);
 		mapSqlParameterSource.addValue("end_date", end);
 		mapSqlParameterSource.addValue("user_id", userProfile.getProfile().getUser().getId());
-		return jdbc.query("select * from channelbyusers(:user_id,:value_date,:end_date)",
+		return jdbc.query("select * from channelbyusers(:user_id,:startDate,:end_date)",
 				mapSqlParameterSource,
 				(rs, rowNum) -> new ChannelReceipt(rs.getString("name_kh"),rs.getInt("receipt"),
 						rs.getDouble("total"), rs.getDouble("discount")));

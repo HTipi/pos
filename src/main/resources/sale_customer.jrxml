@@ -174,7 +174,7 @@ and s.branch_id=$P{branchId} group by s.customer_id,c.name_kh,date_trunc('day',s
 						</cellContents>
 					</crosstabTotalColumnHeader>
 				</columnGroup>
-				<measure name="quantities_MEASURE" class="java.lang.Integer" calculation="Count">
+				<measure name="quantities_MEASURE" class="java.lang.Integer" calculation="Sum">
 					<measureExpression><![CDATA[$F{quantities}]]></measureExpression>
 				</measure>
 				<measure name="total_MEASURE" class="java.lang.Double" calculation="Sum">

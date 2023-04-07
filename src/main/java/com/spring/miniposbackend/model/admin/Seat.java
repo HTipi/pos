@@ -44,7 +44,7 @@ public class Seat extends AuditModel{
     private boolean enable;
 	
 	@Column(name = "free", nullable = true)
-    @ColumnDefault("false")
+    @ColumnDefault("true")
     private boolean free;
 	
 	@Column(name = "printed", nullable = true)

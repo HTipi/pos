@@ -47,11 +47,11 @@ public class SaleDetailService {
 		SaleDetailSummary summary = jdbc.queryForObject(
 				"select count(case when sale.reverse = true then 1 else null end) as void_invoice, "
 						+ "count(case when sale.reverse = false then 1 else null end) as paid_invoice, "
-						+ "min(value_date) as start_date, " + "max(value_date) as end_date,sum(vat) vat,sum(service_charge) service_charge, "
+						+ "min(end_date) as start_date, " + "max(end_date) as end_date,sum(vat) vat,sum(service_charge) service_charge, "
 						+ "sum(case when sale.reverse = false then sale.sub_total else 0 end) as sub_total, "
 						+ "sum(case when sale.reverse = false then sale.discount_amount else 0 end) as discount_amount, "
 						+ "sum(case when sale.reverse = false then sale.discount_sale_detail else 0 end) as discount_sale_detail "
-						+ "from sales sale where date_trunc('day',sale.value_date) between :startDate and :endDate "
+						+ "from sales sale where date_trunc('day',sale.end_date) between :startDate and :endDate "
 						+ queryCondition,
 				mapSqlParameterSource,
 				(rs, rowNum) -> new SaleDetailSummary(rs.getInt("void_invoice"), rs.getInt("paid_invoice"),
@@ -94,11 +94,11 @@ public class SaleDetailService {
 		SaleDetailSummary summary = jdbc.queryForObject(
 				"select count(case when sale.reverse = true then 1 else null end) as void_invoice, "
 						+ "count(case when sale.reverse = false then 1 else null end) as paid_invoice, "
-						+ "min(value_date) as start_date, " + "max(value_date) as end_date,sum(vat) vat,sum(service_charge) service_charge, "
+						+ "min(end_date) as start_date, " + "max(end_date) as end_date,sum(vat) vat,sum(service_charge) service_charge, "
 						+ "sum(case when sale.reverse = false then sale.sub_total else 0 end) as sub_total, "
 						+ "sum(case when sale.reverse = false then sale.discount_amount else 0 end) as discount_amount, "
 						+ "sum(case when sale.reverse = false then sale.discount_sale_detail else 0 end) as discount_sale_detail "
-						+ "from sales sale where sale.value_date between :startDate and :endDate "
+						+ "from sales sale where sale.end_date between :startDate and :endDate "
 						+ queryCondition,
 				mapSqlParameterSource,
 				(rs, rowNum) -> new SaleDetailSummary(rs.getInt("void_invoice"), rs.getInt("paid_invoice"),

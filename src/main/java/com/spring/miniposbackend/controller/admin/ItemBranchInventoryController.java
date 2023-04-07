@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,5 +24,11 @@ public class ItemBranchInventoryController {
 	@PostMapping
 	public SuccessResponse insert(@RequestBody List<ItemBranchInventoryView> itembranchinventoryview,@RequestParam("itembranchId") Long itembranchId) {
 		return new SuccessResponse("00", "fetch image", itembranchinventoryService.insert(itembranchinventoryview,itembranchId));
+	}
+	
+	@GetMapping("by-branch")
+	public SuccessResponse getByBranchId() {
+		return new SuccessResponse("00", "fetch item branch",
+				itembranchinventoryService.showByBranchId());
 	}
 }

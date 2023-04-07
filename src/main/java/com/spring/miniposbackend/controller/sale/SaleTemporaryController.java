@@ -91,7 +91,34 @@ public class SaleTemporaryController {
 		return new SuccessResponse("00", "remove SaleTmp", saleService.removeItem(saleTempId, seatId, invoiceId,userId));
 	}
 
-	@PatchMapping("print")
+	@PatchMapping("discountAmount/{saleTempId}")
+	@PreAuthorize("hasAnyRole('SALE')")
+	public SuccessResponse updateDiscountAmount(@PathVariable Long saleTempId,
+			@RequestParam(name = "invoice-id") Optional<Long> invoiceId,
+			@RequestParam(name = "seat-id") Optional<Integer> seatId,
+			@RequestParam(name = "user-id") Integer userId,@RequestBody Double discountAmount) {
+		return new SuccessResponse("00", "remove SaleTmp", saleService.updateDiscountAmount(saleTempId, seatId, invoiceId,userId,discountAmount));
+		
+	}
+	@PatchMapping("discountPercentage/{saleTempId}")
+	@PreAuthorize("hasAnyRole('SALE')")
+	public SuccessResponse updateDiscountPercentage(@PathVariable Long saleTempId,
+			@RequestParam(name = "invoice-id") Optional<Long> invoiceId,
+			@RequestParam(name = "seat-id") Optional<Integer> seatId,
+			@RequestParam(name = "user-id") Integer userId,@RequestBody Short discount) {
+		return new SuccessResponse("00", "remove SaleTmp", saleService.updateDiscountPercentage(saleTempId, seatId, invoiceId,userId,discount));
+		
+	}
+	@PatchMapping("qty/{saleTempId}")
+	@PreAuthorize("hasAnyRole('SALE')")
+	public SuccessResponse updateQty(@PathVariable Long saleTempId,
+			@RequestParam(name = "invoice-id") Optional<Long> invoiceId,
+			@RequestParam(name = "seat-id") Optional<Integer> seatId,
+			@RequestParam(name = "user-id") Integer userId,@RequestBody double qty) {
+		return new SuccessResponse("00", "remove SaleTmp", saleService.updateQty(saleTempId, seatId, invoiceId,userId,qty));
+		
+	}
+	@PatchMapping("")
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse printItem(@RequestParam(name = "seatId") Optional<Integer> seatId,@RequestParam(name = "invoiceId") Optional<Long> invoiceId,
 			@RequestParam(name = "customerId") Optional<Long> customerId,@RequestBody Optional<SpitBillItems> spitBillItems) {

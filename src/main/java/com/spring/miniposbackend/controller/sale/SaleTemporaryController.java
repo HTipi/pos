@@ -118,7 +118,7 @@ public class SaleTemporaryController {
 		return new SuccessResponse("00", "remove SaleTmp", saleService.updateQty(saleTempId, seatId, invoiceId,userId,qty));
 		
 	}
-	@PatchMapping("")
+	@PatchMapping("print")
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse printItem(@RequestParam(name = "seatId") Optional<Integer> seatId,@RequestParam(name = "invoiceId") Optional<Long> invoiceId,
 			@RequestParam(name = "customerId") Optional<Long> customerId,@RequestBody Optional<SpitBillItems> spitBillItems) {

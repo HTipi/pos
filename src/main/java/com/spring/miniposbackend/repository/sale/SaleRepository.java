@@ -55,7 +55,7 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
 	    List<Sale> findByBranchIdWithValueDate(Integer userId, @DateTimeFormat(pattern = "yyyy-MM-dd") Date date);
 	 
 	 @Query(value = "select s from Sale s where s.branch.id = ?1 and  end_date between ?2 and ?3")
-	    List<Sale> findByBranchIdWithValueDateRange(Integer userId, @DateTimeFormat(pattern = "yyyy-MM-dd") Date date,@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date end);
+	    List<Sale> findByBranchIdWithValueDateRange(Integer userId, @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date date,@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date end);
 	 
 
 }

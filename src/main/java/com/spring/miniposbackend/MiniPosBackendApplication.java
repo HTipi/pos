@@ -14,7 +14,6 @@ public class MiniPosBackendApplication extends SpringBootServletInitializer{
 	    return builder.sources(MiniPosBackendApplication.class);
 	  }
 	public static void main(String[] args) {
-		
 		SpringApplication.run(MiniPosBackendApplication.class, args);
 	}
 

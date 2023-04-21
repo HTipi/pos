@@ -201,6 +201,11 @@ public class SaleService {
 				}
 			} else {
 				saleTemps = saleTemporaryRepository.findBySeatId(seatId.get());
+				Seat seatDb = seatRepository.findById(seatId.get())
+						.orElseThrow(() -> new ResourceNotFoundException("Seat not found"));
+				seatDb.setPrinted(false);
+				seatDb.setFree(true);
+				seatRepository.save(seatDb);
 			}
 			if (saleTemps.size() == 0) {
 				throw new ConflictException("វិក័យប័ត្រនេះបានគិតរួចហើយ", "16");

@@ -209,6 +209,15 @@ public class SaleDashboardController {
 				.SummaryByBranchId(userProfile.getProfile().getBranch().getId(), today, today, "channel"));
 
 	}
+	
+	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
+	@GetMapping("/promotion/summary")
+	public SuccessResponse promotionSummaryDetail(@RequestParam Optional<Integer> branchId) {
+		getDate();
+		return new SuccessResponse("00", "fetch report", branchDashboardService
+				.SummaryByBranchId(userProfile.getProfile().getBranch().getId(), today, today, "promotion"));
+
+	}
 
 	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
 	@GetMapping("/table/summary")

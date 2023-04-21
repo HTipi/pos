@@ -195,6 +195,12 @@ public class SaleTemporaryService {
 			if (!seat.isPresent()) {
 				throw new ResourceNotFoundException("Seat does not exist");
 			}
+			Seat seatDb = seat.get();
+			if(seatDb.isFree())
+			{
+				seatDb.setFree(false);
+				seatRepository.save(seatDb);
+			}
 			saletmps = saleRepository.findBySeatId(seatId.get());
 			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(userId)) {
 				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
@@ -229,9 +235,10 @@ public class SaleTemporaryService {
 			return saleRepository.findByUserId(user.getId());
 		}
 	}
+
 	@Transactional
 	public List<SaleTemporary> updateDiscountAmount(Long saleTempId, Optional<Integer> seatId, Optional<Long> invoiceId,
-			Integer userId,double amount) {
+			Integer userId, double amount) {
 		List<SaleTemporary> list = new ArrayList<SaleTemporary>();
 		List<SaleTemporary> saletmps = new ArrayList<SaleTemporary>();
 		User user = userProfile.getProfile().getUser();
@@ -278,9 +285,10 @@ public class SaleTemporaryService {
 		return list;
 
 	}
+
 	@Transactional
-	public List<SaleTemporary> updateDiscountPercentage(Long saleTempId, Optional<Integer> seatId, Optional<Long> invoiceId,
-			Integer userId,short amount) {
+	public List<SaleTemporary> updateDiscountPercentage(Long saleTempId, Optional<Integer> seatId,
+			Optional<Long> invoiceId, Integer userId, short amount) {
 		List<SaleTemporary> list = new ArrayList<SaleTemporary>();
 		List<SaleTemporary> saletmps = new ArrayList<SaleTemporary>();
 		User user = userProfile.getProfile().getUser();
@@ -327,9 +335,10 @@ public class SaleTemporaryService {
 		return list;
 
 	}
+
 	@Transactional
 	public List<SaleTemporary> updateQty(Long saleTempId, Optional<Integer> seatId, Optional<Long> invoiceId,
-			Integer userId,double qty) {
+			Integer userId, double qty) {
 		List<SaleTemporary> list = new ArrayList<SaleTemporary>();
 		List<SaleTemporary> saletmps = new ArrayList<SaleTemporary>();
 		User user = userProfile.getProfile().getUser();
@@ -375,12 +384,14 @@ public class SaleTemporaryService {
 		return list;
 
 	}
+
 	@Transactional
 	public List<SaleTemporary> removeItem(Long saleTempId, Optional<Integer> seatId, Optional<Long> invoiceId,
 			Integer userId) {
 		List<SaleTemporary> list = new ArrayList<SaleTemporary>();
 		List<SaleTemporary> saletmps = new ArrayList<SaleTemporary>();
 		User user = userProfile.getProfile().getUser();
+		boolean checkSeat = false;
 		if (invoiceId.isPresent()) {
 			Optional<Invoice> invoice = invoiceRepository.findById(invoiceId.get());
 			if (!invoice.isPresent()) {
@@ -401,6 +412,9 @@ public class SaleTemporaryService {
 			saletmps = saleRepository.findBySeatId(seatId.get());
 			if (saletmps.size() == 0) {
 				throw new ConflictException("វិក័យប័ត្រនេះបានគិតរួចហើយ", "16");
+			}
+			if (saletmps.size() < 2) {
+				checkSeat = true;
 			}
 			if (!saletmps.get(0).getUserEdit().getId().equals(userId)) {
 				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
@@ -430,6 +444,13 @@ public class SaleTemporaryService {
 			return sale;
 		}).orElseThrow(
 				() -> new ResourceNotFoundException("ប្រតិបត្តិការនេះត្រូវបានលុបដោយអ្នកប្រើប្រាស់ម្នាក់ទៀត", "17"));
+		if (checkSeat) {
+			Seat seat = seatRepository.findById(seatId.get())
+					.orElseThrow(() -> new ResourceNotFoundException("Seat not found"));
+			seat.setFree(true);
+			seat.setPrinted(false);
+			seatRepository.save(seat);
+		}
 		list.add(saletemp);
 
 		return list;
@@ -512,11 +533,11 @@ public class SaleTemporaryService {
 					} else {
 						list = saleRepository.findBySeatForPrintId(seatId);
 					}
-				}
-				else {
+				} else {
 					list = saleRepository.findBySeatForPrintId(seatId);
 				}
-				Seat seat = seatRepository.findById(seatId).orElseThrow(() -> new ResourceNotFoundException("Seat does not exist"));
+				Seat seat = seatRepository.findById(seatId)
+						.orElseThrow(() -> new ResourceNotFoundException("Seat does not exist"));
 				seat.setPrinted(true);
 				seatRepository.save(seat);
 			}
@@ -525,16 +546,17 @@ public class SaleTemporaryService {
 					: null;
 			list.forEach(saleTemporary -> {
 				boolean settings = true;
-				if(userProfile.getProfile().getBranch().getId() == 23 || userProfile.getProfile().getBranch().getId() == 47)
-					settings =false;
+				if (userProfile.getProfile().getBranch().getId() == 23
+						|| userProfile.getProfile().getBranch().getId() == 47)
+					settings = false;
 				saleTemporary.setPrinted(settings);
 				saleTemporary.setPrinted(settings);
 				saleTemporary.setBillNumber(receiptNum);
 				saleTemporary.setCustomer(customer);
 				saleRepository.save(saleTemporary);
 			});
-			//entityManager.flush();
-			//entityManager.clear();
+			// entityManager.flush();
+			// entityManager.clear();
 			return check ? saleRepository.findBySeatForPrintId(seatId) : list;
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
@@ -554,8 +576,9 @@ public class SaleTemporaryService {
 			list.forEach(saleTemporary -> {
 
 				boolean settings = true;
-				if(userProfile.getProfile().getBranch().getId() == 23 || userProfile.getProfile().getBranch().getId() == 47)
-					settings =false;
+				if (userProfile.getProfile().getBranch().getId() == 23
+						|| userProfile.getProfile().getBranch().getId() == 47)
+					settings = false;
 				saleTemporary.setPrinted(settings);
 				saleTemporary.setBillNumber(receiptNum);
 				saleTemporary.setCustomer(customer);

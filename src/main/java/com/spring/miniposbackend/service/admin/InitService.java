@@ -14,6 +14,7 @@ import com.spring.miniposbackend.model.admin.ItemType;
 import com.spring.miniposbackend.model.admin.Printer;
 import com.spring.miniposbackend.model.admin.User;
 import com.spring.miniposbackend.model.admin.UserRole;
+import com.spring.miniposbackend.model.sale.Invoice;
 import com.spring.miniposbackend.model.security.ClientApplication;
 import com.spring.miniposbackend.modelview.ImageResponse;
 import com.spring.miniposbackend.modelview.InitViewModel;
@@ -26,6 +27,7 @@ import com.spring.miniposbackend.repository.admin.ItemTypeRepository;
 import com.spring.miniposbackend.repository.admin.PrinterRepository;
 import com.spring.miniposbackend.repository.admin.UserRepository;
 import com.spring.miniposbackend.repository.admin.UserRoleRepository;
+import com.spring.miniposbackend.repository.sale.InvoiceRepository;
 import com.spring.miniposbackend.repository.security.ClientApplicationRepository;
 import com.spring.miniposbackend.util.ImageUtil;
 import com.spring.miniposbackend.util.UserProfileUtil;
@@ -56,6 +58,8 @@ public class InitService {
 	private ClientApplicationRepository clientApplicationRepository;
 	@Autowired
 	private PrinterRepository printerRepository;
+	@Autowired
+	private InvoiceRepository invoiceRepository;
 
 	@Autowired
 	private ImageUtil imageUtil;
@@ -85,13 +89,14 @@ public class InitService {
 			UserResponse user = getUsers();
 			ClientApplication clientApp = getClientApp("SALE");
 			List<Printer> printers = getPrinters(branchId);
+			List<Invoice> invoices = getInvoices(branchId);
 
 			return new InitViewModel(settings, itemBranch, itemType, currencies, imageItem, imageItemType, user,
-					clientApp,printers);
+					clientApp,printers,invoices);
 		} catch (Exception e) {
 			throw new Exception(e.getMessage());
 		}
-
+ 
 	}
 
 	private List<BranchSetting> getSettings(Integer branchId) {
@@ -201,6 +206,9 @@ public class InitService {
 	}
 	private List<Printer> getPrinters(int branchId) {
 		return printerRepository.findByBranchId(branchId);
+	}
+	private List<Invoice> getInvoices(int branchId){
+		return invoiceRepository.findByBranchId(branchId);
 	}
 
 }

@@ -202,6 +202,7 @@ public class SaleTemporaryService {
 				seatRepository.save(seatDb);
 			}
 			saletmps = saleRepository.findBySeatId(seatId.get());
+			System.out.println(userId);
 			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(userId)) {
 				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
 				return saletmps;
@@ -265,7 +266,6 @@ public class SaleTemporaryService {
 			}
 			if (!saletmps.get(0).getUserEdit().getId().equals(userId)) {
 				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
-				return saletmps;
 			}
 			saleRepository.updateUserEditSeat(user.getId(), seatId.get());
 		}
@@ -518,24 +518,14 @@ public class SaleTemporaryService {
 //	}
 
 	@Transactional
-	public List<SaleTemporary> printBySeat(Integer seatId, Optional<Long> invoiceId, Optional<Long> customerId,
-			@RequestBody Optional<SpitBillItems> spitBillItems) {
+	public List<SaleTemporary> printBySeat(Integer seatId, Optional<Long> invoiceId, Optional<Long> customerId) {
 		try {
 			boolean check = false;
 			List<SaleTemporary> list = new ArrayList<SaleTemporary>();
 			if (invoiceId.isPresent()) {
 				list = saleRepository.findBySeatForPrintIdWithInvoice(invoiceId.get());
 			} else {
-				if (spitBillItems.isPresent()) {
-					if (spitBillItems.get().getSaleTempIds().size() > 0) {
-						list = saleRepository.findBySeatForPrintByItems(seatId, spitBillItems.get().getSaleTempIds());
-						check = true;
-					} else {
-						list = saleRepository.findBySeatForPrintId(seatId);
-					}
-				} else {
-					list = saleRepository.findBySeatForPrintId(seatId);
-				}
+				list = saleRepository.findBySeatForPrintId(seatId);
 				Seat seat = seatRepository.findById(seatId)
 						.orElseThrow(() -> new ResourceNotFoundException("Seat does not exist"));
 				seat.setPrinted(true);
@@ -549,7 +539,6 @@ public class SaleTemporaryService {
 				if (userProfile.getProfile().getBranch().getId() == 23
 						|| userProfile.getProfile().getBranch().getId() == 47)
 					settings = false;
-				saleTemporary.setPrinted(settings);
 				saleTemporary.setPrinted(settings);
 				saleTemporary.setBillNumber(receiptNum);
 				saleTemporary.setCustomer(customer);

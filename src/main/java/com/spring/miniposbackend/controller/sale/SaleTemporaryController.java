@@ -121,10 +121,10 @@ public class SaleTemporaryController {
 	@PatchMapping("print")
 	@PreAuthorize("hasAnyRole('SALE')")
 	public SuccessResponse printItem(@RequestParam(name = "seatId") Optional<Integer> seatId,@RequestParam(name = "invoiceId") Optional<Long> invoiceId,
-			@RequestParam(name = "customerId") Optional<Long> customerId,@RequestBody Optional<SpitBillItems> spitBillItems) {
+			@RequestParam(name = "customerId") Optional<Long> customerId) {
 		if(seatId.isPresent()) {
 			return new SuccessResponse("00", "Printed",
-					saleService.printBySeat(seatId.get(),invoiceId,customerId,spitBillItems));
+					saleService.printBySeat(seatId.get(),invoiceId,customerId));
 		}
 		else {
 			return new SuccessResponse("00", "Printed",

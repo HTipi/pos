@@ -377,6 +377,7 @@ public class ItemService {
 					throw new UnauthorizedException("you are putting other corporate item type");
 				}
 				Item item = new Item();
+				System.out.println(i);
 				item.setCode(row.getCell(0).getStringCellValue());
 				item.setType(row.getCell(1).getStringCellValue());
 				item.setName(row.getCell(2).getStringCellValue());

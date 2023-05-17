@@ -17,10 +17,6 @@ import com.spring.miniposbackend.util.UserProfileUtil;
 public class InitController {
 
 	@Autowired
-	private ItemTypeService itemTypeService;
-	@Autowired
-	private SeatService seatService;
-	@Autowired
 	private UserProfileUtil userProfile;
 	@Autowired
 	private InitService initService;

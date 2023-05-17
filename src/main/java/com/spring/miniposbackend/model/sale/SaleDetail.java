@@ -26,7 +26,6 @@ import com.spring.miniposbackend.model.AuditModel;
 import com.spring.miniposbackend.model.admin.Branch;
 import com.spring.miniposbackend.model.admin.BranchPromotion;
 import com.spring.miniposbackend.model.admin.ItemBranch;
-import com.spring.miniposbackend.model.admin.ItemBranchPromotion;
 import com.spring.miniposbackend.model.admin.User;
 import com.spring.miniposbackend.model.customer.Customer;
 import com.spring.miniposbackend.modelview.dashboard.ItemPromotion;
@@ -129,6 +128,9 @@ public class SaleDetail extends AuditModel {
 	}
 	public Date getEndDate() {
 		return sale.getEndDate();
+	}
+	public Date getStartDate() {
+		return sale.getValueDate();
 	}
 	public Long getItemId() {
 		return itemBranch.getId();

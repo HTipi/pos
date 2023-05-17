@@ -131,11 +131,11 @@ public interface SaleTemporaryRepository extends JpaRepository<SaleTemporary, Lo
 	void updateInvoiceBySeatId(Long invoiceId, Integer seatId,Long customerId);
 	
 	@Modifying
-	@Query(value = "update Sales_temp set invoice_id=?1 where user_id=?2 and invoice_id is null", nativeQuery = true)
+	@Query(value = "update Sales_temp set invoice_id=?1 where user_id=?2 and invoice_id is null and seat_id is null", nativeQuery = true)
 	void updateInvoiceByUserId(Long invoiceId, Integer userId);
 	
 	@Modifying
-	@Query(value = "update Sales_temp set invoice_id=?1,customer_id=?3 where user_id=?2 and invoice_id is null", nativeQuery = true)
+	@Query(value = "update Sales_temp set invoice_id=?1,customer_id=?3 where user_id=?2 and invoice_id is null and seat_id is null", nativeQuery = true)
 	void updateInvoiceByUserId(Long invoiceId, Integer userId,Long customerId);
 
 //	@Query(value = "select count(s) from SaleTemporary s where s.user.branch.id = ?1")

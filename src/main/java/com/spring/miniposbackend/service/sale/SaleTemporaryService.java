@@ -196,13 +196,11 @@ public class SaleTemporaryService {
 				throw new ResourceNotFoundException("Seat does not exist");
 			}
 			Seat seatDb = seat.get();
-			if(seatDb.isFree())
-			{
+			if (seatDb.isFree()) {
 				seatDb.setFree(false);
 				seatRepository.save(seatDb);
 			}
 			saletmps = saleRepository.findBySeatId(seatId.get());
-			System.out.println(userId);
 			if (saletmps.size() > 0 && !saletmps.get(0).getUserEdit().getId().equals(userId)) {
 				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
 				return saletmps;
@@ -266,6 +264,7 @@ public class SaleTemporaryService {
 			}
 			if (!saletmps.get(0).getUserEdit().getId().equals(userId)) {
 				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
+				return saletmps;
 			}
 			saleRepository.updateUserEditSeat(user.getId(), seatId.get());
 		}
@@ -310,6 +309,7 @@ public class SaleTemporaryService {
 			}
 
 			saletmps = saleRepository.findBySeatId(seatId.get());
+
 			if (saletmps.size() == 0) {
 				throw new ConflictException("វិក័យប័ត្រនេះបានគិតរួចហើយ", "16");
 			}
@@ -363,6 +363,7 @@ public class SaleTemporaryService {
 			if (saletmps.size() == 0) {
 				throw new ConflictException("វិក័យប័ត្រនេះបានគិតរួចហើយ", "16");
 			}
+			System.out.println(userId);
 			if (!saletmps.get(0).getUserEdit().getId().equals(userId)) {
 				saleRepository.updateUserEditSeat(user.getId(), seatId.get());
 				return saletmps;
@@ -535,11 +536,16 @@ public class SaleTemporaryService {
 			Customer customer = customerId.isPresent() ? customerRepository.findById(customerId.get()).orElse(null)
 					: null;
 			list.forEach(saleTemporary -> {
-				boolean settings = true;
-				if (userProfile.getProfile().getBranch().getId() == 23
-						|| userProfile.getProfile().getBranch().getId() == 47)
-					settings = false;
-				saleTemporary.setPrinted(settings);
+//				boolean settings = true;
+//				if (userProfile.getProfile().getBranch().getId() == 23
+//						|| userProfile.getProfile().getBranch().getId() == 47)
+//					settings = false;
+				String setting = branchSettingRepository
+						.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "DBP").orElse("");
+				if (setting.equalsIgnoreCase("true"))
+					saleTemporary.setPrinted(true);
+				else
+					saleTemporary.setPrinted(false);
 				saleTemporary.setBillNumber(receiptNum);
 				saleTemporary.setCustomer(customer);
 				saleRepository.save(saleTemporary);

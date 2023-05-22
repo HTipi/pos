@@ -62,10 +62,7 @@ public class SaleTemporaryService {
 
 	@Transactional
 	public List<SaleTemporary> changeSeat(Integer seatId, Integer newSeatId) {
-		Optional<Seat> seat = seatRepository.findById(newSeatId);
-		if (!seat.isPresent()) {
-			throw new ResourceNotFoundException("Seat does not exist");
-		}
+		Seat seat = seatRepository.findById(newSeatId).orElseThrow(() -> new ResourceNotFoundException("old seat not found"));;
 		List<SaleTemporary> oldList = saleRepository.findBySeatId(seatId);
 		if (oldList.size() == 0) {
 			throw new ResourceNotFoundException("Item not found in the old seat");
@@ -73,7 +70,7 @@ public class SaleTemporaryService {
 		List<SaleTemporary> newList = saleRepository.findBySeatId(newSeatId);
 		if (newList.size() == 0) {
 			for (int i = 0; i < oldList.size(); i++) {
-				oldList.get(i).setSeat(seat.get());
+				oldList.get(i).setSeat(seat);
 				saleRepository.save(oldList.get(i));
 			}
 		} else {
@@ -100,7 +97,7 @@ public class SaleTemporaryService {
 					}
 				}
 				if (check == false) {
-					oldSale.setSeat(seat.get());
+					oldSale.setSeat(seat);
 					saleRepository.save(oldSale);
 				}
 			}
@@ -108,6 +105,12 @@ public class SaleTemporaryService {
 		saleRepository.deleteBySeatId(seatId);
 		entityManager.flush();
 		entityManager.clear();
+		Seat seatOld = seatRepository.findById(seatId).orElseThrow(() -> new ResourceNotFoundException("old seat not found"));
+		seatOld.setFree(true);
+		seatOld.setPrinted(false);
+		seatRepository.save(seatOld);
+		seat.setFree(false);
+		seatRepository.save(seat);
 		return saleRepository.findBySeatId(newSeatId);
 
 	}

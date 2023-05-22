@@ -63,6 +63,13 @@ public class Invoice extends AuditModel {
 		});
 		return grandTotal;
 	}
+	public String getCustomer() {
+		if(saleTemporaries.size() == 0)
+			return "";
+		if(saleTemporaries.get(0).getCustomer() == null)
+			return "";
+		return saleTemporaries.get(0).getCustomer().getNameKh() + " " + saleTemporaries.get(0).getCustomer().getPrimaryPhone();
+	}
 
 	public Date getValueDate() {
 		return createdAt;

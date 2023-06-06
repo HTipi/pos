@@ -18,6 +18,8 @@ public class InvoiceService {
 	private UserProfileUtil userProfile;
 	
 	public List<Invoice> showByBrandId(){
+		if(userProfile.getProfile().getBranch().getId() == 88)
+		return invoiceRepository.findByBranchId(userProfile.getProfile().getUser().getId());
 		return invoiceRepository.findByBranchId(userProfile.getProfile().getBranch().getId());
 	}
 	

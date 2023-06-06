@@ -208,6 +208,8 @@ public class InitService {
 		return printerRepository.findByBranchId(branchId);
 	}
 	private List<Invoice> getInvoices(int branchId){
+		if(branchId == 88)
+		return invoiceRepository.findByBranchId(userProfile.getProfile().getUser().getId());
 		return invoiceRepository.findByBranchId(branchId);
 	}
 

@@ -18,9 +18,11 @@ public class InvoiceService {
 	private UserProfileUtil userProfile;
 	
 	public List<Invoice> showByBrandId(){
-		if(userProfile.getProfile().getBranch().getId() == 88)
+		if (userProfile.getProfile().getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_BRANCH"))) {
+			return invoiceRepository.findByBranchId(userProfile.getProfile().getBranch().getId());
+		}
 		return invoiceRepository.findByBranchId(userProfile.getProfile().getUser().getId());
-		return invoiceRepository.findByBranchId(userProfile.getProfile().getBranch().getId());
+
 	}
 	
 	public Invoice delete(Long invoiceId) {

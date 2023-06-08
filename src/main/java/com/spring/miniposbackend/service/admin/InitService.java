@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.model.admin.BranchCurrency;
 import com.spring.miniposbackend.model.admin.BranchPaymentChannel;
 import com.spring.miniposbackend.model.admin.BranchSetting;
@@ -208,9 +210,10 @@ public class InitService {
 		return printerRepository.findByBranchId(branchId);
 	}
 	private List<Invoice> getInvoices(int branchId){
-		if(branchId == 88)
+		if (userProfile.getProfile().getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_BRANCH"))) {
+			return invoiceRepository.findByBranchId(branchId);
+		}
 		return invoiceRepository.findByBranchId(userProfile.getProfile().getUser().getId());
-		return invoiceRepository.findByBranchId(branchId);
 	}
 
 }

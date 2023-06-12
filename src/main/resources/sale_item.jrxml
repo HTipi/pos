@@ -2,7 +2,7 @@
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="sale_item" pageWidth="600" pageHeight="842" columnWidth="560" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="fe8a2d45-aff2-446a-90ca-d9e4df66ecf6">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="local.jrdax"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="uat"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
@@ -21,15 +21,14 @@
 	<queryString language="SQL">
 		<![CDATA[select i.name_kh,sum(quantity) quantities,sum(d.sub_total) total,sum(coalesce(d.costing,0) * quantity) costing,(select min(receipt_number::INTEGER) receipt_number from sales where date_trunc('day',end_date) between $P{start} and $P{end} and branch_id=$P{branchId} and reverse=false) min_receipt,
 (select max(receipt_number::INTEGER) receipt_number from sales where date_trunc('day',end_date) between $P{start} and $P{end} and branch_id=$P{branchId} and reverse=false) max_receipt,
-date_trunc('day',d.value_date) value_date,
-(select sum(discount_amount+discount_sale_detail) from sales inner join branches b on sales.branch_id=b.id where date_trunc('day',end_date) 
-	between $P{start} and $P{end} and b.id=$P{branchId} and sales.reverse=false) as discount_amount
+(select sum(discount_amount+discount_sale_detail) from sales  where date_trunc('day',end_date) 
+	between $P{start} and $P{end} and branch_id=$P{branchId} and sales.reverse=false) as discount_amount,sum(d.discount_total) discount_total
 from sale_details d inner join item_branches ib on d.item_branch_id=ib.id
 inner join sales s on s.id=d.sale_id
 inner join items i on i.id=ib.item_id
 inner join item_types t on t.id=i.item_type_id
 where ib.branch_id=$P{branchId} and d.reverse=false and s.reverse=false and date_trunc('day',d.value_date) between $P{start} and $P{end} and parent_sale_id is null
-group by i.name_kh,i.id,i.item_type_id,date_trunc('day',d.value_date) order by value_date]]>
+group by i.name_kh,i.id,i.item_type_id]]>
 	</queryString>
 	<field name="name_kh" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="name_kh"/>
@@ -56,13 +55,13 @@ group by i.name_kh,i.id,i.item_type_id,date_trunc('day',d.value_date) order by v
 		<property name="com.jaspersoft.studio.field.name" value="max_receipt"/>
 		<property name="com.jaspersoft.studio.field.label" value="max_receipt"/>
 	</field>
-	<field name="value_date" class="java.sql.Timestamp">
-		<property name="com.jaspersoft.studio.field.name" value="value_date"/>
-		<property name="com.jaspersoft.studio.field.label" value="value_date"/>
-	</field>
 	<field name="discount_amount" class="java.math.BigDecimal">
 		<property name="com.jaspersoft.studio.field.name" value="discount_amount"/>
 		<property name="com.jaspersoft.studio.field.label" value="discount_amount"/>
+	</field>
+	<field name="discount_total" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="discount_total"/>
+		<property name="com.jaspersoft.studio.field.label" value="discount_total"/>
 	</field>
 	<variable name="total" class="java.lang.Double" resetType="Group" resetGroup="Group1" calculation="Sum">
 		<variableExpression><![CDATA[$F{total}]]></variableExpression>
@@ -76,40 +75,35 @@ group by i.name_kh,i.id,i.item_type_id,date_trunc('day',d.value_date) order by v
 	<variable name="totalAllCosting" class="java.lang.Double" resetType="Master" calculation="Sum">
 		<variableExpression><![CDATA[$V{totalcosting}]]></variableExpression>
 	</variable>
+	<variable name="total_discount" class="java.lang.Double" resetType="Group" resetGroup="Group1" calculation="Sum">
+		<variableExpression><![CDATA[$F{discount_total}]]></variableExpression>
+	</variable>
 	<group name="Group1">
-		<groupExpression><![CDATA[$F{value_date}]]></groupExpression>
-		<groupHeader>
-			<band height="40">
-				<rectangle>
-					<reportElement x="-20" y="0" width="591" height="40" backcolor="#FFFFCC" uuid="ea3388af-3fbd-40e2-8431-4373d0e9e4ad"/>
-				</rectangle>
-				<textField>
-					<reportElement x="-20" y="5" width="445" height="30" backcolor="#FFCC99" uuid="110e489e-b752-4594-b7e6-62d188d3dd20"/>
-					<textElement verticalAlignment="Middle">
-						<font size="12" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA["Date: " + new SimpleDateFormat("yyyy-MM-dd").format($F{value_date})]]></textFieldExpression>
-				</textField>
-			</band>
-		</groupHeader>
 		<groupFooter>
 			<band height="38">
 				<rectangle>
 					<reportElement x="-20" y="1" width="591" height="37" backcolor="#FFCCCC" uuid="409efccc-8a4a-4eb1-ba0f-47d7bb5b0c94"/>
 				</rectangle>
 				<textField pattern="#,##0.00#;(#,##0.00#-)">
-					<reportElement x="238" y="6" width="193" height="27" uuid="59659f5a-9dac-477d-903f-4d3c421e5a18"/>
+					<reportElement x="331" y="6" width="129" height="27" uuid="59659f5a-9dac-477d-903f-4d3c421e5a18"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font size="12" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{total}]]></textFieldExpression>
 				</textField>
 				<textField pattern="#,##0.00#;(#,##0.00#-)">
-					<reportElement x="441" y="6" width="126" height="27" uuid="d7d47cfc-397e-4e79-98a2-7e7bd1ce33f2"/>
+					<reportElement x="460" y="6" width="107" height="27" uuid="d7d47cfc-397e-4e79-98a2-7e7bd1ce33f2"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font size="12" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$V{totalcosting}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00#;(#,##0.00#-)">
+					<reportElement x="200" y="6" width="129" height="27" uuid="ab26ac26-fda9-4e37-920b-b8f3ca2a3e04"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{total_discount}]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupFooter>
@@ -154,7 +148,7 @@ group by i.name_kh,i.id,i.item_type_id,date_trunc('day',d.value_date) order by v
 	<columnHeader>
 		<band height="50" splitType="Stretch">
 			<staticText>
-				<reportElement x="180" y="15" width="110" height="35" uuid="7e070c21-3545-4c10-b658-fb08abe4db9a">
+				<reportElement x="130" y="15" width="90" height="35" uuid="7e070c21-3545-4c10-b658-fb08abe4db9a">
 					<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 					<property name="com.jaspersoft.studio.data.defaultdataadapter" value="mini-pos"/>
 				</reportElement>
@@ -162,12 +156,12 @@ group by i.name_kh,i.id,i.item_type_id,date_trunc('day',d.value_date) order by v
 					<pen lineWidth="1.75"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="14"/>
+					<font size="12"/>
 				</textElement>
 				<text><![CDATA[Quantities]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="291" y="15" width="140" height="35" uuid="f0d97230-5363-4859-a730-e394ed1636f6">
+				<reportElement x="331" y="15" width="129" height="35" uuid="f0d97230-5363-4859-a730-e394ed1636f6">
 					<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 					<property name="com.jaspersoft.studio.data.defaultdataadapter" value="mini-pos"/>
 				</reportElement>
@@ -175,12 +169,12 @@ group by i.name_kh,i.id,i.item_type_id,date_trunc('day',d.value_date) order by v
 					<pen lineWidth="1.75"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="14"/>
+					<font size="12"/>
 				</textElement>
 				<text><![CDATA[Total]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="-20" y="15" width="200" height="35" uuid="46fac6b8-9f19-4160-b7ed-d60b2e98ad7c">
+				<reportElement x="-20" y="15" width="150" height="35" uuid="46fac6b8-9f19-4160-b7ed-d60b2e98ad7c">
 					<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 					<property name="com.jaspersoft.studio.data.defaultdataadapter" value="mini-pos"/>
 				</reportElement>
@@ -188,12 +182,12 @@ group by i.name_kh,i.id,i.item_type_id,date_trunc('day',d.value_date) order by v
 					<pen lineWidth="1.75"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="14"/>
+					<font size="12"/>
 				</textElement>
 				<text><![CDATA[Description]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="431" y="15" width="140" height="35" uuid="a5728622-1a56-40a9-8976-ff07a670fbff">
+				<reportElement x="460" y="15" width="111" height="35" uuid="a5728622-1a56-40a9-8976-ff07a670fbff">
 					<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 					<property name="com.jaspersoft.studio.data.defaultdataadapter" value="mini-pos"/>
 				</reportElement>
@@ -201,53 +195,76 @@ group by i.name_kh,i.id,i.item_type_id,date_trunc('day',d.value_date) order by v
 					<pen lineWidth="1.75"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="14"/>
+					<font size="12"/>
 				</textElement>
 				<text><![CDATA[Costing]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="220" y="15" width="111" height="35" uuid="3f3b1377-cee5-43f9-925d-9d11c8042354">
+					<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+					<property name="com.jaspersoft.studio.data.defaultdataadapter" value="mini-pos"/>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Discount]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
 		<band height="38" splitType="Stretch">
 			<textField pattern="#,#00.00#;(#,#00.00#-)">
-				<reportElement x="291" y="0" width="140" height="38" uuid="5aa1d197-83c5-4459-ae91-93958ea5ba97"/>
+				<reportElement x="331" y="0" width="129" height="38" uuid="5aa1d197-83c5-4459-ae91-93958ea5ba97"/>
 				<box>
 					<pen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="14"/>
+					<font size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{total}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.###;(#,##0.###-)">
-				<reportElement x="180" y="0" width="110" height="38" uuid="d51776a9-a01d-4d8c-b0f1-c538d47131c2"/>
+				<reportElement x="130" y="0" width="90" height="38" uuid="d51776a9-a01d-4d8c-b0f1-c538d47131c2"/>
 				<box>
 					<pen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="14"/>
+					<font size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{quantities}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement stretchType="ContainerBottom" x="-20" y="0" width="200" height="38" uuid="f96b908e-06d2-4b3b-baa6-45749043ee5d"/>
+				<reportElement stretchType="ContainerBottom" x="-20" y="0" width="150" height="38" uuid="f96b908e-06d2-4b3b-baa6-45749043ee5d"/>
 				<box>
 					<pen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="KhmerOSContent" size="14"/>
+					<font fontName="KhmerOSContent" size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{name_kh}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,#00.00#;(#,#00.00#-)">
-				<reportElement x="431" y="0" width="140" height="38" uuid="4fee564e-dfe2-4882-b110-edd93ecb00c4"/>
+				<reportElement x="460" y="0" width="111" height="38" uuid="4fee564e-dfe2-4882-b110-edd93ecb00c4"/>
 				<box>
 					<pen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="14"/>
+					<font size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{costing}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,#00.00#;(#,#00.00#-)">
+				<reportElement x="220" y="0" width="111" height="38" uuid="332187d5-ba4d-476b-8831-793d8d9e883c"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{discount_total}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

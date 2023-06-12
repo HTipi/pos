@@ -81,13 +81,13 @@ group by i.name_kh,i.id,t.name_kh,date_trunc('day',d.value_date) order by value_
 	<parameter name="end" class="java.util.Date"/>
 	<queryString language="SQL">
 		<![CDATA[select t.name_kh type_kh,i.name_kh,sum(quantity) quantities,sum(d.sub_total) total,
-date_trunc('day',d.value_date) value_date
+date_trunc('day',d.value_date) value_date,ib.price
 from sale_details d inner join item_branches ib on d.item_branch_id=ib.id
 inner join sales s on s.id=d.sale_id
 inner join items i on i.id=ib.item_id
 inner join item_types t on t.id=i.item_type_id
 where ib.branch_id=$P{branchId} and d.reverse=false and s.reverse=false and date_trunc('day',d.value_date) between $P{start} and $P{end} and parent_sale_id is null 
-group by i.name_kh,i.id,t.name_kh,date_trunc('day',d.value_date) order by value_date]]>
+group by i.name_kh,i.id,t.name_kh,date_trunc('day',d.value_date),ib.price order by value_date]]>
 	</queryString>
 	<field name="type_kh" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="type_kh"/>
@@ -111,9 +111,25 @@ group by i.name_kh,i.id,t.name_kh,date_trunc('day',d.value_date) order by value_
 		<property name="com.jaspersoft.studio.field.name" value="value_date"/>
 		<property name="com.jaspersoft.studio.field.label" value="value_date"/>
 	</field>
+	<field name="price" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="price"/>
+		<property name="com.jaspersoft.studio.field.label" value="price"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="item_branches"/>
+	</field>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
+	<pageHeader>
+		<band height="54">
+			<textField>
+				<reportElement x="-20" y="-18" width="310" height="30" uuid="492b6294-f01e-46d6-9e8d-aecf5cab5a28"/>
+				<textElement>
+					<font size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Sale Monthly Report: " +  new SimpleDateFormat("yyyy-MMMM").format($P{end})]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
 	<summary>
 		<band height="179" splitType="Stretch">
 			<crosstab>
@@ -127,14 +143,14 @@ group by i.name_kh,i.id,t.name_kh,date_trunc('day',d.value_date) order by value_
 				<crosstabDataset>
 					<dataset resetType="Report"/>
 				</crosstabDataset>
-				<rowGroup name="type" width="120" totalPosition="End">
+				<rowGroup name="type" width="100" totalPosition="End">
 					<bucket class="java.lang.String">
 						<bucketExpression><![CDATA[$F{type_kh}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents mode="Opaque" style="Crosstab_CH">
 							<textField>
-								<reportElement x="0" y="0" width="120" height="80" uuid="7ff0e009-a827-4225-877e-681041a3ad2d"/>
+								<reportElement x="0" y="0" width="100" height="41" uuid="7ff0e009-a827-4225-877e-681041a3ad2d"/>
 								<textElement verticalAlignment="Middle">
 									<font fontName="Khmer OS Content"/>
 								</textElement>
@@ -143,9 +159,9 @@ group by i.name_kh,i.id,t.name_kh,date_trunc('day',d.value_date) order by value_
 						</cellContents>
 					</crosstabRowHeader>
 					<crosstabTotalRowHeader>
-						<cellContents mode="Opaque" style="Crosstab_CG">
+						<cellContents mode="Opaque" style="Crosstab_CT">
 							<staticText>
-								<reportElement x="0" y="0" width="240" height="40" uuid="fefa2bd1-3e25-490b-b273-330eacc5b036"/>
+								<reportElement x="0" y="0" width="220" height="20" forecolor="#FFFFFF" uuid="fefa2bd1-3e25-490b-b273-330eacc5b036"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font isBold="true"/>
 								</textElement>
@@ -161,7 +177,7 @@ group by i.name_kh,i.id,t.name_kh,date_trunc('day',d.value_date) order by value_
 					<crosstabRowHeader>
 						<cellContents mode="Opaque" style="Crosstab_CH">
 							<textField>
-								<reportElement x="0" y="0" width="120" height="40" uuid="66ad89df-fa9e-401b-a2f0-a3343fa3356d"/>
+								<reportElement x="0" y="0" width="120" height="21" uuid="66ad89df-fa9e-401b-a2f0-a3343fa3356d"/>
 								<textElement verticalAlignment="Middle">
 									<font fontName="Khmer OS Content"/>
 								</textElement>
@@ -170,9 +186,9 @@ group by i.name_kh,i.id,t.name_kh,date_trunc('day',d.value_date) order by value_
 						</cellContents>
 					</crosstabRowHeader>
 					<crosstabTotalRowHeader>
-						<cellContents mode="Opaque" style="Crosstab_CT">
+						<cellContents mode="Opaque" style="Crosstab_CG">
 							<staticText>
-								<reportElement x="0" y="0" width="120" height="40" forecolor="#FFFFFF" uuid="df026bef-a1ab-4018-b9bc-0a5be8a530d8"/>
+								<reportElement x="0" y="0" width="120" height="20" forecolor="#0A0A0A" uuid="df026bef-a1ab-4018-b9bc-0a5be8a530d8"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font isBold="true"/>
 								</textElement>
@@ -188,20 +204,35 @@ group by i.name_kh,i.id,t.name_kh,date_trunc('day',d.value_date) order by value_
 					<crosstabColumnHeader>
 						<cellContents mode="Opaque" style="Crosstab_CH">
 							<textField>
-								<reportElement x="0" y="0" width="80" height="20" uuid="6f1d5ba6-8b7f-4841-a569-160c5a48aa5f"/>
+								<reportElement x="0" y="0" width="60" height="20" uuid="6f1d5ba6-8b7f-4841-a569-160c5a48aa5f"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
-								<textFieldExpression><![CDATA[new SimpleDateFormat("yyyy-MM-dd").format($V{value_date})]]></textFieldExpression>
+								<textFieldExpression><![CDATA[new SimpleDateFormat("dd").format($V{value_date})]]></textFieldExpression>
 							</textField>
 						</cellContents>
 					</crosstabColumnHeader>
 					<crosstabTotalColumnHeader>
 						<cellContents mode="Opaque" style="Crosstab_CT">
+							<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
 							<staticText>
 								<reportElement x="0" y="0" width="100" height="20" forecolor="#FFFFFF" uuid="f5a59952-5e2e-4e55-9778-1c8c55e7d40b"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font isBold="true"/>
 								</textElement>
 								<text><![CDATA[Total]]></text>
+							</staticText>
+							<staticText>
+								<reportElement x="101" y="0" width="140" height="20" forecolor="#FFFFFF" uuid="eff6f782-f4fe-47de-a90d-93569cf77ed7"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[Unit Price]]></text>
+							</staticText>
+							<staticText>
+								<reportElement x="240" y="0" width="140" height="20" forecolor="#FFFFFF" uuid="1b610aaf-e1d9-4937-9393-d55800bcc5d9"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[Total Price]]></text>
 							</staticText>
 						</cellContents>
 					</crosstabTotalColumnHeader>
@@ -212,89 +243,87 @@ group by i.name_kh,i.id,t.name_kh,date_trunc('day',d.value_date) order by value_
 				<measure name="total_MEASURE" class="java.lang.Double" calculation="Sum">
 					<measureExpression><![CDATA[$F{total}]]></measureExpression>
 				</measure>
-				<crosstabCell width="80" height="40">
+				<measure name="unit" class="java.math.BigDecimal">
+					<measureExpression><![CDATA[$F{price}]]></measureExpression>
+				</measure>
+				<crosstabCell width="60" height="21">
 					<cellContents mode="Opaque" style="Crosstab_CD">
 						<textField>
-							<reportElement x="0" y="0" width="80" height="20" uuid="e0bfd429-7cb9-456e-af63-e11d568843e6"/>
-							<textElement textAlignment="Left" verticalAlignment="Middle">
+							<reportElement x="0" y="0" width="60" height="21" uuid="e0bfd429-7cb9-456e-af63-e11d568843e6"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{quantities_MEASURE}]]></textFieldExpression>
 						</textField>
-						<textField pattern="#,##0.00;(#,##0.00-)">
-							<reportElement x="0" y="20" width="80" height="20" uuid="0757807a-0542-4cc1-8702-f5c8b2087451"/>
-							<textElement textAlignment="Left" verticalAlignment="Middle">
-								<font isBold="true"/>
-							</textElement>
-							<textFieldExpression><![CDATA[$V{total_MEASURE}]]></textFieldExpression>
-						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="100" height="40" columnTotalGroup="value_date">
+				<crosstabCell width="380" height="21" columnTotalGroup="value_date">
 					<cellContents mode="Opaque" style="Crosstab_CT">
+						<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
 						<textField>
 							<reportElement x="0" y="0" width="100" height="20" forecolor="#FFFFFF" uuid="d380b1f1-f4cb-4bb6-9723-d226f1904854"/>
-							<textElement textAlignment="Right" verticalAlignment="Middle">
+							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{quantities_MEASURE}]]></textFieldExpression>
 						</textField>
 						<textField pattern="#,##0.00;(#,##0.00-)">
-							<reportElement x="0" y="20" width="100" height="20" forecolor="#FFFFFF" uuid="1a8b5a23-c61b-4867-ac18-e62a9cee22b1"/>
+							<reportElement x="240" y="0" width="140" height="20" forecolor="#FFFFFF" uuid="5b93553e-52ec-480c-8ef1-0ef7a66db899"/>
 							<textElement textAlignment="Right" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{total_MEASURE}]]></textFieldExpression>
-						</textField>
-					</cellContents>
-				</crosstabCell>
-				<crosstabCell width="80" height="40" rowTotalGroup="name_kh">
-					<cellContents mode="Opaque" style="Crosstab_CT">
-						<textField>
-							<reportElement x="0" y="0" width="80" height="20" forecolor="#FFFFFF" uuid="c2e602cd-4474-4146-91aa-f727dc5f06a5"/>
-							<textElement textAlignment="Right" verticalAlignment="Middle">
-								<font isBold="true"/>
-							</textElement>
-							<textFieldExpression><![CDATA[$V{quantities_MEASURE}]]></textFieldExpression>
 						</textField>
 						<textField pattern="#,##0.00;(#,##0.00-)">
-							<reportElement x="0" y="20" width="80" height="20" forecolor="#FFFFFF" uuid="e75ad64e-7a44-41c4-b7b8-f29633df33f1"/>
-							<textElement textAlignment="Right" verticalAlignment="Middle">
+							<reportElement x="102" y="1" width="140" height="20" forecolor="#FFFFFF" uuid="1233c0ff-1209-4cac-8029-82e1232ffc2b"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
-							<textFieldExpression><![CDATA[$V{total_MEASURE}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{unit}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="100" height="40" rowTotalGroup="name_kh" columnTotalGroup="value_date">
-					<cellContents mode="Opaque" style="Crosstab_CT">
-						<textField>
-							<reportElement x="0" y="0" width="100" height="20" forecolor="#FFFFFF" uuid="75d7dc72-1472-4998-bae1-7649086cdda5"/>
-							<textElement textAlignment="Right" verticalAlignment="Middle">
-								<font isBold="true"/>
-							</textElement>
-							<textFieldExpression><![CDATA[$V{quantities_MEASURE}]]></textFieldExpression>
-						</textField>
-						<textField pattern="#,##0.00;(#,##0.00-)">
-							<reportElement x="0" y="20" width="100" height="20" forecolor="#FFFFFF" uuid="af3bdbcf-126f-4d4b-bb7c-d17320f639fd"/>
-							<textElement textAlignment="Right" verticalAlignment="Middle">
-								<font isBold="true"/>
-							</textElement>
-							<textFieldExpression><![CDATA[$V{total_MEASURE}]]></textFieldExpression>
-						</textField>
-					</cellContents>
-				</crosstabCell>
-				<crosstabCell width="80" height="40" rowTotalGroup="type">
+				<crosstabCell width="60" height="20" rowTotalGroup="name_kh">
 					<cellContents mode="Opaque" style="Crosstab_CG">
 						<textField>
-							<reportElement x="0" y="0" width="80" height="20" forecolor="#030303" uuid="52c922d3-209a-4d55-9925-e42788241ba3"/>
+							<reportElement x="0" y="0" width="60" height="20" forecolor="#0A0A0A" uuid="c2e602cd-4474-4146-91aa-f727dc5f06a5"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{quantities_MEASURE}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="380" height="20" rowTotalGroup="name_kh" columnTotalGroup="value_date">
+					<cellContents mode="Opaque" style="Crosstab_CT">
+						<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+						<textField pattern="#,##0.00;(#,##0.00-)">
+							<reportElement x="240" y="0" width="140" height="20" forecolor="#FFFFFF" uuid="5f7eef32-ba9b-4cd8-ae1b-fe850f5851e2"/>
+							<textElement textAlignment="Right" verticalAlignment="Middle">
+								<font isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{total_MEASURE}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="0" y="0" width="100" height="20" forecolor="#FFFFFF" uuid="711a4d28-13e3-4194-aa7a-d8d511fbd072"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{quantities_MEASURE}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="60" height="20" rowTotalGroup="type">
+					<cellContents mode="Opaque" style="Crosstab_CT">
+						<textField>
+							<reportElement x="0" y="0" width="60" height="10" forecolor="#FFFFFF" uuid="52c922d3-209a-4d55-9925-e42788241ba3"/>
 							<textElement textAlignment="Left" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{quantities_MEASURE}]]></textFieldExpression>
 						</textField>
 						<textField pattern="#,##0.00;(#,##0.00-)">
-							<reportElement x="0" y="20" width="80" height="20" forecolor="#030303" uuid="20efab99-9747-4b90-951b-379181b0835d"/>
+							<reportElement x="0" y="10" width="60" height="10" forecolor="#FFFFFF" uuid="20efab99-9747-4b90-951b-379181b0835d"/>
 							<textElement textAlignment="Left" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
@@ -302,21 +331,22 @@ group by i.name_kh,i.id,t.name_kh,date_trunc('day',d.value_date) order by value_
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="100" height="40" rowTotalGroup="type" columnTotalGroup="value_date">
+				<crosstabCell width="380" height="20" rowTotalGroup="type" columnTotalGroup="value_date">
 					<cellContents mode="Opaque" style="Crosstab_CT">
+						<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+						<textField>
+							<reportElement x="0" y="0" width="100" height="20" forecolor="#FFFFFF" uuid="81a3785c-7ef9-40fa-b29b-f158d2209276"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{quantities_MEASURE}]]></textFieldExpression>
+						</textField>
 						<textField pattern="#,##0.00;(#,##0.00-)">
-							<reportElement x="0" y="0" width="100" height="20" forecolor="#FFFFFF" uuid="330bd50d-423a-4957-b6c0-9e46583f3b65"/>
+							<reportElement x="240" y="0" width="140" height="20" forecolor="#FFFFFF" uuid="bf822e85-0180-413e-a29d-1f308da82754"/>
 							<textElement textAlignment="Right" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{total_MEASURE}]]></textFieldExpression>
-						</textField>
-						<textField>
-							<reportElement x="0" y="20" width="100" height="20" forecolor="#FFFFFF" uuid="59c2a875-6f21-4445-98dd-f7eebfb7659f"/>
-							<textElement textAlignment="Right" verticalAlignment="Middle">
-								<font isBold="true"/>
-							</textElement>
-							<textFieldExpression><![CDATA[$V{quantities_MEASURE}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>

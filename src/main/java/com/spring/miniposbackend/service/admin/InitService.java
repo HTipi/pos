@@ -210,10 +210,11 @@ public class InitService {
 		return printerRepository.findByBranchId(branchId);
 	}
 	private List<Invoice> getInvoices(int branchId){
-		if (userProfile.getProfile().getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_BRANCH"))) {
-			return invoiceRepository.findByBranchId(branchId);
-		}
-		return invoiceRepository.findByBranchId(userProfile.getProfile().getUser().getId());
+//		if (userProfile.getProfile().getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_BRANCH"))) {
+//			return invoiceRepository.findByBranchId(branchId);
+//		}
+//		return invoiceRepository.findByBranchId(userProfile.getProfile().getUser().getId());
+		return invoiceRepository.findByBranchId(branchId);
 	}
 
 }

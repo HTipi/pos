@@ -9,6 +9,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.AuditModel;
 
 import javax.persistence.*;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,5 +77,9 @@ public class Branch extends AuditModel {
 	@Column(name = "enable", nullable = false)
 	@ColumnDefault("true")
 	private boolean enable;
+	
+	@Column(name = "point_exchange", nullable = true, precision = 10, scale = 2)
+	@ColumnDefault("0.00")
+    private BigDecimal pointExchange;
 	
 }

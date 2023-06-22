@@ -271,4 +271,11 @@ public class SaleDetail extends AuditModel {
 		}
 		return items;
 	}
+	public Short getPoints() {
+		return itemBranch.getPoint();
+	}
+	public long getSaleIds()
+	  {
+	    return sale.getId();
+	  }
 }

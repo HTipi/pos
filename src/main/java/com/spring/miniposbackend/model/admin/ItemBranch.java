@@ -102,6 +102,15 @@ public class ItemBranch extends AuditModel {
 	@JsonIgnore
 	@OneToMany(mappedBy = "itemBranchPromotionIdentity.itemBranch", fetch = FetchType.LAZY)
 	List<ItemBranchPromotion> itemBranchPromotions;
+	
+	@Column(name = "point", nullable = true)
+	@ColumnDefault("0")
+	private Short point;
+
+	@Column(name = "reward", nullable = true)
+	@ColumnDefault("0")
+	private Short reward;
+	
 
 	public Long getId() {
 		return id;

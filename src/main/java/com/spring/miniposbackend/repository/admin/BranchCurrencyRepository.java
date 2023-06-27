@@ -11,4 +11,7 @@ public interface BranchCurrencyRepository extends JpaRepository<BranchCurrency, 
 	
 	@Query(value = "select bc from BranchCurrency bc where bc.branch.id = ?1 and bc.currency.enable = ?2 and bc.enable = ?3")
 	List<BranchCurrency> findByBranchId(Integer branchId, boolean currencyEnable, boolean enable);
+	
+	@Query(value = "select bc from BranchCurrency bc where bc.branch.id = ?1 and bc.isHome =true")
+	BranchCurrency findCurByBranchId(Integer branchId);
 }

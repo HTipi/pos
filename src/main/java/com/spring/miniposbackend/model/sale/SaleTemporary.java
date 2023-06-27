@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -130,6 +131,9 @@ public class SaleTemporary extends AuditModel {
 	@Type(type = "list-array")
 	@Column(name = "add_promo", columnDefinition = "int[]",nullable = true)
 	private List<Integer> addPromo;
+	
+	@Column(name = "qr_num", nullable = true)
+	private UUID qrnumber;
 
 	public List<Long> getAddOnItems() {
 		return itemBranch.getAddOnItems();
@@ -192,6 +196,12 @@ public class SaleTemporary extends AuditModel {
 			return 0;
 		return paymentChannel.getId();
 	}
+	public short getReward() {
+		return itemBranch.getReward();
+	}
+	public short getPoint() {
+		return itemBranch.getPoint();
+	}
 	public List<ItemPromotion> getItemPromotion() {
 		List<ItemPromotion> items = new ArrayList<ItemPromotion>();
 		ItemPromotion pro = null;
@@ -241,5 +251,8 @@ public class SaleTemporary extends AuditModel {
 
 	public double getTotal() {
 		return getSubTotal() - getDiscountTotal();
+	}
+	public String getType() {
+		return itemBranch.getType();
 	}
 }

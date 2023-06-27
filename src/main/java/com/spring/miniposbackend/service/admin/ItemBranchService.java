@@ -173,6 +173,8 @@ public class ItemBranchService {
 					itemBr.setStockOut(0L);
 					itemBr.setPrice(item.getPrice());
 					itemBr.setDiscount(itemBr.getDiscount());
+					itemBr.setPoint((short) 0);
+					itemBr.setReward((short) 0);
 					itemBranchRepository.save(itemBr);
 				}
 //				else {

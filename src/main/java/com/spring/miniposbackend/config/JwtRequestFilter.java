@@ -42,12 +42,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 
 		final String requestTokenHeader = request.getHeader("Authorization");
-
 		String username = null;
 		String jwtToken = null;
 		// JWT Token is in the form "Bearer token". Remove Bearer word and get
 		// only the Token
-		if (!request.getRequestURI().contentEquals("/authenticate")) {
+		if (!request.getRequestURI().contentEquals("/authenticate") || !request.getRequestURI().contentEquals("/verifying")) {
 			if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
 				jwtToken = requestTokenHeader.substring(7);
 				try {
@@ -78,7 +77,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 				UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
 				validateUserDetails(userDetails);
 				if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
-
 					UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
 							userDetails, null, userDetails.getAuthorities());
 					usernamePasswordAuthenticationToken
@@ -90,7 +88,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 				}
 			} catch (UsernameNotFoundException e) {
 				System.out.println(e.getMessage());
-
 			} catch (LockedException e) {
 				System.out.println(e.getMessage());
 			} catch (DisabledException e) {

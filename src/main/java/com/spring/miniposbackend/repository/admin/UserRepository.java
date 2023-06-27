@@ -3,6 +3,7 @@ package com.spring.miniposbackend.repository.admin;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 //import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import com.spring.miniposbackend.model.admin.User;
@@ -13,6 +14,18 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 //    List<User> findAllActive();
 	Optional<User> findFirstByUsername(String username);
 	Optional<User> findFirstByApiToken(String token);
+	
+	@Query(value="select u from User u where u.username=?1 and u.person.id != null")
+	Optional<User> findByTelephoneWithPassword(String username);
+	
+	@Query(value="select u from User u where u.username=?1")
+	User findByprimaryphone(String username);
+	
+	@Query(value="select u from User u where u.oneTimePasswordCode=?1")
+	User findByOtpCode(Integer code);
+	
+	@Query(value="select u from User u where u.oneTimePasswordCode=?1")
+	Optional<User>  findByCode(Integer code);
 
 //    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END FROM User c WHERE c.user_name = :user_name and c.user_visible=:user_visible")
 //    boolean existsByUser_name(@Param("user_name") String user_name, @Param("user_visible") boolean user_visible);

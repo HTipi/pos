@@ -2,6 +2,7 @@ package com.spring.miniposbackend.controller.sale;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -157,6 +158,22 @@ public class SaleTemporaryController {
 		}
 		
 			return new SuccessResponse("0", "Please update your list", obj);
+	}
+	@PatchMapping("updateqr")
+	@PreAuthorize("hasAnyRole('SALE')")
+	public SuccessResponse update(@RequestParam(name = "user-id") Integer userId,
+			@RequestParam(name = "invoice-id") Optional<Long> invoiceId,
+			@RequestParam(name = "seat-id") Optional<Integer> seatId
+		)
+		{
+		return new SuccessResponse("00", "add SaleTmp", saleService.update(userId,invoiceId,seatId));
+	}
+
+	@GetMapping("by-qrnumber")
+	@PreAuthorize("hasAnyRole('CUSTOMER')")
+	public SuccessResponse getByInvoiceId(@RequestParam UUID qrnumber) {
+		return new SuccessResponse("00", "fetch Sale Tmp by User",
+				saleService.showByQrnumber(qrnumber));
 	}
 
 }

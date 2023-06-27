@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.persistence.EntityManager;
 
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.exception.UnauthorizedException;
+import com.spring.miniposbackend.model.account.Account;
 import com.spring.miniposbackend.model.admin.Branch;
 import com.spring.miniposbackend.model.admin.BranchCurrency;
 import com.spring.miniposbackend.model.admin.BranchPromotion;
@@ -28,7 +30,13 @@ import com.spring.miniposbackend.model.sale.SaleDetail;
 import com.spring.miniposbackend.model.sale.SaleDetailPromotion;
 import com.spring.miniposbackend.model.sale.SaleDetailPromotionIdentity;
 import com.spring.miniposbackend.model.sale.SaleTemporary;
+import com.spring.miniposbackend.model.transaction.Transaction;
+import com.spring.miniposbackend.model.transaction.TransactionSale;
+import com.spring.miniposbackend.model.transaction.TransactionType;
 import com.spring.miniposbackend.modelview.SpitBillItems;
+import com.spring.miniposbackend.modelview.sale.SalePaymentRequest;
+import com.spring.miniposbackend.modelview.sale.TransactionSalePointView;
+import com.spring.miniposbackend.repository.account.AccountRepository;
 import com.spring.miniposbackend.repository.admin.BranchCurrencyRepository;
 import com.spring.miniposbackend.repository.admin.BranchPromotionRepository;
 import com.spring.miniposbackend.repository.admin.BranchSettingRepository;
@@ -36,12 +44,16 @@ import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchinventoryRepository;
 import com.spring.miniposbackend.repository.admin.PaymentChannelRepository;
 import com.spring.miniposbackend.repository.admin.SeatRepository;
+import com.spring.miniposbackend.repository.admin.UserRepository;
 import com.spring.miniposbackend.repository.customer.CustomerRepository;
 import com.spring.miniposbackend.repository.sale.InvoiceRepository;
 import com.spring.miniposbackend.repository.sale.SaleDetailPromotionRepository;
 import com.spring.miniposbackend.repository.sale.SaleDetailRepository;
 import com.spring.miniposbackend.repository.sale.SaleRepository;
 import com.spring.miniposbackend.repository.sale.SaleTemporaryRepository;
+import com.spring.miniposbackend.repository.transaction.TransactionRepository;
+import com.spring.miniposbackend.repository.transaction.TransactionSaleRepository;
+import com.spring.miniposbackend.repository.transaction.TransactionTypeRepository;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
 @Service
@@ -85,6 +97,16 @@ public class SaleService {
 	private SaleDetailPromotionRepository saleDetailPromotionRepository;
 	@Autowired
 	private ItemBranchinventoryRepository itemBranchinventoryRepository;
+	@Autowired
+	private AccountRepository accountRepository;
+	@Autowired
+	private TransactionTypeRepository transactionTypeRepository;
+	@Autowired
+	private UserRepository userRepository;
+	@Autowired
+	private TransactionRepository transactionRepository;
+	@Autowired
+	private TransactionSaleRepository transactionSaleRepository;
 
 	public List<Sale> showSaleByUser(@DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> date, boolean byUser,
 			Optional<Integer> paymentId) {
@@ -158,7 +180,7 @@ public class SaleService {
 	public List create(Optional<Long> invoiceId, Optional<Integer> seatId, Optional<Integer> channelId, Double discount,
 			Double cashIn, Double change, Integer currencyId, Integer userId, boolean cancel, Optional<String> remark,
 			Optional<Double> serviceCharge, Optional<SpitBillItems> spitBillItems, Optional<Long> customerId,
-			Optional<Double> vat) {
+			Optional<Double> vat,Optional<Long> personId,Optional<Integer> transactionTypeId) {
 		entityManager.clear();
 		User user = userProfile.getProfile().getUser();
 		Branch branch = userProfile.getProfile().getBranch();
@@ -167,6 +189,8 @@ public class SaleService {
 		String seatName = "";
 		List<SaleTemporary> saleTemps;
 		Sale sale;
+		Account account;
+		Transaction transaction = null;
 		BranchCurrency branchCurrency = branchCurrencyRepository.findById(currencyId)
 				.orElseThrow(() -> new ResourceNotFoundException("Currency does not exist"));
 
@@ -221,6 +245,17 @@ public class SaleService {
 			if (saleTemps.size() == 0) {
 				throw new ResourceNotFoundException("វិក័យប័ត្រនេះបានគិតរួចហើយ", "16");
 			}
+		}
+		SaleTemporary saleTmp = saleTemps.get(0);
+		TransactionType transactionType;
+		boolean tran = false;
+		if(saleTmp.getItemBranch().getType().equalsIgnoreCase("CREDIT"))
+		{
+			if(!personId.isPresent() || !transactionTypeId.isPresent())
+			{
+				throw new ConflictException("ប្រតិបត្តិការមិនត្រឹមត្រូវ", "17");
+			}
+			tran = true;
 		}
 		sale = new Sale();
 		sale.setBranch(branch);
@@ -330,10 +365,229 @@ public class SaleService {
 		saleResult.setDiscountSaleDetail(BigDecimal.valueOf(discountAmount));
 		String receiptNum = receiptService.getReceiptNumberByBranchId(branch.getId()).toString();
 		saleResult.setReceiptNumber(receiptNum);
+		if(tran)
+		{
+			account = accountRepository.findByCreditAccount(personId.get())
+					.orElseThrow(() -> new ResourceNotFoundException("acccount does not exist"));
+			transactionType = transactionTypeRepository.findById(transactionTypeId.get())
+					.orElseThrow(() -> new ResourceNotFoundException("tranType does not exist"));
+			final BigDecimal previousBalance = account.getBalance();
+			final BigDecimal tranAmount = BigDecimal.valueOf(subTotal + discountAmount);
+			transaction = new Transaction();
+			account.setBalance(account.getBalance().add(tranAmount));
+			transaction.setTransactionAmount(tranAmount);
+			transaction.setPreviousBalance(previousBalance);
+			transaction.setAccount(account);
+			transaction.setTransactionType(transactionType);
+			transaction.setBranch(userProfile.getProfile().getBranch());
+			transaction.setCurrentBalance(account.getBalance());
+			transaction.setRemark(remark.get());
+			transaction.setUser(user);
+			transaction.setValueDate(new Date());
+			accountRepository.save(account);
+			transactionRepository.save(transaction);
+			
+			ItemBranch itemBranch = saleTemps.get(0).getItemBranch();
+			if(itemBranch.getPoint() > 0)
+			{
+				final Account accountPoint = accountRepository.findByPointAccount(personId.get())
+						.orElseThrow(() -> new ResourceNotFoundException("acccount does not exist"));
+				final TransactionType pointType = transactionTypeRepository.findById(4)
+						.orElseThrow(() -> new ResourceNotFoundException("Point does not exist"));
+				final BigDecimal previousPoint = accountPoint.getBalance();
+				final BigDecimal pointAmount = BigDecimal.valueOf(itemBranch.getPoint());
+				final Transaction pointTran = new Transaction();
+				accountPoint.setBalance(accountPoint.getBalance().add(pointAmount));
+				pointTran.setTransactionAmount(pointAmount);
+				pointTran.setPreviousBalance(previousPoint);
+				pointTran.setAccount(accountPoint);
+				pointTran.setTransactionType(pointType);
+				pointTran.setBranch(userProfile.getProfile().getBranch());
+				pointTran.setCurrentBalance(accountPoint.getBalance());
+				pointTran.setRemark(remark.get());
+				pointTran.setUser(user);
+				pointTran.setValueDate(new Date());
+				accountRepository.save(accountPoint);
+				transactionRepository.save(pointTran);
+			}
+		}
 		saleRepository.save(saleResult);
 		entityManager.flush();
 		entityManager.clear();
+		if(tran)
+		{
+			TransactionSale tranSale = new TransactionSale();
+			tranSale.setSale(saleResult);
+			tranSale.setTransaction(transaction);
+			transactionSaleRepository.save(tranSale);
+		}
 		return saleDetailRepository.findMainBySaleId(saleResult.getId());
+	}
+	@Transactional
+	public List<?> createByQr(SalePaymentRequest request, UUID qr) {
+		Account account = accountRepository.findById(request.getAccountId())
+				.orElseThrow(() -> new ResourceNotFoundException("acccount does not exist"));
+		TransactionType transactionType = transactionTypeRepository.findById(request.getTransactionTypeId())
+				.orElseThrow(() -> new ResourceNotFoundException("tranType does not exist"));
+		User user = userRepository.findById(request.getUserId())
+				.orElseThrow(() -> new ResourceNotFoundException("user does not exist"));
+		final BigDecimal previousBalance = account.getBalance();
+		Transaction transaction = new Transaction();
+		if (account.getAccountType().getId() == 1) {
+			if (account.getBalance().compareTo(request.getTotal()) == -1) {
+				throw new ConflictException("insufficient balance", "09");
+			}
+			account.setBalance(account.getBalance().subtract(request.getTotal()));
+			transaction.setTransactionAmount(request.getTotal());
+		} else {
+			if (account.getBalance().shortValue() < request.getPoint()) {
+				throw new ConflictException("insufficient point", "09");
+			}
+			account.setBalance(account.getBalance().subtract(BigDecimal.valueOf(request.getPoint())));
+			transaction.setTransactionAmount(BigDecimal.valueOf(request.getPoint()));
+		}
+
+		transaction.setPreviousBalance(previousBalance);
+		transaction.setAccount(account);
+		transaction.setTransactionType(transactionType);
+		transaction.setBranch(userProfile.getProfile().getBranch());
+		transaction.setCurrentBalance(account.getBalance());
+		transaction.setRemark(request.getRemark());
+		transaction.setUser(user);
+		transaction.setValueDate(new Date());
+		entityManager.clear();
+		Branch branch = userProfile.getProfile().getBranch();
+		// Seat seat = null;
+		// Invoice invoice = null;
+
+		Sale sale;
+		BranchCurrency branchCurrency = branchCurrencyRepository.findById(request.getCurrencyId())
+				.orElseThrow(() -> new ResourceNotFoundException("Currency does not exist"));
+		List<SaleTemporary> saleTemps = saleTemporaryRepository.findByQrnumber(qr);
+		if (saleTemps.size() == 0) {
+			throw new ResourceNotFoundException("វិក័យប័ត្រនេះបានគិតរួចហើយ", "16");
+		}
+		SaleTemporary saleTmp = saleTemps.get(0);
+		String seatName = saleTmp.getSeat_name();
+//		if (saleTmp.getInvoice() != null) {
+//			invoice = invoiceRepository.findById(saleTmp.getInvoice_id())
+//					.orElseThrow(() -> new ResourceNotFoundException("វិក័យប័ត្រនេះបានគិតរួចហើយ", "16"));
+//		} else if (saleTmp.getSeat() != null) {
+//			seat = seatRepository.findById(saleTmp.getSeat_id())
+//					.orElseThrow(() -> new ResourceNotFoundException("Seat does not exist"));
+//
+//			if (seat.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
+//				throw new UnauthorizedException("Transaction is unauthorized");
+//			}
+//		}
+		sale = new Sale();
+		sale.setBranch(branch);
+		sale.setUser(user);
+		sale.setSeatName(seatName);
+		sale.setSubTotal(BigDecimal.valueOf(0.00));
+		sale.setDiscountSaleDetail(BigDecimal.valueOf(0.00));
+		sale.setDiscountAmount(BigDecimal.valueOf(request.getDiscount()));
+		sale.setReceiptNumber("0");
+		sale.setValueDate(saleTemps.get(0).getValueDate());
+		sale.setCashIn(request.getTotal().doubleValue());
+		sale.setChange(0.00);
+		sale.setReverse(false);
+		sale.setEndDate(new Date());
+		sale.setServiceCharge(request.getServiceCharge());
+			sale.setVat(request.getVat());
+		if (saleTemps.get(0).getBillNumber() == 0) {
+			Long receiptNum = receiptService.getBillNumberByBranchId(userProfile.getProfile().getBranch().getId());
+			sale.setBillNumber(receiptNum);
+		} else
+			sale.setBillNumber(saleTemps.get(0).getBillNumber());
+		sale.setRemark(request.getRemark());
+		sale.setBranchCurrency(branchCurrency);
+		Sale saleResult = saleRepository.save(sale);
+		saleTemps.forEach((saleTemp) -> {
+			SaleDetail saleDetail = addItem(branch, user, saleResult, saleTemp, Optional.empty(), false);
+			List<SaleTemporary> subItems = saleTemp.getAddOns() == null ? new ArrayList<SaleTemporary>()
+					: saleTemp.getAddOns();
+			subItems.forEach((subItem) -> {
+				addItem(branch, user, saleResult, subItem, Optional.of(saleDetail), false);
+			});
+			ItemBranch itemBranch = saleTemp.getItemBranch();
+			List<ItemBranchInventory> itemInventories = itemBranchinventoryRepository
+					.findByItemBranchId(itemBranch.getId());
+			if (itemInventories.size() > 0) {
+				itemInventories.forEach((inventory) -> {
+					ItemBranch item = itemRepository.findById(inventory.getInvenId())
+							.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
+					int itembalance = saleTemporaryRepository.findItemBalanceByUserId(user.getId(), item.getId())
+							.orElse(0);
+					if (item.getItemBalance() < itembalance) {
+						String setting = branchSettingRepository
+								.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN")
+								.orElse("");
+						if (!setting.contentEquals(setting))
+							throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
+					}
+					item.setStockOut((long) (item.getStockOut() + (saleTemp.getQuantity() * inventory.getQty())));
+					itemRepository.save(item);
+				});
+			} else {
+				List<Long> inventories = itemBranch.getAddOnInven() == null ? new ArrayList<Long>()
+						: itemBranch.getAddOnInven();
+				inventories.forEach((inventory) -> {
+					ItemBranch item = itemRepository.findById(inventory)
+							.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
+					int itembalance = saleTemporaryRepository.findItemBalanceByUserId(user.getId(), item.getId())
+							.orElse(0);
+					if (item.getItemBalance() < itembalance) {
+						String setting = branchSettingRepository
+								.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN")
+								.orElse("");
+						if (!setting.contentEquals(setting))
+							throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
+					}
+					item.setStockOut((long) (item.getStockOut() + (saleTemp.getQuantity() * itemBranch.getInvenQty())));
+					itemRepository.save(item);
+				});
+			}
+		});
+		if (saleTmp.getInvoice() != null) {
+			saleTemporaryRepository.deleteByInvoiceId(saleTmp.getInvoice_id());
+			invoiceRepository.deleteById(saleTmp.getInvoice_id());
+		} else if (saleTmp.getSeat() != null) {
+			saleTemporaryRepository.deleteBySeatId(saleTmp.getSeat_id());
+		} else {
+			saleTemporaryRepository.deleteByUserId(user.getId());
+		}
+		List<SaleDetail> saleDetails = saleDetailRepository.findMainBySaleId(sale.getId());
+
+		double subTotal = 0.00;
+		double discountAmount = 0.00;
+		for (int i = 0; i < saleDetails.size(); i++) {
+			subTotal += saleDetails.get(i).getSubTotal().doubleValue();
+			discountAmount += saleDetails.get(i).getDiscountTotal().doubleValue();
+		}
+		saleResult.setSubTotal(BigDecimal.valueOf(subTotal));
+		saleResult.setDiscountSaleDetail(BigDecimal.valueOf(discountAmount));
+		String receiptNum = receiptService.getReceiptNumberByBranchId(branch.getId()).toString();
+		saleResult.setReceiptNumber(receiptNum);
+		saleRepository.save(saleResult);
+		accountRepository.save(account);
+		transactionRepository.save(transaction);
+		entityManager.flush();
+		entityManager.clear();
+		TransactionSale tranSale = new TransactionSale();
+		tranSale.setSale(saleResult);
+		tranSale.setTransaction(transaction);
+		tranSale.setQrNumber(qr);
+		transactionSaleRepository.save(tranSale);
+		// packageitemrservice.create(sale.getId(),request.getExpirydate(),
+		// saleDetails);
+		return saleDetailRepository.findMainBySaleId(saleResult.getId());
+	}
+	
+	public List<SaleDetail> checkQrSale(UUID qr) {
+		TransactionSale tranSale = transactionSaleRepository.findByQr(qr)
+				.orElseThrow(() -> new ResourceNotFoundException("Not Pay Yet", "02"));
+		return saleDetailRepository.findMainBySaleId(tranSale.getSaleId());
 	}
 
 	@Transactional
@@ -495,5 +749,36 @@ public class SaleService {
 			}
 		}
 		return details;
+	}
+	@Transactional
+	public boolean topupPoint(TransactionSalePointView request) {
+		entityManager.clear();
+		boolean check = transactionSaleRepository.existsBySaleId(request.getSaleId());
+		if(check)
+		{
+			throw new ConflictException("Point already settled", "01");
+		}
+		Account pointAccount = accountRepository.findPointById(request.getAccountId()).orElseThrow(() -> new ResourceNotFoundException("Point does not exist"));
+		Sale sale = saleRepository.findById(request.getSaleId()).orElseThrow(() -> new ResourceNotFoundException("Sale does not exist"));
+		TransactionType tranType = transactionTypeRepository.findById(request.getTransactionTypeId()).orElseThrow(() -> new ResourceNotFoundException("type does not exist"));
+		final BigDecimal previousBalance = pointAccount.getBalance();
+		Transaction transaction = new Transaction();
+		pointAccount.setBalance(pointAccount.getBalance().add(BigDecimal.valueOf(request.getPoint())));
+		transaction.setTransactionAmount(BigDecimal.valueOf(request.getPoint()));
+		transaction.setPreviousBalance(previousBalance);
+		transaction.setAccount(pointAccount);
+		transaction.setTransactionType(tranType);
+		transaction.setBranch(userProfile.getProfile().getBranch());
+		transaction.setCurrentBalance(pointAccount.getBalance());
+		transaction.setUser(userProfile.getProfile().getUser());
+		transaction.setValueDate(new Date());
+		transactionRepository.save(transaction);
+		entityManager.flush();
+		entityManager.clear();
+		TransactionSale tranSale = new TransactionSale();
+		tranSale.setSale(sale);
+		tranSale.setTransaction(transaction);
+		transactionSaleRepository.save(tranSale);
+		return true;
 	}
 }

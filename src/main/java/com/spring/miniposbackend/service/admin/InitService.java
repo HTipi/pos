@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.spring.miniposbackend.model.SuccessResponse;
+import com.spring.miniposbackend.model.admin.Branch;
 import com.spring.miniposbackend.model.admin.BranchCurrency;
 import com.spring.miniposbackend.model.admin.BranchPaymentChannel;
 import com.spring.miniposbackend.model.admin.BranchSetting;
@@ -18,11 +19,16 @@ import com.spring.miniposbackend.model.admin.User;
 import com.spring.miniposbackend.model.admin.UserRole;
 import com.spring.miniposbackend.model.sale.Invoice;
 import com.spring.miniposbackend.model.security.ClientApplication;
+import com.spring.miniposbackend.model.transaction.TransactionType;
 import com.spring.miniposbackend.modelview.ImageResponse;
+import com.spring.miniposbackend.modelview.InitPointViewModel;
 import com.spring.miniposbackend.modelview.InitViewModel;
 import com.spring.miniposbackend.modelview.UserResponse;
+import com.spring.miniposbackend.modelview.account.AccountModel;
+import com.spring.miniposbackend.repository.admin.BranchAdveriseRepository;
 import com.spring.miniposbackend.repository.admin.BranchCurrencyRepository;
 import com.spring.miniposbackend.repository.admin.BranchPaymentChannelRepository;
+import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.admin.BranchSettingRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
 import com.spring.miniposbackend.repository.admin.ItemTypeRepository;
@@ -31,6 +37,8 @@ import com.spring.miniposbackend.repository.admin.UserRepository;
 import com.spring.miniposbackend.repository.admin.UserRoleRepository;
 import com.spring.miniposbackend.repository.sale.InvoiceRepository;
 import com.spring.miniposbackend.repository.security.ClientApplicationRepository;
+import com.spring.miniposbackend.repository.transaction.TransactionTypeRepository;
+import com.spring.miniposbackend.service.account.AccountService;
 import com.spring.miniposbackend.util.ImageUtil;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
@@ -64,6 +72,15 @@ public class InitService {
 	private InvoiceRepository invoiceRepository;
 
 	@Autowired
+	private BranchRepository branchRepository;
+	@Autowired
+	private TransactionTypeRepository transactionTypeRepository;
+	@Autowired
+	private AccountService accountService;
+	@Autowired
+	private BranchAdveriseRepository branchAdvertiseRepository;
+
+	@Autowired
 	private ImageUtil imageUtil;
 	@Value("${file.path.image.item-type}")
 	private String imagePathItemType;
@@ -74,6 +91,8 @@ public class InitService {
 
 	@Value("${file.path.image.branch-channel}")
 	private String imagePathQR;
+	@Value("${file.path.image.profile}")
+	private String imagePathProfile;
 
 	public InitViewModel showInitHorPao() throws Exception {
 
@@ -83,7 +102,7 @@ public class InitService {
 			List<BranchSetting> settings = getSettings(branchId);
 			List<BranchCurrency> currencies = getCurrencies(branchId, true, true);
 			System.out.println(currencies.size());
-			//List<BranchPaymentChannel> branchPaymentChannels = getChannels(branchId);
+			// List<BranchPaymentChannel> branchPaymentChannels = getChannels(branchId);
 			List<ItemBranch> itemBranch = getItemBranch(branchId);
 			List<ItemType> itemType = getItemTypes(corporateId);
 			List<ImageResponse> imageItemType = getImagesFromListItemType(itemType);
@@ -94,11 +113,45 @@ public class InitService {
 			List<Invoice> invoices = getInvoices(branchId);
 
 			return new InitViewModel(settings, itemBranch, itemType, currencies, imageItem, imageItemType, user,
-					clientApp,printers,invoices);
+					clientApp, printers, invoices);
 		} catch (Exception e) {
 			throw new Exception(e.getMessage());
 		}
- 
+
+	}
+
+	public InitPointViewModel showInitHorPaoPoint(Optional<Integer> branchId) throws Exception {
+
+		try {
+			Integer branch = branchId.isPresent() ? branchId.get() : userProfile.getProfile().getBranch().getId();
+			Optional<Branch> branchlogo = branchRepository.findById(branch);
+			String fileLocation = imagePathBranch + "/" + branchlogo.get().getLogo();
+			byte[] logo;
+			try {
+				logo = imageUtil.getImage(fileLocation);
+			} catch (IOException e) {
+				logo = null;
+			}
+
+			BranchCurrency currency = branchCurrencyRepository.findCurByBranchId(branch);
+			List<TransactionType> types = getTransactionTypes();
+			UserResponse user = getUsersPoint();
+			List<Integer> branchAdvertise  = branchAdvertiseRepository.findByBranchId(branch);
+			if(branchAdvertise.isEmpty()) {
+				branchAdvertise = branchAdvertiseRepository.findByBranchId(1);		
+			}
+			AccountModel account = new AccountModel();
+			account.setCredit(accountService.credit(branch));
+			account.setPoint(accountService.point(branch));
+			account.setAccount(accountService.acc(branch));
+			account.setLogo(logo);
+			account.setBranchAdvertiseId(branchAdvertise);
+			return new InitPointViewModel(user, account, currency, types);
+
+		} catch (Exception e) {
+			throw new Exception(e.getMessage());
+		}
+
 	}
 
 	private List<BranchSetting> getSettings(Integer branchId) {
@@ -206,15 +259,48 @@ public class InitService {
 		return clientApplicationRepository.findFirstByName(name)
 				.orElseThrow(() -> new ResourceNotFoundException("Record does not exist", "01"));
 	}
+
 	private List<Printer> getPrinters(int branchId) {
 		return printerRepository.findByBranchId(branchId);
 	}
-	private List<Invoice> getInvoices(int branchId){
+
+	private List<Invoice> getInvoices(int branchId) {
 //		if (userProfile.getProfile().getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_BRANCH"))) {
 //			return invoiceRepository.findByBranchId(branchId);
 //		}
 //		return invoiceRepository.findByBranchId(userProfile.getProfile().getUser().getId());
 		return invoiceRepository.findByBranchId(branchId);
+	}
+
+	private List<TransactionType> getTransactionTypes() {
+		return transactionTypeRepository.findAll();
+	}
+
+	private UserResponse getUsersPoint() {
+		String fileLocation = imagePathBranch + "/" + userProfile.getProfile().getBranch().getLogo();
+		byte[] image;
+		try {
+			image = imageUtil.getImage(fileLocation);
+		} catch (IOException e) {
+			image = null;
+		}
+		String fileLocationQR = imagePathQR + "/" + userProfile.getProfile().getBranch().getQr();
+		byte[] imageQR;
+		try {
+			imageQR = imageUtil.getImage(fileLocationQR);
+		} catch (IOException e) {
+			imageQR = null;
+		}
+		String fileLocationProfile = imagePathProfile + "/" + userProfile.getProfile().getUser().getPerson().getImage();
+		byte[] imageProfile;
+		try {
+			imageProfile = imageUtil.getImage(fileLocationProfile);
+		} catch (IOException e) {
+			imageProfile = null;
+		}
+		User user = showByUsername(userProfile.getProfile().getUsername());
+		return new UserResponse(user, getRoleByUserId(userProfile.getProfile().getUser().getId()), image, imageQR,
+				user.getPerson(), imageProfile);
 	}
 
 }

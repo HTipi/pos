@@ -34,4 +34,14 @@ public class UserTokenService {
 				}).orElse(null);
 			}).orElseThrow(()-> new ResourceNotFoundException("Client Application does not exist"));
 	}
+	public UserToken setApiTokenPerson(String clientAppName, String username, String token) throws Exception {
+		return clientAppRepository.findFirstByName(clientAppName).map((clientApp) -> {
+			return userRepository.findFirstByUsername(username).map((user) -> {
+				UserToken userToken = new UserToken();
+				userToken.setClientAppUserIdentity(new ClientAppUserIdentity(clientApp, user));
+				userToken.setApiToken(token);
+				return userTokenRepository.save(userToken);
+			}).orElse(null);
+		}).orElseThrow(() -> new ResourceNotFoundException("Client Application does not exist"));
+}
 }

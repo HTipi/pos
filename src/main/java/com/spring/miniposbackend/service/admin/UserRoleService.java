@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.exception.UnauthorizedException;
+import com.spring.miniposbackend.model.admin.User;
 import com.spring.miniposbackend.model.admin.UserRole;
 import com.spring.miniposbackend.model.admin.UserRoleIdentity;
 import com.spring.miniposbackend.repository.admin.RoleRepository;
@@ -64,6 +65,18 @@ public class UserRoleService {
 					return userRole;
 				}).orElseThrow(() -> new ResourceNotFoundException("User Role does not exist"));
 
+			}).orElseThrow(() -> new ResourceNotFoundException("Role does not exist"));
+		}).orElseThrow(() -> new ResourceNotFoundException("User does not exist"));
+	}
+	public UserRole createCustomer(Integer userId) {
+		return userRepository.findById(userId).map((user) -> {
+			if (userProfile.getProfile().getCorporate().getId() != user.getBranch().getCorporate().getId()) {
+				throw new UnauthorizedException("You are not authorized");
+			}
+			return roleRepository.findById(4).map((role) -> {
+				UserRole userRole = new UserRole();
+				userRole.setUserRoleIdentity(new UserRoleIdentity(user, role));
+				return userRoleRepository.save(userRole);
 			}).orElseThrow(() -> new ResourceNotFoundException("Role does not exist"));
 		}).orElseThrow(() -> new ResourceNotFoundException("User does not exist"));
 	}

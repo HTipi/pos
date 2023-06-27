@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.persistence.EntityManager;
 
@@ -797,5 +798,30 @@ public class SaleTemporaryService {
 				return saleRepository.save(saleTmp);
 			});
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
+	}
+	@Transactional
+	public String update(Integer userId, Optional<Long> invoiceId, Optional<Integer> seatId) {
+		List<SaleTemporary> saletemp;
+		if (invoiceId.isPresent()) {
+			saletemp = saleRepository.findByInvoiceId(invoiceId.get());
+		} else if (seatId.isPresent()) {
+			saletemp = saleRepository.findBySeatId(seatId.get());
+		} else {
+			saletemp = saleRepository.findByUserId(userId);
+		}
+		UUID uuid = UUID.randomUUID();
+		for (int i = 0; i < saletemp.size(); i++) {
+			saletemp.get(i).setQrnumber(uuid);
+			saleRepository.save(saletemp.get(i));
+		}
+		return uuid.toString();
+	}
+
+	public List<SaleTemporary> showByQrnumber(UUID qrnumber) {
+		List<SaleTemporary> saletemp = saleRepository.findByQrnumber(qrnumber);
+		if (saletemp.size() == 0) {
+			throw new ResourceNotFoundException("Invalid QR");
+		}
+		return saletemp;
 	}
 }

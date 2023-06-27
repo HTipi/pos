@@ -3,6 +3,7 @@ package com.spring.miniposbackend.repository.sale;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -149,5 +150,7 @@ public interface SaleTemporaryRepository extends JpaRepository<SaleTemporary, Lo
 	@Query(value = "select s.seat.id from SaleTemporary s where s.user.branch.id = ?1 and s.invoice is null")
 	List<Integer> findStatusSeatByBranchId(Integer branchId);
 	
+	@Query(value = "select s from SaleTemporary s where s.qrnumber = ?1 and s.cancel = false and s.parentSaleTemporary is null") //update
+	List<SaleTemporary> findByQrnumber(UUID qrnumber);
 	
 }

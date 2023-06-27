@@ -2,6 +2,8 @@ package com.spring.miniposbackend.controller.admin;
 
 import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.modelview.UserResponse;
+import com.spring.miniposbackend.modelview.person.LoginView;
+import com.spring.miniposbackend.modelview.person.PersonPasswordView;
 import com.spring.miniposbackend.service.admin.UserService;
 import com.spring.miniposbackend.util.ImageUtil;
 import com.spring.miniposbackend.util.UserProfileUtil;
@@ -56,6 +58,26 @@ public class UserController {
 			@RequestParam("new-password") String newPassword) {
 		return new SuccessResponse("00", "លេខសំងាត់ត្រូវបានប្តូរដោយជោគជ័យ",
 				userService.resetPassword(userProfile.getProfile().getUsername(), currentPassword, newPassword));
+	}
+
+	@PatchMapping("reset-passwordcustomer")
+	public SuccessResponse resetPasswordCustomer(@RequestBody PersonPasswordView personPasswordView) throws Exception {
+		return new SuccessResponse("00", "Get code successfully",userService.resetPasswordCustomer(personPasswordView.getNewPassword()));
+	} 
+	
+	@PatchMapping("reset-firstlogin")
+	public SuccessResponse resetFirstLogin(@RequestBody PersonPasswordView personPasswordView) throws Exception {
+		return new SuccessResponse("00", "Get code successfully",userService.resetPasswordCustomerFirstLogin(personPasswordView.getNewPassword()));
+	}
+	
+	@PostMapping("verify-otpcode")
+	public SuccessResponse resetPasswordCustomer(@RequestBody LoginView code) throws Exception {
+		return new SuccessResponse("00", "លេខសំងាត់ត្រូវបានប្តូរដោយជោគជ័យ",userService.verifyOtp(code.getCode()));
+	}
+	
+	@PostMapping("verify-otpfirstlogin")
+	public Object resetfirstlogin(@RequestBody LoginView code) throws Exception {
+		return userService.otpFirstLogin(code.getCode());
 	}
 
 //    @GetMapping

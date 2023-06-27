@@ -269,6 +269,8 @@ public class ItemService {
 				itemBr.setPrice(item.getPrice());
 				itemBr.setDiscount(item.getDiscount());
 				itemBr.setInvenQty((short) 1);
+				itemBr.setPoint((short) 0);
+				itemBr.setReward((short) 0);
 				itemBranchRepository.save(itemBr);
 
 //					else {

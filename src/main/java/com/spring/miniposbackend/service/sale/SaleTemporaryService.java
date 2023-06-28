@@ -708,6 +708,7 @@ public class SaleTemporaryService {
 		Short discountPercentage = requestItem.getDiscountPercentage();
 		Double discountAmount = requestItem.getDiscountAmount();
 		Double price = requestItem.getPrice();
+		Short addPercentage = requestItem.getAddPercentage() != null ? requestItem.getAddPercentage().get() : 0;
 		if (quantity < 0.1) {
 			throw new ConflictException("Quantity must be greater than 0.1");
 		}
@@ -736,6 +737,7 @@ public class SaleTemporaryService {
 				saleTmp.setDiscountAmount(BigDecimal.valueOf(discountAmount));
 				saleTmp.setPrice(BigDecimal.valueOf(price));
 				saleTmp.setUserEdit(user);
+				saleTmp.setAddPercent(addPercentage);
 				saleTmp.setAddPromo(requestItem.getAddPromo());
 				if (invoice.isPresent()) {
 					saleTmp.setInvoice(invoice.get());
@@ -777,6 +779,7 @@ public class SaleTemporaryService {
 				saleTmp.setUser(user);
 				saleTmp.setUserEdit(user);
 				saleTmp.setAddPromo(requestItem.getAddPromo());
+				saleTmp.setAddPercent(addPercentage);
 				if (channelId.isPresent()) {
 
 					saleTmp.setPaymentChannel(channelId.get());

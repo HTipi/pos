@@ -12,6 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicUpdate;
@@ -131,5 +133,11 @@ public class Sale extends AuditModel {
 	@JoinColumn(name = "cur_id", nullable = false)
 	@JsonIgnore
 	private BranchCurrency branchCurrency;
+	
+	@Column(name = "discount_percentage", nullable = true)
+	@Min(0)
+	@Max(100)
+	@ColumnDefault("0")
+	private Short discountPercentage;
 
 }

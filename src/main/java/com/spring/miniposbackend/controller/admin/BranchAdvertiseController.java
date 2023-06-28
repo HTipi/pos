@@ -49,7 +49,7 @@ public class BranchAdvertiseController {
 	
 	// can not return multi image
 	@GetMapping("photo/{branchAdvertiseId}")
-	public 	ResponseEntity<byte[]> getImageAsResponseEntity(@PathVariable Long branchAdvertiseId) {
+	public 	ResponseEntity<byte[]> getImageAsResponseEntity(@PathVariable Integer branchAdvertiseId) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setCacheControl(CacheControl.noCache().getHeaderValue());
 		headers.setContentType(MediaType.IMAGE_PNG);
@@ -62,7 +62,7 @@ public class BranchAdvertiseController {
 	
 	@PatchMapping("option/{id}")
 //	@PreAuthorize("hasAnyRole('CUSTOMER')")
-	public SuccessResponse disable(@PathVariable Long id) {
+	public SuccessResponse disable(@PathVariable Integer id) {
 		return new SuccessResponse("00", "Update Item",branchAdvertiseService.disable(id));
 	}
 	

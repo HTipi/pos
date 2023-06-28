@@ -271,6 +271,7 @@ public class ItemService {
 				itemBr.setInvenQty((short) 1);
 				itemBr.setPoint((short) 0);
 				itemBr.setReward((short) 0);
+				itemBr.setAddPercent((short) 0);
 				itemBranchRepository.save(itemBr);
 
 //					else {

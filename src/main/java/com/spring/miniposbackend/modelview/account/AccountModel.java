@@ -2,6 +2,7 @@ package com.spring.miniposbackend.modelview.account;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.account.Account;
 import com.spring.miniposbackend.model.customer.Person;
 
@@ -12,8 +13,9 @@ import lombok.Setter;
 @Getter
 public class AccountModel {
 
-	
+	@JsonIgnore
 	private Account account;
+	
 	private byte[] logo;
 	private byte[] profile;
 	private AccountCreditPoint credit;

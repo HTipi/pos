@@ -134,6 +134,12 @@ public class SaleTemporary extends AuditModel {
 	
 	@Column(name = "qr_num", nullable = true)
 	private UUID qrnumber;
+	
+	@Column(name = "add_percent", nullable = true)
+	@Min(0)
+	@Max(100)
+	@ColumnDefault("0")
+	private Short addPercent;
 
 	public List<Long> getAddOnItems() {
 		return itemBranch.getAddOnItems();

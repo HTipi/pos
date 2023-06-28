@@ -111,6 +111,12 @@ public class ItemBranch extends AuditModel {
 	@ColumnDefault("0")
 	private Short reward;
 	
+	@Column(name = "add_percent", nullable = true)
+	@Min(0)
+	@Max(100)
+	@ColumnDefault("0")
+	private Short addPercent;
+	
 
 	public Long getId() {
 		return id;

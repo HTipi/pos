@@ -80,10 +80,10 @@ public class SaleDetail extends AuditModel {
 	@Column(name = "sub_total", nullable = false, precision = 10, scale = 2)
 	@ColumnDefault("0")
 	private BigDecimal subTotal;
-	
+
 	@Column(name = "costing", nullable = true, precision = 10, scale = 2)
 	@ColumnDefault("0")
-    private BigDecimal costing;
+	private BigDecimal costing;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "sale_id", nullable = false)
@@ -113,12 +113,18 @@ public class SaleDetail extends AuditModel {
 	@OneToMany(fetch = FetchType.EAGER)
 	@JoinColumn(name = "parent_sale_id", nullable = true)
 	private List<SaleDetail> addOns;
-	
+
+	@Column(name = "add_percent", nullable = true)
+	@Min(0)
+	@Max(100)
+	@ColumnDefault("0")
+	private Short addPercent;
+
 	public Customer getCustomer() {
-		
+
 		return sale.getCustomer();
 	}
-	
+
 	@JsonIgnore
 	@OneToMany(mappedBy = "saleDetailPromotionIdentity.saleDetail", fetch = FetchType.LAZY)
 	List<SaleDetailPromotion> saleDetailPromotions;
@@ -126,12 +132,15 @@ public class SaleDetail extends AuditModel {
 	public String getItemTypeName() {
 		return itemBranch.getItemTypeName();
 	}
+
 	public Date getEndDate() {
 		return sale.getEndDate();
 	}
+
 	public Date getStartDate() {
 		return sale.getValueDate();
 	}
+
 	public Long getItemId() {
 		return itemBranch.getId();
 	}
@@ -203,18 +212,20 @@ public class SaleDetail extends AuditModel {
 	public String getCurrencyCode() {
 		return sale.getBranchCurrency().getCode();
 	}
-	
+
 	public double getGrandDiscountAmount() {
 		return sale.getDiscountAmount().doubleValue();
 	}
-	
+
 	public double getDiscountSaleDetail() {
 		return sale.getDiscountSaleDetail().doubleValue();
 	}
+
 	public double getDiscountPercentages() {
-		if(sale.getDiscountAmount().doubleValue() <= 0)
+		if (sale.getDiscountAmount().doubleValue() <= 0)
 			return 0;
-		return sale.getDiscountAmount().doubleValue() / (sale.getSubTotal().doubleValue() - sale.getDiscountSaleDetail().doubleValue());
+		return sale.getDiscountAmount().doubleValue()
+				/ (sale.getSubTotal().doubleValue() - sale.getDiscountSaleDetail().doubleValue());
 	}
 
 	public double getGrandDiscountTotal() {
@@ -248,34 +259,41 @@ public class SaleDetail extends AuditModel {
 	}
 
 	public double getServiceCharge() {
-		if(sale.getServiceCharge() == null)
+		if (sale.getServiceCharge() == null)
 			return (double) 0.00;
 		return sale.getServiceCharge();
 	}
+
 	public double getVat() {
-		if(sale.getVat() == null)
+		if (sale.getVat() == null)
 			return (double) 0.00;
 		return sale.getVat();
 	}
+
 	public List<ItemPromotion> getItemPromotion() {
 		List<ItemPromotion> items = new ArrayList<ItemPromotion>();
-		ItemPromotion pro = null;	
+		ItemPromotion pro = null;
 		for (int i = 0; i < saleDetailPromotions.size(); i++) {
 			BranchPromotion itemPro = saleDetailPromotions.get(i).getBranchPromotion();
-					pro = new ItemPromotion();
-					pro.setBranchPromotionId(itemPro.getId());
-					pro.setPromotionCode(itemPro.getCode());
-					pro.setPromotionDiscount(itemPro.getDiscount());
-					pro.setPromotionName(itemPro.getPromotion().getName());
-					items.add(pro);
+			pro = new ItemPromotion();
+			pro.setBranchPromotionId(itemPro.getId());
+			pro.setPromotionCode(itemPro.getCode());
+			pro.setPromotionDiscount(itemPro.getDiscount());
+			pro.setPromotionName(itemPro.getPromotion().getName());
+			items.add(pro);
 		}
 		return items;
 	}
+
 	public Short getPoints() {
 		return itemBranch.getPoint();
 	}
-	public long getSaleIds()
-	  {
-	    return sale.getId();
-	  }
+
+	public long getSaleIds() {
+		return sale.getId();
+	}
+	public short getDiscountPercentageBill() {
+		
+		return sale.getDiscountPercentage();
+	}
 }

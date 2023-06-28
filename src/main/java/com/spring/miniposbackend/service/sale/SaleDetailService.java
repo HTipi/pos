@@ -8,10 +8,14 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
+
+import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.model.sale.SaleDetail;
 import com.spring.miniposbackend.modelview.SaleDetailSummary;
 import com.spring.miniposbackend.modelview.SaleDetailTransaction;
+import com.spring.miniposbackend.repository.sale.SaleDetailRepository;
+import com.spring.miniposbackend.repository.transaction.TransactionSaleRepository;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
 @Service
@@ -21,6 +25,11 @@ public class SaleDetailService {
 	private NamedParameterJdbcTemplate jdbc;
 	@Autowired
 	private UserProfileUtil userProfile;
+	
+	@Autowired
+	private  SaleDetailRepository saleDetailRepository;
+	@Autowired
+	private TransactionSaleRepository transactionSaleRepository;
 
 	public List<SaleDetail> showByTable(Integer tableId) {
 		return null;
@@ -119,6 +128,16 @@ public class SaleDetailService {
 		summary.setDetails(details);
 		return summary;
 
+	}
+	public List<SaleDetail> showSaleDetail(Long saleId) {
+		List<SaleDetail> saledetail = null;
+		boolean exits = transactionSaleRepository.existsBySaleId(saleId) ;
+		if(exits) {
+			 saledetail = saleDetailRepository.findBySaleId(saleId);
+		}else {
+			throw new ResourceNotFoundException("This sale doesn't exit in transaction");
+		}
+		return saledetail;
 	}
 
 }

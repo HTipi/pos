@@ -11,7 +11,7 @@ import com.spring.miniposbackend.model.admin.BranchAdvertise;
 
 
 @Repository
-public interface BranchAdveriseRepository extends JpaRepository<BranchAdvertise, Long>{
+public interface BranchAdveriseRepository extends JpaRepository<BranchAdvertise, Integer>{
 
 	@Query(value="select ba from BranchAdvertise ba where ba.id=?1 and ba.branch.id=?2")
 	BranchAdvertise findByIdandBranchId(int id,Integer branchid);

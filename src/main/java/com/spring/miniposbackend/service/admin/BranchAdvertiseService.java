@@ -90,7 +90,7 @@ public class BranchAdvertiseService {
 		}		
 		return ba;
 	}
-	public byte[] getFileData(Long branchAdvertiseId) {
+	public byte[] getFileData(Integer branchAdvertiseId) {
 		return  branchAdvertiseRepository.findById(branchAdvertiseId).map(branchAdvertise -> {
 			try {
 				return get(logoAdvertise + "/" + branchAdvertise.getId()+".png");
@@ -119,7 +119,7 @@ public class BranchAdvertiseService {
 		}
 	}
 	
-	public BranchAdvertise disable(Long id) {
+	public BranchAdvertise disable(Integer id) {
 		return branchAdvertiseRepository.findById(id).map((ba) -> {
 			if (userProfile.getProfile().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
 				throw new UnauthorizedException("Unauthorized");

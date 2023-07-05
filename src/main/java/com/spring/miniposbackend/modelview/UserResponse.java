@@ -166,5 +166,9 @@ public class UserResponse {
 			return null;
 		return person.getFirstName();
 	}
+	public BigDecimal getRewardExchange() {
+		
+		return branch.getRewardExchange();
+	}
 
 }

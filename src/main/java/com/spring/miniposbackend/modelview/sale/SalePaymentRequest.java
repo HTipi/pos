@@ -23,5 +23,6 @@ public class SalePaymentRequest {
 	short point;
 	int transactionTypeId;
 	double vat;
+	Integer branchId;
 	@JsonFormat(pattern = "yyyy-MM-dd") Optional<String> expirydate;
 }

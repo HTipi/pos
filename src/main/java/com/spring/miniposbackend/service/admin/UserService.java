@@ -1,6 +1,5 @@
 package com.spring.miniposbackend.service.admin;
 
-import com.spring.miniposbackend.controller.security.AuthenticationController;
 import com.spring.miniposbackend.exception.BadRequestException;
 import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
@@ -9,7 +8,6 @@ import com.spring.miniposbackend.model.admin.User;
 import com.spring.miniposbackend.model.admin.UserRole;
 import com.spring.miniposbackend.model.security.UserToken;
 import com.spring.miniposbackend.modelview.UserResponse;
-import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.admin.UserRepository;
 import com.spring.miniposbackend.repository.admin.UserRoleRepository;
 import com.spring.miniposbackend.repository.security.UserTokenRespository;
@@ -24,7 +22,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -131,18 +128,20 @@ public class UserService {
 	public void sms(String primaryphone, int generateCodes) {
 		try {
 			User user = userRepository.findByprimaryphone(primaryphone);
-			String to = "+855" + user.getUsername().replaceFirst("0", "");
-			String from = "HORPAO";
+			String to = "855" + user.getUsername().replaceFirst("0", "");
+			String from = "SMS Info";
 			String message = "Otp code: " + generateCodes;
 			HttpClient httpclient = HttpClients.createDefault();
-			HttpPost httpPost = new HttpPost("https://sms.khmerload.com/horpao/send");
-			httpPost.setHeader("Accept", "application/json");
+			HttpPost httpPost = new HttpPost("https://cloudapi.plasgate.com/rest/send?private_key=Kp_h8F-UH_ecG3KHkUAFoCf5swXjaQEcuStT6FJRec_MdE-s-fLiTGW6ubiXfIqnSYK-flX2pY9A_lQzxtYQPQ");
+			//httpPost.setHeader("Accept", "application/json");
 			httpPost.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
-			httpPost.setHeader(HttpHeaders.AUTHORIZATION,
-					"Bearer " + "a2fa6d7817d79a50620195cd5aebc74e5d1c5bbc534c9d7cf16938bfd53a95a5");
+			httpPost.setHeader("X-Secret", "$5$rounds=535000$a6DZSPA44UzCzh2C$ImVZKD5M5B9TUv4whjQeU.TRJGUrnCEDAkwDxNDewnA");
+			
+			//httpPost.setHeader(HttpHeaders.AUTHORIZATION,
+			//		"Bearer " + "a2fa6d7817d79a50620195cd5aebc74e5d1c5bbc534c9d7cf16938bfd53a95a5");
 			StringEntity params;
-			params = new StringEntity("{\"to\":\"" + to + "\",\"from\":\"" + from
-					+ "\",\"message\":\"" + message + "\"}");
+			params = new StringEntity("{\"to\":\"" + to + "\",\"sender\":\"" + from
+					+ "\",\"content\":\"" + message + "\"}");
 			httpPost.setEntity(params);
 			httpclient.execute(httpPost);
 		} catch (ClientProtocolException e) {
@@ -154,6 +153,32 @@ public class UserService {
 		}
 
 	}
+//	public void sms(String primaryphone, int generateCodes) {
+//		try {
+//			User user = userRepository.findByprimaryphone(primaryphone);
+//			String to = "+855" + user.getUsername().replaceFirst("0", "");
+//			String from = "HORPAO";
+//			String message = "Otp code: " + generateCodes;
+//			HttpClient httpclient = HttpClients.createDefault();
+//			HttpPost httpPost = new HttpPost("https://sms.khmerload.com/horpao/send");
+//			httpPost.setHeader("Accept", "application/json");
+//			httpPost.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+//			httpPost.setHeader(HttpHeaders.AUTHORIZATION,
+//					"Bearer " + "a2fa6d7817d79a50620195cd5aebc74e5d1c5bbc534c9d7cf16938bfd53a95a5");
+//			StringEntity params;
+//			params = new StringEntity("{\"to\":\"" + to + "\",\"from\":\"" + from
+//					+ "\",\"message\":\"" + message + "\"}");
+//			httpPost.setEntity(params);
+//			httpclient.execute(httpPost);
+//		} catch (ClientProtocolException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//
+//	}
 
 	public void limitSendOtp(User user) throws Exception {
 		try {
@@ -165,7 +190,7 @@ public class UserService {
 				user.setTimeCount(1);
 				user.setResetDate(Integer.parseInt(yearmonthday));
 			} else {
-				if (user.getTimeCount().intValue() <= 2) {
+				if (user.getTimeCount().intValue() <= 5) {
 					user.setTimeCount(user.getTimeCount() + 1);
 				} else {
 					throw new BadRequestException("Can't send anymore wait until tommorrow", "05");
@@ -214,6 +239,7 @@ public class UserService {
 		return "";
 	}
 	
+	@Transactional
 	public Object otpFirstLogin(int code) throws Exception {
 
 		User user = userRepository.findByOtpCode(code);

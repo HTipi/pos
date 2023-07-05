@@ -22,4 +22,7 @@ public interface TransactionSaleRepository extends JpaRepository<TransactionSale
 	
 	@Query("select case when count(s)> 0 then true else false end from TransactionSale s where s.sale.id=?1")
 	boolean existsBySaleId(long saleId);
+	
+	@Query("select case when count(s)> 0 then true else false end from TransactionSale s where s.sale.id=?1 and s.transaction.transactionType.id=4 and s.sale.branch.id=?2")
+	boolean existsPointBySaleId(long saleId,int branchId);
 }

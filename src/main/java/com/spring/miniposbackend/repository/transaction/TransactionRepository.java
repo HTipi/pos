@@ -16,4 +16,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>{
 	
 	@Query(value = "select t from Transaction t where t.account.id=?1 and date_trunc('day',value_date) between ?2 and ?3")
 	List<Transaction> findAllByAccountAndDate(Long accountId,@DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,@DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate);
+
+	@Query(value = "select t from Transaction t where t.account.person.id=?1 and date_trunc('day',value_date) between ?2 and ?3 and t.branch.id=?4")
+	List<Transaction> findAllByPersonAndDate(Long personId,@DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,@DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,Integer branchId);
 }

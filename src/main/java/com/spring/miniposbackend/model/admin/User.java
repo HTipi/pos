@@ -95,8 +95,8 @@ public class User extends AuditModel{
 	@Column(name = "imei", nullable = true)
 	private String imei;
 
-	@Column(name = "otp", nullable = false)
-	@ColumnDefault("false")
-	private boolean otp;
+	 @Column(name = "otp", nullable = false)
+	 @ColumnDefault("true")
+	 private Boolean otp;
 
 }

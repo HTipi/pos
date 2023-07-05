@@ -35,5 +35,12 @@ public class TransactionController {
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,@RequestParam Long accountId) {
 		return new SuccessResponse("00", "fetch transaction", transactionService.getTransactionByDate(from, to,accountId));
 	}
+	
+	@GetMapping("by-person")
+	@PreAuthorize("hasAnyRole('CUSTOMER')")
+	public SuccessResponse showTransactionSummaryPerson(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
+			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,@RequestParam Integer branchId) {
+		return new SuccessResponse("00", "fetch transaction", transactionService.getTransactionByDateAndPerson(from, to,branchId));
+	}
 }
 

@@ -36,7 +36,7 @@ public class Person extends AuditModel {
 	@Column(name = "id", nullable = false)
 	private Long id;
 
-	@Column(name = "firstname", nullable = true, length = 128)
+	@Column(name = "firstname", nullable = false, length = 128)
 	private String firstName;
 
 	@Column(name = "name", nullable = false, length = 128)

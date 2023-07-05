@@ -41,6 +41,7 @@ import com.spring.miniposbackend.modelview.sale.TransactionSalePointView;
 import com.spring.miniposbackend.repository.account.AccountRepository;
 import com.spring.miniposbackend.repository.admin.BranchCurrencyRepository;
 import com.spring.miniposbackend.repository.admin.BranchPromotionRepository;
+import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.admin.BranchSettingRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchinventoryRepository;
@@ -109,6 +110,8 @@ public class SaleService {
 	private TransactionRepository transactionRepository;
 	@Autowired
 	private TransactionSaleRepository transactionSaleRepository;
+	@Autowired
+	private BranchRepository branchRepository;
 
 	public List<Sale> showSaleByUser(@DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> date, boolean byUser,
 			Optional<Integer> paymentId) {
@@ -375,7 +378,7 @@ public class SaleService {
 			double addAmount = 0.00;
 			addAmount = (saleDetails.get(0).getSubTotal().doubleValue()
 					* saleDetails.get(0).getAddPercent().doubleValue() / 100);
-			account = accountRepository.findByCreditAccount(personId.get())
+			account = accountRepository.findByCreditAccount(personId.get(),userProfile.getProfile().getBranch().getId())
 					.orElseThrow(() -> new ResourceNotFoundException("acccount does not exist"));
 			transactionType = transactionTypeRepository.findById(transactionTypeId.get())
 					.orElseThrow(() -> new ResourceNotFoundException("tranType does not exist"));
@@ -387,7 +390,7 @@ public class SaleService {
 			transaction.setPreviousBalance(previousBalance);
 			transaction.setAccount(account);
 			transaction.setTransactionType(transactionType);
-			transaction.setBranch(userProfile.getProfile().getBranch());
+			transaction.setBranch(account.getBranch());
 			transaction.setCurrentBalance(account.getBalance());
 			transaction.setRemark(remark.get());
 			transaction.setUser(user);
@@ -401,7 +404,7 @@ public class SaleService {
 				final TransactionType pointType = transactionTypeRepository.findById(4)
 						.orElseThrow(() -> new ResourceNotFoundException("Point does not exist"));
 				final BigDecimal previousPoint = accountPoint.getBalance();
-				final BigDecimal pointAmount = BigDecimal.valueOf(itemBranch.getPoint());
+				final BigDecimal pointAmount = BigDecimal.valueOf(itemBranch.getPoint() * saleTmp.getQuantity());
 				final Transaction pointTran = new Transaction();
 				accountPoint.setBalance(accountPoint.getBalance().add(pointAmount));
 				pointTran.setTransactionAmount(pointAmount);
@@ -442,13 +445,13 @@ public class SaleService {
 		transaction.setPreviousBalance(previousBalance);
 		transaction.setAccount(account);
 		transaction.setTransactionType(transactionType);
-		transaction.setBranch(userProfile.getProfile().getBranch());
+		transaction.setBranch(account.getBranch());
 		transaction.setCurrentBalance(account.getBalance());
 		transaction.setRemark(request.getRemark());
 		transaction.setUser(user);
 		transaction.setValueDate(new Date());
 		entityManager.clear();
-		Branch branch = userProfile.getProfile().getBranch();
+		Branch branch = branchRepository.findById(request.getBranchId()).orElseThrow(() -> new ResourceNotFoundException("Branch does not exist"));
 		// Seat seat = null;
 		// Invoice invoice = null;
 
@@ -564,11 +567,11 @@ public class SaleService {
 			if (account.getBalance().compareTo(request.getTotal()) == -1) {
 				throw new ConflictException("insufficient balance", "09");
 			}
-			account.setBalance(account.getBalance().subtract(BigDecimal.valueOf(subTotal - discountAmount)));
-			transaction.setTransactionAmount(BigDecimal.valueOf(subTotal - discountAmount));
+			account.setBalance(account.getBalance().subtract(BigDecimal.valueOf(subTotal + request.getServiceCharge() - discountAmount - request.getDiscount())));
+			transaction.setTransactionAmount(BigDecimal.valueOf(subTotal + request.getServiceCharge() - discountAmount - request.getDiscount()));
 		} else {
 			if (account.getBalance().shortValue() < request.getPoint()) {
-				throw new ConflictException("insufficient point", "09");
+				throw new ConflictException("insufficient point", "08");
 			}
 			account.setBalance(account.getBalance().subtract(BigDecimal.valueOf(request.getPoint())));
 			transaction.setTransactionAmount(BigDecimal.valueOf(request.getPoint()));
@@ -761,12 +764,12 @@ public class SaleService {
 	@Transactional
 	public boolean topupPoint(TransactionSalePointView request) {
 		entityManager.clear();
-		boolean check = transactionSaleRepository.existsBySaleId(request.getSaleId());
+		boolean check = transactionSaleRepository.existsPointBySaleId(request.getSaleId(),request.getBranchId());
 		if (check) {
 			throw new ConflictException("Point already settled", "01");
 		}
-		Account pointAccount = accountRepository.findPointById(request.getAccountId())
-				.orElseThrow(() -> new ResourceNotFoundException("Point does not exist"));
+		Account pointAccount = accountRepository.findPointByPersonId(userProfile.getProfile().getUser().getPerson().getId(),request.getBranchId())
+				.orElseThrow(() -> new ResourceNotFoundException("Account does not exist","02"));
 		Sale sale = saleRepository.findById(request.getSaleId())
 				.orElseThrow(() -> new ResourceNotFoundException("Sale does not exist"));
 		TransactionType tranType = transactionTypeRepository.findById(request.getTransactionTypeId())
@@ -778,7 +781,7 @@ public class SaleService {
 		transaction.setPreviousBalance(previousBalance);
 		transaction.setAccount(pointAccount);
 		transaction.setTransactionType(tranType);
-		transaction.setBranch(userProfile.getProfile().getBranch());
+		transaction.setBranch(pointAccount.getBranch());
 		transaction.setCurrentBalance(pointAccount.getBalance());
 		transaction.setUser(userProfile.getProfile().getUser());
 		transaction.setValueDate(new Date());

@@ -10,5 +10,6 @@ public class TransactionSalePointView {
 	private short point;
 	private int transactionTypeId;
 	private long accountId;
+	private int branchId;
 
 }

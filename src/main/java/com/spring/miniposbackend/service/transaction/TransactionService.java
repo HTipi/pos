@@ -68,6 +68,10 @@ public class TransactionService {
 	
 		return transactionRepository.findAllByAccountAndDate(accountId,startDate,endDate);
 	}
+	public List<Transaction> getTransactionByDateAndPerson(@DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate, @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,Integer branchId){
+	
+		return transactionRepository.findAllByPersonAndDate(userProfile.getProfile().getUser().getPerson().getId(),startDate,endDate,branchId);
+	}
 	
 	
 	public List<TransactionSaleDetail> getTransactionSummary(

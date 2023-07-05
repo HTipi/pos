@@ -86,13 +86,13 @@ public class SaleDetailService {
 		MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource();
 		mapSqlParameterSource.addValue("startDate", startDate);
 		mapSqlParameterSource.addValue("endDate", endDate);
-		String queryCondition = "and sale.branch_id = :branchId ";
+		String queryCondition = "and sale_details.branch_id = :branchId ";
 		if (byUser) {
 			if (userProfile.getProfile().getUser().getId() != userProfile.getProfile().getUser().getId()) {
 				throw new UnauthorizedException("User is unauthorized");
 			}
 			mapSqlParameterSource.addValue("userId", userProfile.getProfile().getUser().getId());
-			queryCondition = "and sale.user_id = :userId ";
+			queryCondition = "and sale_details.user_id = :userId ";
 		} else {
 			if (userProfile.getProfile().getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
 				throw new UnauthorizedException("Branch is unauthorized");
@@ -101,27 +101,28 @@ public class SaleDetailService {
 		}
 
 		SaleDetailSummary summary = jdbc.queryForObject(
-				"select count(case when sale.reverse = true then 1 else null end) as void_invoice, "
-						+ "count(case when sale.reverse = false then 1 else null end) as paid_invoice, "
+				"select count(case when sale_details.reverse = true then 1 else null end) as void_invoice, "
+						+ "count(case when sale_details.reverse = false then 1 else null end) as paid_invoice, "
 						+ "min(end_date) as start_date, " + "max(end_date) as end_date,sum(vat) vat,sum(service_charge) service_charge, "
-						+ "sum(case when sale.reverse = false then sale.sub_total else 0 end) as sub_total, "
-						+ "sum(case when sale.reverse = false then sale.discount_amount else 0 end) as discount_amount, "
-						+ "sum(case when sale.reverse = false then sale.discount_sale_detail else 0 end) as discount_sale_detail "
-						+ "from sales sale where sale.end_date between :startDate and :endDate "
+						+ "sum(case when sale_details.reverse = false then sale_details.sub_total else 0 end) as sub_total, "
+						+ "sum(case when sale_details.reverse = false then sale_details.discount_amount else 0 end) as discount_amount, "
+						+ "sum(case when sale_details.reverse = false then sale_details.discount_sale_detail else 0 end) as discount_sale_detail "
+						+ "from sales sale_details where sale_details.end_date between :startDate and :endDate "
 						+ queryCondition,
 				mapSqlParameterSource,
 				(rs, rowNum) -> new SaleDetailSummary(rs.getInt("void_invoice"), rs.getInt("paid_invoice"),
 						rs.getString("start_date"), rs.getString("end_date"), rs.getDouble("sub_total"),
 						rs.getDouble("discount_amount"), rs.getDouble("discount_sale_detail"),rs.getDouble("vat"),rs.getDouble("service_charge")));
 		List<SaleDetailTransaction> details = jdbc
-				.query("select ib.id as item_id, " + "max(i.name) as item_name, " + "sum(sale.quantity) as quantity, "
-						+ "sum(sub_total) as sub_total, " + "sum(sale.discount_total) as discount_total, i.item_type_id,is_stock,stock_in-stock_out stocks "
-						+ "from sale_details sale " + "inner join item_branches ib on sale.item_branch_id = ib.id "
-						+ "inner join items i on ib.item_id=i.id "
-//				+ "inner join branches branch on sale.branch_id = branch.id "
+				.query("select parent.item_branch_id as item_id,(parent.name_kh) || ' ' || COALESCE(child.name_kh,' ') as item_name, sum(parent.quantity) as quantity,"
+						+ "sum(parent.sub_total) as sub_total,sum(parent.discount_total) as discount_total,parent.item_type_id,parent.is_stock,parent.stock_in-parent.stock_out stocks "
+						+ "from (select sale_details.*,i.name_kh,i.item_type_id,i.is_stock,stock_in,stock_out from sale_details inner join item_branches ib on item_branch_id = ib.id "
+						+ "inner join items i on ib.item_id=i.id where reverse = false and value_date between :startDate and :endDate and parent_sale_id is null " + queryCondition  + ") parent "
+						+ "left join (select sale_details.*,i.name_kh from sale_details inner join item_branches ib on item_branch_id = ib.id "
+						+ "inner join items i on ib.item_id=i.id where reverse = false and value_date between :startDate and :endDate " + queryCondition  + ") child on child.parent_sale_id=parent.id  "
+						//				+ "inner join branches branch on sale.branch_id = branch.id "
 //				+ "inner join corporates corporate on branch.corporate_id = corporate.id "
-						+ "where sale.reverse = false and i.type='MAINITEM' " + queryCondition
-						+ "and sale.value_date between :startDate and :endDate " + "group by ib.id,item_type_id,is_stock,stock_in,stock_out",
+						+ "group by parent.item_branch_id,parent.name_kh,child.name_kh,item_type_id,is_stock,stock_in,stock_out",
 						mapSqlParameterSource,
 						(rs, rowNum) -> new SaleDetailTransaction(rs.getLong("item_id"), rs.getString("item_name"),
 								rs.getDouble("quantity"), rs.getDouble("sub_total"), rs.getDouble("discount_total"),rs.getInt("item_type_id"),rs.getBoolean("is_stock"),rs.getInt("stocks")));

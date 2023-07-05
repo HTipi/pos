@@ -82,4 +82,8 @@ public class Branch extends AuditModel {
 	@ColumnDefault("0.00")
     private BigDecimal pointExchange;
 	
+	@Column(name = "reward_exchange", nullable = true, precision = 10, scale = 2)
+	@ColumnDefault("0.00")
+    private BigDecimal rewardExchange;
+	
 }

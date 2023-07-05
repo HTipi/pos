@@ -66,6 +66,8 @@ public class PersonDetailView{
 	}
 	
 	public String getFirstName() {
+		if(person == null)
+			return "";
 		return person.getFirstName();
 	}
 	

@@ -101,13 +101,14 @@ public class AccountService {
 	public List<AccountDefault> showsByQuery(String query) throws Exception {
 		try {
 			List<Account> account = this.accountRepository
-					.findByAccountQuery(query, userProfile.getProfile().getUser().getPerson().getId()).stream()
+					.findByAccountBranchQuery(query, userProfile.getProfile().getUser().getPerson().getId()).stream()
 					.limit(10).collect(Collectors.toList());
 			if (account.size() == 0) {
 				throw new ResourceNotFoundException("អ្នកពុំមានឈ្មោះក្នុងហាងនេះឡើយ");
 			}
+
 			List<AccountDefault> list = new ArrayList<>();
-			for (int i = 0; i < 1; i++) {
+			for (int i = 0; i < account.size(); i++) {
 				AccountDefault acc = new AccountDefault();
 				acc.setAddress(account.get(i).getBranchAdress());
 				acc.setBranchId(account.get(i).getBranchId());

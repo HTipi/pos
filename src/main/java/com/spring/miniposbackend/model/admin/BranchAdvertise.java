@@ -26,7 +26,7 @@ public class BranchAdvertise {
 	@Column(name="id", nullable = false)
 	private Integer id;
 	
-	@Column(name = "image",length = 64 , nullable = false)
+	@Column(name = "image",length = 64 , nullable = true)
     private String image;
 	
 	@Column(name = "enable", nullable = false)

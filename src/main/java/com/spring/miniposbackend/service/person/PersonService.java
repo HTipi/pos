@@ -82,6 +82,7 @@ public class PersonService {
 			Person person = new Person();
 			person.setName("");
 			person.setNameKh("");
+			person.setFirstName("");
 			person.setPrimaryPhone(request.getUserName());
 			Sex sex = sexrepository.findById(1)
 					.orElseThrow(() -> new BadRequestException("There only 2 sex Male and Female"));
@@ -103,6 +104,7 @@ public class PersonService {
 			user.setTelephone(request.getUserName());
 			user.setUsername(request.getUserName());
 			user.setFullName("");
+			user.setOtp(true);
 			user.setPerson(person);
 			userRepository.save(user);
 			entityManager.flush();

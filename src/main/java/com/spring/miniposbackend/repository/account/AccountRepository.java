@@ -34,8 +34,11 @@ public interface AccountRepository extends JpaRepository<Account, Long>{
 	@Query(value = "select acc from Account acc where CONCAT(acc.branch.telephone,acc.branch.name,acc.corporate.name) like %:query%  and acc.person.id=:personId")
 	List<Account> findByAccountQuery(@Param("query") String query,@Param("personId") Long personId);
 	
-	@Query(value="select acc from Account acc where acc.accountType.id=1 and acc.person.id=?1")
-	Optional<Account> findByCreditAccount(long personId);
+	@Query(value = "select acc from Account acc where CONCAT(acc.branch.telephone,acc.branch.name,acc.corporate.name) like %:query%  and acc.person.id=:personId and acc.accountType.id=1")
+	List<Account> findByAccountBranchQuery(@Param("query") String query,@Param("personId") Long personId);
+	
+	@Query(value="select acc from Account acc where acc.accountType.id=1 and acc.person.id=?1 and acc.branch.id=?2")
+	Optional<Account> findByCreditAccount(long personId,int branchId);
 	
 	@Query(value="select acc from Account acc where acc.accountType.id=2 and acc.person.id=?1")
 	Optional<Account> findByPointAccount(long personId);
@@ -48,9 +51,12 @@ public interface AccountRepository extends JpaRepository<Account, Long>{
 
 	@Query(value="select acc from Account acc where acc.person.id=?1 and acc.branch.id=?2")
 	List<Account> findByPersonAccInBranch(Long person,int branchId);
+//	
+//	@Query(value="select acc from Account acc where acc.id=?1 and acc.accountType.id=2 and acc.branch.id=?2")
+//	Optional<Account> findPointById(long accountId,int branchId);
 	
-	@Query(value="select acc from Account acc where acc.id=?1 and acc.accountType.id=2")
-	Optional<Account> findPointById(Long accountId);
+	@Query(value="select acc from Account acc where acc.person.id=?1 and acc.accountType.id=2 and acc.branch.id=?2")
+	Optional<Account> findPointByPersonId(long personId,int branchId);
 	
 }
 

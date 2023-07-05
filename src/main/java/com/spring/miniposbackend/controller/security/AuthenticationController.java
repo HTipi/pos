@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.spring.miniposbackend.exception.BadRequestException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
+import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.model.admin.User;
 import com.spring.miniposbackend.model.admin.UserRole;
@@ -61,7 +62,7 @@ public class AuthenticationController {
 	private ImageUtil imageUtil;
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Autowired
 	private UserTokenRespository userTokenRespository;
 
@@ -73,37 +74,68 @@ public class AuthenticationController {
 
 	@Value("${file.path.image.profile}")
 	private String imagePathProfile;
-	
-	
 
-	private final long expiryInterval = 5L * 60 * 1000; 
+	private final long expiryInterval = 5L * 60 * 1000;
 
 	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-	public SuccessResponse token(@RequestBody JwtRequest authenticationRequest) throws AuthenticationException , Exception {
+	public SuccessResponse token(@RequestBody JwtRequest authenticationRequest)
+			throws AuthenticationException, Exception {
 		authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
 		try {
 			if (authenticationRequest.getClientAppName().equalsIgnoreCase("POINT")
 					&& authenticationRequest.getUsername().startsWith("0")) {
 				User userVerify = userRepository.findByTelephoneWithPassword(authenticationRequest.getUsername())
 						.orElseThrow(() -> new ResourceNotFoundException("username and password are incorrect"));
-				userService.limitSendOtp(userVerify);		
+				userService.limitSendOtp(userVerify);
 				Integer generateCodes = userService.generateCode();
-				final String Persontoken = jwtTokenUtil.generateToken(authenticationRequest.getUsername());				
-				userTokenService.setApiTokenPerson(authenticationRequest.getClientAppName(),
+				final String Persontoken = jwtTokenUtil.generateToken(authenticationRequest.getUsername());
+				UserToken userToken = userTokenService.setApiTokenPerson(authenticationRequest.getClientAppName(),
 						authenticationRequest.getUsername(), Persontoken);
-				if(userVerify.getFirstLogin()==true) {
+				if (userVerify.getFirstLogin() == true) {
 					return new SuccessResponse("04", "first time login", Persontoken);
 				}
 				userVerify.setOneTimePasswordCode(generateCodes);
 				userVerify.setExpiry(new Date(System.currentTimeMillis() + expiryInterval));
 				userRepository.save(userVerify);
 
-			    userService.sms(userVerify.getUsername(),userVerify.getOneTimePasswordCode());
-					
+				if(userVerify.getOtp())
+				{
+					userService.sms(userVerify.getUsername(), userVerify.getOneTimePasswordCode());
 
-				return new SuccessResponse("00", "Get code successfully", "");
+					return new SuccessResponse("00", "Get code successfully", "");
+				}
+				else {
+					User user = userToken.getClientAppUserIdentity().getUser();
+					List<UserRole> userRoles = userService.getRoleByUserId(user.getId());
+					String fileLocation = imagePath + "/" + user.getBranch().getLogo();
 
-			} else {
+					byte[] image;
+					try {
+						image = imageUtil.getImage(fileLocation);
+					} catch (IOException e) {
+						image = null;
+					}
+					String fileLocationQR = imagePathQR + "/" + user.getBranch().getQr();
+					byte[] imageQR;
+					try {
+						imageQR = imageUtil.getImage(fileLocationQR);
+					} catch (IOException e) {
+						imageQR = null;
+					}
+
+					String fileLocationProfile = imagePathProfile + "/" + user.getPerson().getImage();
+					byte[] profile;
+					try {
+						profile = imageUtil.getImage(fileLocationProfile);
+					} catch (IOException e) {
+						profile = null;
+					}
+					return new SuccessResponse("03", "login Successfully", new UserResponse(user, userRoles,
+							userToken.getApiToken(), image, imageQR, user.getPerson(), profile));
+				}
+
+			} else if((authenticationRequest.getClientAppName().equalsIgnoreCase("SALE") || authenticationRequest.getClientAppName().equalsIgnoreCase("DASHBOARD")) && 
+					!authenticationRequest.getUsername().startsWith("0")) {
 				final String token = jwtTokenUtil.generateToken(authenticationRequest.getUsername());
 				UserToken userToken = userTokenService.setApiToken(authenticationRequest.getClientAppName(),
 						authenticationRequest.getUsername(), token);
@@ -126,17 +158,21 @@ public class AuthenticationController {
 				return new SuccessResponse("00", "login Successfully",
 						new UserResponse(user, userRoles, token, image, imageQR));
 			}
+			else {
+				throw new UnauthorizedException("Invalid Login", "01");
+			}
 
 		} catch (Exception e) {
 			throw new Exception(e.getMessage());
 		}
 	}
+
 	@RequestMapping(value = "/verifying", method = RequestMethod.POST)
 	public Object otp(@RequestBody LoginView code) throws Exception {
 
 		User user = userRepository.findByOtpCode(code.getCode());
 		if (user == null) {
-			throw new BadRequestException("wrong code","01");
+			throw new BadRequestException("wrong code", "01");
 		}
 
 		try {
@@ -158,7 +194,7 @@ public class AuthenticationController {
 					} catch (IOException e) {
 						imageQR = null;
 					}
-					
+
 					String fileLocationProfile = imagePathProfile + "/" + user.getPerson().getImage();
 					byte[] profile;
 					try {
@@ -167,18 +203,18 @@ public class AuthenticationController {
 						profile = null;
 					}
 					UserToken usertoken = userTokenRespository.findByUserId(user.getId(), "POINT");
-					return new SuccessResponse("00", "login Successfully",
-							new UserResponse(user, userRoles, usertoken.getApiToken(), image, imageQR, user.getPerson(),profile));
+					return new SuccessResponse("00", "login Successfully", new UserResponse(user, userRoles,
+							usertoken.getApiToken(), image, imageQR, user.getPerson(), profile));
 
 				} else {
-					throw new BadRequestException("Your code has expired","02");
+					throw new BadRequestException("Your code has expired", "02");
 				}
 			} else {
-				throw new BadRequestException("wrong code","01");
+				throw new BadRequestException("wrong code", "01");
 			}
 
 		} catch (BadRequestException e) {
-			throw new BadRequestException(e.getMessage(),e.getErrorCode());
+			throw new BadRequestException(e.getMessage(), e.getErrorCode());
 		}
 	}
 

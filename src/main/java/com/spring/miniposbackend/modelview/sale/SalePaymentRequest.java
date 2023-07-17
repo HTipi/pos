@@ -24,5 +24,6 @@ public class SalePaymentRequest {
 	int transactionTypeId;
 	double vat;
 	Integer branchId;
+	BigDecimal grandTotal;
 	@JsonFormat(pattern = "yyyy-MM-dd") Optional<String> expirydate;
 }

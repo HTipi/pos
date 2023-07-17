@@ -87,12 +87,16 @@ public class SaleDetailService {
 		mapSqlParameterSource.addValue("startDate", startDate);
 		mapSqlParameterSource.addValue("endDate", endDate);
 		String queryCondition = "and sale_details.branch_id = :branchId ";
+		String result = "left join (select sale_details.parent_sale_id,STRING_AGG(i.name_kh,',') name_kh,sale_details.branch_id from sale_details inner join item_branches ib on item_branch_id = ib.id ";
+		String groupby = " , sale_details.branch_id ";
 		if (byUser) {
 			if (userProfile.getProfile().getUser().getId() != userProfile.getProfile().getUser().getId()) {
 				throw new UnauthorizedException("User is unauthorized");
 			}
 			mapSqlParameterSource.addValue("userId", userProfile.getProfile().getUser().getId());
 			queryCondition = "and sale_details.user_id = :userId ";
+			result = "left join (select sale_details.parent_sale_id,STRING_AGG(i.name_kh,',') name_kh,sale_details.user_id from sale_details inner join item_branches ib on item_branch_id = ib.id ";
+			groupby = " , sale_details.user_id ";
 		} else {
 			if (userProfile.getProfile().getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
 				throw new UnauthorizedException("Branch is unauthorized");
@@ -113,13 +117,14 @@ public class SaleDetailService {
 				(rs, rowNum) -> new SaleDetailSummary(rs.getInt("void_invoice"), rs.getInt("paid_invoice"),
 						rs.getString("start_date"), rs.getString("end_date"), rs.getDouble("sub_total"),
 						rs.getDouble("discount_amount"), rs.getDouble("discount_sale_detail"),rs.getDouble("vat"),rs.getDouble("service_charge")));
+	
 		List<SaleDetailTransaction> details = jdbc
 				.query("select parent.item_branch_id as item_id,(parent.name_kh) || ' ' || COALESCE(child.name_kh,' ') as item_name, sum(parent.quantity) as quantity,"
 						+ "sum(parent.sub_total) as sub_total,sum(parent.discount_total) as discount_total,parent.item_type_id,parent.is_stock,parent.stock_in-parent.stock_out stocks "
 						+ "from (select sale_details.*,i.name_kh,i.item_type_id,i.is_stock,stock_in,stock_out from sale_details inner join item_branches ib on item_branch_id = ib.id "
 						+ "inner join items i on ib.item_id=i.id where reverse = false and value_date between :startDate and :endDate and parent_sale_id is null " + queryCondition  + ") parent "
-						+ "left join (select sale_details.*,i.name_kh from sale_details inner join item_branches ib on item_branch_id = ib.id "
-						+ "inner join items i on ib.item_id=i.id where reverse = false and value_date between :startDate and :endDate " + queryCondition  + ") child on child.parent_sale_id=parent.id  "
+						+ result
+						+ "inner join items i on ib.item_id=i.id where reverse = false and value_date between :startDate and :endDate " + queryCondition  + " group by sale_details.parent_sale_id " + groupby  + ") child on child.parent_sale_id=parent.id "
 						//				+ "inner join branches branch on sale.branch_id = branch.id "
 //				+ "inner join corporates corporate on branch.corporate_id = corporate.id "
 						+ "group by parent.item_branch_id,parent.name_kh,child.name_kh,item_type_id,is_stock,stock_in,stock_out",

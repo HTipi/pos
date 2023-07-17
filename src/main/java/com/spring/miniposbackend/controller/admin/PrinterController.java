@@ -2,6 +2,7 @@ package com.spring.miniposbackend.controller.admin;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,4 +51,10 @@ public class PrinterController {
 		return new SuccessResponse("00", "upload printertypes successed",
 				printerService.uploadprinttype(printerItemTypeRequest, printer_id));
 	}
+	@DeleteMapping("{printerId}")
+	public SuccessResponse deletePrinter(@PathVariable Integer printerId) {
+
+		return new SuccessResponse("00", "update printers", printerService.deletePrinter(printerId));
+	}
+	
 }

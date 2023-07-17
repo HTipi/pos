@@ -62,6 +62,9 @@ public class Printer {
     @ColumnDefault("false")
 	private boolean separatePrinter;
 	
+	@Column(name = "type", nullable = true, length = 1)
+    private String type;
+	
 	public List<Integer> getItemTypes(){
 		if(printerItemTypes == null)
 			return new ArrayList<Integer>();

@@ -97,4 +97,12 @@ public class PrinterService {
 		}
 	}
 
+	@Transactional
+	public Printer deletePrinter(Integer printerId) {
+		Printer printer = printerRepository.findById(printerId)
+				.orElseThrow(() -> new ResourceNotFoundException("Printer_id does not exist"));
+		printerRepository.deleteByPrinterId(printerId);
+		return printer;
+	}
+
 }

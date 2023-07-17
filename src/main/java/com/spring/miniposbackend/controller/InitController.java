@@ -53,4 +53,11 @@ public class InitController {
 		return new SuccessResponse("00", "fetch Init", initService.showInitHorPaoPoint(branchId));
 		
 	}
+	
+	@GetMapping("dashboard")
+	@PreAuthorize("hasAnyRole('BRANCH,OWNER')")
+	public SuccessResponse initDashboard() throws Exception {
+		return new SuccessResponse("00", "fetch Init", initService.showInitHorPaoDashboard());
+		
+	}
 }

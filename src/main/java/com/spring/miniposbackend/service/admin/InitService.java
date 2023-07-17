@@ -1,6 +1,9 @@
 package com.spring.miniposbackend.service.admin;
 
+import com.spring.miniposbackend.exception.ConflictException;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
+import com.spring.miniposbackend.exception.UnauthorizedException;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,7 @@ import com.spring.miniposbackend.model.sale.Invoice;
 import com.spring.miniposbackend.model.security.ClientApplication;
 import com.spring.miniposbackend.model.transaction.TransactionType;
 import com.spring.miniposbackend.modelview.ImageResponse;
+import com.spring.miniposbackend.modelview.InitDashboardViewModel;
 import com.spring.miniposbackend.modelview.InitPointViewModel;
 import com.spring.miniposbackend.modelview.InitViewModel;
 import com.spring.miniposbackend.modelview.UserResponse;
@@ -30,6 +34,7 @@ import com.spring.miniposbackend.repository.admin.BranchCurrencyRepository;
 import com.spring.miniposbackend.repository.admin.BranchPaymentChannelRepository;
 import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.admin.BranchSettingRepository;
+import com.spring.miniposbackend.repository.admin.CorporateRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
 import com.spring.miniposbackend.repository.admin.ItemTypeRepository;
 import com.spring.miniposbackend.repository.admin.PrinterRepository;
@@ -79,6 +84,8 @@ public class InitService {
 	private AccountService accountService;
 	@Autowired
 	private BranchAdveriseRepository branchAdvertiseRepository;
+	@Autowired
+	private CorporateRepository corporateRepository;
 
 	@Autowired
 	private ImageUtil imageUtil;
@@ -120,6 +127,22 @@ public class InitService {
 
 	}
 
+	public InitDashboardViewModel showInitHorPaoDashboard() throws Exception {
+
+		try {
+			Integer branchId = userProfile.getProfile().getBranch().getId();
+			Integer corporateId = userProfile.getProfile().getCorporate().getId();
+			List<BranchSetting> settings = getSettings(branchId);
+			List<BranchCurrency> currencies = getCurrencies(branchId, true, true);
+			UserResponse user = getUsers();
+			List<Branch> branches = showByCorpoateId(corporateId);
+			return new InitDashboardViewModel(settings, currencies, user,branches);
+		} catch (Exception e) {
+			throw new Exception(e.getMessage());
+		}
+
+	}
+
 	public InitPointViewModel showInitHorPaoPoint(Optional<Integer> branchId) throws Exception {
 
 		try {
@@ -136,9 +159,9 @@ public class InitService {
 			BranchCurrency currency = branchCurrencyRepository.findCurByBranchId(branch);
 			List<TransactionType> types = getTransactionTypes();
 			UserResponse user = getUsersPoint();
-			List<Integer> branchAdvertise  = branchAdvertiseRepository.findByBranchId(branch);
-			if(branchAdvertise.isEmpty()) {
-				branchAdvertise = branchAdvertiseRepository.findByBranchId(1);		
+			List<Integer> branchAdvertise = branchAdvertiseRepository.findByBranchId(branch);
+			if (branchAdvertise.isEmpty()) {
+				branchAdvertise = branchAdvertiseRepository.findByBranchId(1);
 			}
 			AccountModel account = new AccountModel();
 			account.setCredit(accountService.credit(branch));
@@ -301,6 +324,12 @@ public class InitService {
 		User user = showByUsername(userProfile.getProfile().getUsername());
 		return new UserResponse(user, getRoleByUserId(userProfile.getProfile().getUser().getId()), image, imageQR,
 				user.getPerson(), imageProfile);
+	}
+
+	private List<Branch> showByCorpoateId(Integer corporateId) {
+
+		return branchRepository.findByCorporateId(corporateId);
+
 	}
 
 }

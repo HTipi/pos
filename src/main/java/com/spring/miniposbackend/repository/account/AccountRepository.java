@@ -40,8 +40,8 @@ public interface AccountRepository extends JpaRepository<Account, Long>{
 	@Query(value="select acc from Account acc where acc.accountType.id=1 and acc.person.id=?1 and acc.branch.id=?2")
 	Optional<Account> findByCreditAccount(long personId,int branchId);
 	
-	@Query(value="select acc from Account acc where acc.accountType.id=2 and acc.person.id=?1")
-	Optional<Account> findByPointAccount(long personId);
+	@Query(value="select acc from Account acc where acc.accountType.id=2 and acc.person.id=?1 and acc.branch.id=?2")
+	Optional<Account> findByPointAccount(long personId,int branchId);
 	
 	@Query(value = "select bc from Account bc where bc.person.primaryPhone like %:query% and bc.branch.id=:branchId and bc.accountType.id=1")
 	List<Account> findByAccountCreditQuery(@Param("query") String query,@Param("branchId") Integer branchId);

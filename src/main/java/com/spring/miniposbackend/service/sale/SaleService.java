@@ -399,7 +399,7 @@ public class SaleService {
 			transactionRepository.save(transaction);
 			ItemBranch itemBranch = saleTemps.get(0).getItemBranch();
 			if (itemBranch.getPoint() > 0) {
-				final Account accountPoint = accountRepository.findByPointAccount(personId.get())
+				final Account accountPoint = accountRepository.findByPointAccount(personId.get(),userProfile.getProfile().getBranch().getId())
 						.orElseThrow(() -> new ResourceNotFoundException("acccount does not exist"));
 				final TransactionType pointType = transactionTypeRepository.findById(4)
 						.orElseThrow(() -> new ResourceNotFoundException("Point does not exist"));
@@ -564,7 +564,7 @@ public class SaleService {
 		saleResult.setSubTotal(BigDecimal.valueOf(subTotal));
 		saleResult.setDiscountSaleDetail(BigDecimal.valueOf(discountAmount));
 		if (account.getAccountType().getId() == 1) {
-			if (account.getBalance().compareTo(request.getTotal()) == -1) {
+			if (account.getBalance().compareTo(request.getGrandTotal()) == -1) {
 				throw new ConflictException("insufficient balance", "09");
 			}
 			account.setBalance(account.getBalance().subtract(BigDecimal.valueOf(subTotal + request.getServiceCharge() - discountAmount - request.getDiscount())));

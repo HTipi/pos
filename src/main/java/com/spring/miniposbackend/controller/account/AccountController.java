@@ -46,8 +46,6 @@ public class AccountController {
 	public SuccessResponse showByCredit(@RequestParam("query") String query) throws Exception, QueryException {
 		return new SuccessResponse("00", "Here your're informations",accountService.showsByCreditQuery(query));
 	}
-
 	
-
 
 }

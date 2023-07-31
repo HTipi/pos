@@ -302,7 +302,7 @@ public class ItemService {
 //				if (items.getItemBalance() > 0) {
 //					throw new ConflictException("The item is still in stock", "13");
 //				}
-				pending = saleTemporaryRepository.existsByItemId(itemId);
+				pending = saleTemporaryRepository.existsByItemId(items.getId());
 				if (pending)
 					throw new ConflictException("The item is pending ordered", "10");
 			});

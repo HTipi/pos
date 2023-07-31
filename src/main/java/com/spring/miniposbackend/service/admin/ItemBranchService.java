@@ -21,6 +21,7 @@ import com.spring.miniposbackend.modelview.ImageRequest;
 import com.spring.miniposbackend.modelview.ImageResponse;
 import com.spring.miniposbackend.modelview.ItemBranchCheckList;
 import com.spring.miniposbackend.modelview.ItemBranchUpdate;
+import com.spring.miniposbackend.modelview.PointRewardRequest;
 import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
 import com.spring.miniposbackend.repository.admin.ItemRepository;
@@ -272,4 +273,19 @@ public class ItemBranchService {
 			return itemBranchRepository.save(itemBranch);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
+	@Transactional
+	  public List<ItemBranch> updatePointAndReward(PointRewardRequest itemBranchView){
+	    List<ItemBranch> list = new ArrayList<>();
+	    for(int i=0;i<itemBranchView.getItemBranchId().size();i++) {
+	      ItemBranch itemBranch = itemBranchRepository.findById(itemBranchView.getItemBranchId().get(i)).orElseThrow(() -> new ResourceNotFoundException("This item doesn’t exit","01"));
+	      if(userProfile.getProfile().getBranch().getId() != itemBranch.getBranch().getId()) {
+	        throw new UnauthorizedException("Branch is unauthorized");
+	      }
+	      itemBranch.setPoint(itemBranchView.getPoint());
+	      itemBranch.setReward(itemBranchView.getReward());
+	      itemBranchRepository.save(itemBranch);
+	      list.add(itemBranch);
+	    }
+	    return list;
+	  }
 }

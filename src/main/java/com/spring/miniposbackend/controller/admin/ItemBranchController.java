@@ -23,6 +23,7 @@ import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.modelview.ImageRequest;
 import com.spring.miniposbackend.modelview.ItemBranchCheckList;
 import com.spring.miniposbackend.modelview.ItemBranchUpdate;
+import com.spring.miniposbackend.modelview.PointRewardRequest;
 import com.spring.miniposbackend.service.admin.ItemBranchService;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
@@ -140,7 +141,11 @@ public class ItemBranchController {
 		return new SuccessResponse("00", "update Inventory Item",
 				itemBranchService.updateAddOnInventory(itemBranchId, addOnItems));
 	}
-	
+	@PatchMapping("update-item-point")
+	  @PreAuthorize("hasAnyRole('BRANCH','OWNER')")
+	  public SuccessResponse updatePointAndReward(@RequestBody PointRewardRequest itemBranchView) {
+	    return new SuccessResponse("00", "update Point and Reward", itemBranchService.updatePointAndReward(itemBranchView));
+	  }
 	
 
 }

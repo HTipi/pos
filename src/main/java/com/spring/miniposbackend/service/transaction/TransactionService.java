@@ -15,6 +15,7 @@ import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.model.account.Account;
 import com.spring.miniposbackend.model.transaction.Transaction;
 import com.spring.miniposbackend.model.transaction.TransactionType;
+import com.spring.miniposbackend.modelview.transaction.GivePointRequest;
 import com.spring.miniposbackend.modelview.transaction.TransactionRequest;
 import com.spring.miniposbackend.modelview.transaction.TransactionSaleDetail;
 import com.spring.miniposbackend.repository.account.AccountRepository;
@@ -123,6 +124,28 @@ public class TransactionService {
 //		return summary;
 		return details;
 	}
+	@Transactional
+	 public boolean givePoint(Long personId, GivePointRequest givePointRequest) {
+	  Account pointAccount = accountRepository.findByPoint(userProfile.getProfile().getBranch().getId(),personId)
+	    .orElseThrow(() -> new ResourceNotFoundException("Point Account not found"));
+	  TransactionType tranType = transactionTypeRepository.findById(5)
+	    .orElseThrow(() -> new ResourceNotFoundException("type does not exist"));
+	  final BigDecimal previousBalance = pointAccount.getBalance();
+	  pointAccount.setBalance(pointAccount.getBalance().add(BigDecimal.valueOf(givePointRequest.getPoint())));
+	  accountRepository.save(pointAccount);
+	  Transaction transaction = new Transaction();
+	  transaction.setTransactionAmount(BigDecimal.valueOf(givePointRequest.getPoint()));
+	  transaction.setPreviousBalance(previousBalance);
+	  transaction.setAccount(pointAccount);
+	  transaction.setTransactionType(tranType);
+	  transaction.setBranch(userProfile.getProfile().getBranch());
+	  transaction.setCurrentBalance(pointAccount.getBalance());
+	  transaction.setUser(userProfile.getProfile().getUser());
+	  transaction.setValueDate(new Date());
+	  transaction.setRemark(givePointRequest.getRemark());
+	  transactionRepository.save(transaction);
+	  return true;
+	 }
 	
 
 }

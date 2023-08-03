@@ -97,6 +97,14 @@ public class SaleDashboardController {
 		return new SuccessResponse("00", "fetch report",
 				branchDashboardService.promotionReceipt(userProfile.getProfile().getBranch().getId(), from));
 	}
+	
+	@GetMapping("/promotion/receipts")
+	@PreAuthorize("hasAnyRole('SALE')")
+	public SuccessResponse promotionReceipts(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date from,@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date end) {
+
+		return new SuccessResponse("00", "fetch report",
+				branchDashboardService.promotionReceipts(from,end));
+	}
 
 	@GetMapping("/branch-chart/summary")
 	@PreAuthorize("hasAnyRole('OWNER')")
@@ -194,9 +202,10 @@ public class SaleDashboardController {
 			return new SuccessResponse("00", "fetch report",
 					branchDashboardService.itemTypeChartByBranchId(branchId.get(), from, to));
 		} else {
-
-			return new SuccessResponse("00", "fetch report", branchDashboardService
-					.itemTypeChartByCopId(userProfile.getProfile().getCorporate().getId(), from, to));
+			return new SuccessResponse("00", "fetch report",
+					branchDashboardService.itemTypeChartByBranchId(branchId.get(), from, to));
+//			return new SuccessResponse("00", "fetch report", branchDashboardService
+//					.itemTypeChartByCopId(userProfile.getProfile().getCorporate().getId(), from, to));
 		}
 
 	}

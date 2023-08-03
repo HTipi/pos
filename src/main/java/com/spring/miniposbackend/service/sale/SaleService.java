@@ -151,8 +151,17 @@ public class SaleService {
 			if (byUser) {
 				if (paymentId.isPresent()) {
 					if (paymentId.get() == 0)
+					{	
+						System.out.println(0);
 						return saleRepository.findByIdWithValueDateRangeAndPaymentNullId(
 								userProfile.getProfile().getUser().getId(), date.get(), end.get());
+					}
+					else if (paymentId.get() == -2)
+					{
+						System.out.println(-2);
+						return saleRepository.findByIdWithValueDateRangeAndPaymentNullIdAccount(
+					        userProfile.getProfile().getUser().getId(), date.get(), end.get());
+					}
 					else
 						return saleRepository.findByIdWithValueDateRangeAndPaymentId(
 								userProfile.getProfile().getUser().getId(), date.get(), paymentId.get(), end.get());
@@ -164,6 +173,9 @@ public class SaleService {
 				if (paymentId.isPresent()) {
 					if (paymentId.get() == 0)
 						return saleRepository.findByBranchIdWithValueDateRangeAndPaymentNullId(
+								userProfile.getProfile().getBranch().getId(), date.get(), end.get());
+					else if (paymentId.get() == -2)
+						return saleRepository.findByBranchIdWithValueDateRangeAndPaymentNullIdAccount(
 								userProfile.getProfile().getBranch().getId(), date.get(), end.get());
 					else
 						return saleRepository.findByBranchIdWithValueDateRangeAndPaymentId(

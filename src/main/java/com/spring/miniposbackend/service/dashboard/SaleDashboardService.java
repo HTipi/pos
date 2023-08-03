@@ -81,6 +81,22 @@ public class SaleDashboardService {
 				mapSqlParameterSource, (rs, rowNum) -> new PromotionReceipt(rs.getString("promotion"),
 						rs.getDouble("discount_amt"), rs.getDouble("qty")));
 	}
+	public List<PromotionReceipt> promotionReceipts(
+			@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date startDate,
+			@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date end) {
+		MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource();
+		mapSqlParameterSource.addValue("startDate", startDate);
+		mapSqlParameterSource.addValue("end_date", end);
+		mapSqlParameterSource.addValue("user_id", userProfile.getProfile().getUser().getId());
+		return jdbc.query(
+				"select p.name_kh promotion,sum(sp.discount) discount_amt,sum(s.quantity) qty from sale_detail_promotion sp inner join sale_details s on sp.sale_detail_id=s.id "
+						+ "inner join item_branches ib on ib.id=s.item_branch_id inner join items i on i.id=ib.item_id "
+						+ "inner join branch_promotions bp on bp.id=sp.branch_promotion_id "
+						+ "inner join promotions p on p.id=bp.promotion_id where s.reverse=false and s.value_date between :startDate and :end_date and s.user_id=:user_id and i.type='MAINITEM'"
+						+ "group by p.name_kh,p.id order by p.id",
+				mapSqlParameterSource, (rs, rowNum) -> new PromotionReceipt(rs.getString("promotion"),
+						rs.getDouble("discount_amt"), rs.getDouble("qty")));
+	}
 
 	public List<ChannelReceipt> channelReceipt(Integer branchId,
 			@DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate) {
@@ -237,22 +253,22 @@ public class SaleDashboardService {
 		return jdbc.query("select * from itemTypeChartByBranchId(:branchId,:startDate,:endDate)", mapSqlParameterSource,
 				(rs, rowNum) -> new ItemTypeSummaryChart(rs.getInt("itemTypeId"), rs.getString("itemTypeName"),
 						rs.getString("itemTypeKh"), rs.getDouble("saleAmt"), rs.getDouble("disAmt"),
-						rs.getInt("saleItem")));
+						rs.getInt("saleItem"),rs.getDouble("service_charge")));
 	}
 
-	public List<ItemTypeSummaryChart> itemTypeChartByCopId(Integer corporateId, Date startDate, Date endDate) {
-		if (userProfile.getProfile().getCorporate().getId() != corporateId) {
-			throw new UnauthorizedException("Corporate is unauthorized");
-		}
-		MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource();
-		mapSqlParameterSource.addValue("startDate", startDate);
-		mapSqlParameterSource.addValue("endDate", endDate);
-		mapSqlParameterSource.addValue("corporateId", corporateId);
-		return jdbc.query("select * from itemTypeChartByCopId(:corporateId,:startDate,:endDate)", mapSqlParameterSource,
-				(rs, rowNum) -> new ItemTypeSummaryChart(rs.getInt("itemTypeId"), rs.getString("itemTypeName"),
-						rs.getString("itemTypeKh"), rs.getDouble("saleAmt"), rs.getDouble("disAmt"),
-						rs.getInt("saleItem")));
-	}
+//	public List<ItemTypeSummaryChart> itemTypeChartByCopId(Integer corporateId, Date startDate, Date endDate) {
+//		if (userProfile.getProfile().getCorporate().getId() != corporateId) {
+//			throw new UnauthorizedException("Corporate is unauthorized");
+//		}
+//		MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource();
+//		mapSqlParameterSource.addValue("startDate", startDate);
+//		mapSqlParameterSource.addValue("endDate", endDate);
+//		mapSqlParameterSource.addValue("corporateId", corporateId);
+//		return jdbc.query("select * from itemTypeChartByCopId(:corporateId,:startDate,:endDate)", mapSqlParameterSource,
+//				(rs, rowNum) -> new ItemTypeSummaryChart(rs.getInt("itemTypeId"), rs.getString("itemTypeName"),
+//						rs.getString("itemTypeKh"), rs.getDouble("saleAmt"), rs.getDouble("disAmt"),
+//						rs.getInt("saleItem")));
+//	}
 
 	public List<ItemSummaryDetail> itemSummaryByCorporateId(Integer corporateId, Date startDate, Date startWeek,
 			Date endDate) {

@@ -100,5 +100,14 @@ public class Transaction{
 	{
 		return transactionType.getNameKh();
 	}
+	
+	public String getReceiptNumber()
+	{
+		if(transactionSale != null)
+		{
+			return transactionSale.getSale().getReceiptNumber();
+		}
+		return "";
+	}
 
 }

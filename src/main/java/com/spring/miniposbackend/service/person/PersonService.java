@@ -21,6 +21,7 @@ import com.spring.miniposbackend.model.account.Account;
 import com.spring.miniposbackend.model.admin.Sex;
 import com.spring.miniposbackend.model.admin.User;
 import com.spring.miniposbackend.model.customer.Person;
+import com.spring.miniposbackend.modelview.account.ShowProfileView;
 import com.spring.miniposbackend.modelview.person.PersonDetailView;
 import com.spring.miniposbackend.modelview.person.PersonNormalUpdateView;
 import com.spring.miniposbackend.modelview.person.PersonPrimaryPhoneView;
@@ -208,7 +209,26 @@ public class PersonService {
 				userProfile.getProfile().getBranch().getId());
 		if (person.isPresent()) {
 			if (primaryphones) {
-				return new SuccessResponse("01", "Have account", "");
+				  Account credit = accountRepository.findByCredit(userProfile.getProfile().getBranch().getId(),person.get().getId())
+				    .orElseThrow(()-> new ResourceNotFoundException("This person doesn't have account in your branch!"));
+				  Account point = accountRepository.findByPoint(userProfile.getProfile().getBranch().getId(),person.get().getId())
+				    .orElseThrow(()-> new ResourceNotFoundException("This person doesn't have account in your branch!"));
+				  
+				  ShowProfileView showProfileView = new ShowProfileView();
+				  String fileLocation = imagePathProfile + "/" + person.get().getImage();
+				  byte[] logo;
+				  try {
+				   logo = imageUtil.getImage(fileLocation);
+				  } catch (IOException e) {
+				   logo = null;
+				  }
+				  showProfileView.setImage(logo);
+				  showProfileView.setName(person.get().getNameKh());
+				  showProfileView.setCredit(credit.getBalance());
+				  showProfileView.setPoint(point.getBalance());
+				  showProfileView.setSex(person.get().getSex().getName());
+				  showProfileView.setRemark("");
+				return new SuccessResponse("01", "Have account", showProfileView);
 			} else {
 				return new SuccessResponse("03", "No account in the branch", person.get().getId());
 			}

@@ -141,5 +141,10 @@ public class Sale extends AuditModel {
 	@Max(100)
 	@ColumnDefault("0")
 	private Short discountPercentage;
+	
+	@OneToOne(fetch = FetchType.LAZY,
+            mappedBy = "sale")
+ @JsonIgnore
+    private TransactionSale transactionSale;
 
 }

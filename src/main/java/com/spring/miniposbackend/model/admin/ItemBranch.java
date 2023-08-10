@@ -80,11 +80,11 @@ public class ItemBranch extends AuditModel {
 
 	@Column(name = "stock_in", nullable = false)
 	@ColumnDefault("0")
-	private Long stockIn;
+	private BigDecimal stockIn;
 
 	@Column(name = "stock_out", nullable = false)
 	@ColumnDefault("0")
-	private Long stockOut;
+	private BigDecimal stockOut;
 
 	@Type(type = "list-array")
 	@Column(name = "add_on", columnDefinition = "bigint[]")
@@ -95,9 +95,9 @@ public class ItemBranch extends AuditModel {
 	private List<Long> addOnInven;
 	
 	
-	@Column(name = "inven_qty", nullable = true)
+	@Column(name = "inven_qty", nullable = true,precision = 10, scale = 2)
 	@ColumnDefault("1")
-	private Short invenQty;
+	private BigDecimal invenQty;
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "itemBranchPromotionIdentity.itemBranch", fetch = FetchType.LAZY)
@@ -195,8 +195,8 @@ public class ItemBranch extends AuditModel {
 		return item.getVersion();
 	}
 
-	public Long getItemBalance() {
-		return stockIn - stockOut;
+	public BigDecimal getItemBalance() {
+		return stockIn.subtract(stockOut);
 	}
 
 	public String getBranchName() {
@@ -213,6 +213,11 @@ public class ItemBranch extends AuditModel {
 	public List<ItemBranchPromotion> getItemBranchPromotion(){
 		
 		return itemBranchPromotions;
+	}
+	public String getBarCode() {
+		if(item.getBarCode() == null)
+			return "";
+		return item.getBarCode();
 	}
 
 }

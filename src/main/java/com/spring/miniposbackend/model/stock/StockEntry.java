@@ -60,9 +60,9 @@ public class StockEntry extends AuditModel{
 	@ColumnDefault("0")
     private Short discount;
 
-    @Column(name = "quantity", nullable = false)
+    @Column(name = "quantity", nullable = false,precision = 10, scale = 2)
     @ColumnDefault("1")
-    private Short quantity;
+    private BigDecimal quantity;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stock_id", nullable = false)
@@ -89,7 +89,7 @@ public class StockEntry extends AuditModel{
 	public String getItemName() {
 		return itemBranch.getNameKh();
 	}
-	public Long getStockBalance() {
+	public BigDecimal getStockBalance() {
 		return itemBranch.getItemBalance();
 	}
 	public String getStockCode() {

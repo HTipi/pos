@@ -253,7 +253,7 @@ public class SaleDashboardService {
 		return jdbc.query("select * from itemTypeChartByBranchId(:branchId,:startDate,:endDate)", mapSqlParameterSource,
 				(rs, rowNum) -> new ItemTypeSummaryChart(rs.getInt("itemTypeId"), rs.getString("itemTypeName"),
 						rs.getString("itemTypeKh"), rs.getDouble("saleAmt"), rs.getDouble("disAmt"),
-						rs.getInt("saleItem"),rs.getDouble("service_charge")));
+						rs.getInt("saleItem"),rs.getDouble("servicecharge")));
 	}
 
 //	public List<ItemTypeSummaryChart> itemTypeChartByCopId(Integer corporateId, Date startDate, Date endDate) {

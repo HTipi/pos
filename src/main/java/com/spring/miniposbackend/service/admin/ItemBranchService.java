@@ -65,7 +65,7 @@ public class ItemBranchService {
 		checkList.forEach((item) -> {
 			ItemBranch itemBr = itemBranchRepository.findById(item.getItemBranchId())
 					.orElseThrow(() -> new ResourceNotFoundException("ItemBranch does not exist"));
-			if (itemBr.getItemBalance() > 0) {
+			if (itemBr.getItemBalance().doubleValue() > 0) {
 				throw new ConflictException("We still have the item in stock", "10");
 			}
 			if (saleTemporaryRepository.existsByItemId(itemBr.getId())) {
@@ -170,8 +170,8 @@ public class ItemBranchService {
 					itemBr.setItem(item);
 					itemBr.setUseItemConfiguration(true);
 					itemBr.setEnable(false);
-					itemBr.setStockIn(0L);
-					itemBr.setStockOut(0L);
+					itemBr.setStockIn(BigDecimal.valueOf(0));
+					itemBr.setStockOut(BigDecimal.valueOf(0));
 					itemBr.setPrice(item.getPrice());
 					itemBr.setDiscount(itemBr.getDiscount());
 					itemBr.setPoint((short) 0);
@@ -236,9 +236,9 @@ public class ItemBranchService {
 			return itemBranchRepository.save(itemBranch);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
-	public ItemBranch setInvenQty(Long itemBranchId, Short qty) {
+	public ItemBranch setInvenQty(Long itemBranchId, double qty) {
 		return itemBranchRepository.findById(itemBranchId).map(itemBranch -> {
-			itemBranch.setInvenQty(qty);
+			itemBranch.setInvenQty(BigDecimal.valueOf(qty));
 			return itemBranchRepository.save(itemBranch);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
@@ -258,7 +258,7 @@ public class ItemBranchService {
 				throw new UnauthorizedException("Corporate is unauthorized");
 			}
 			boolean pending = false;
-			if (itemBranch.getItemBalance() > 0) {
+			if (itemBranch.getItemBalance().doubleValue() > 0) {
 				throw new ConflictException("The item is still in stock", "13");
 			}
 			pending = saleTemporaryRepository.existsByItemId(itemBranchId);

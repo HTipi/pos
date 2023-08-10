@@ -248,6 +248,7 @@ public class ItemService {
 			item.setCosting(BigDecimal.valueOf(0));
 			item.setWholePrice(BigDecimal.valueOf(0));
 			item.setEnable(true);
+			item.setBarCode(requestItem.getBarCode());
 			itemRepository.save(item);
 			List<Branch> branches = branchRepository.findByCorporateId(itemType.getCorporate().getId(), true);
 			branches.forEach((branch) -> {
@@ -262,13 +263,13 @@ public class ItemService {
 					itemBr.setEnable(false);
 				}
 				itemBr.setAddOnItems(new ArrayList<Long>());
-				itemBr.setStockIn(0L);
-				itemBr.setStockOut(0L);
+				itemBr.setStockIn(BigDecimal.valueOf(0));
+				itemBr.setStockOut(BigDecimal.valueOf(0));
 				itemBr.setCosting(BigDecimal.valueOf(0));
 				itemBr.setWholePrice(BigDecimal.valueOf(0));
 				itemBr.setPrice(item.getPrice());
 				itemBr.setDiscount(item.getDiscount());
-				itemBr.setInvenQty((short) 1);
+				itemBr.setInvenQty(BigDecimal.valueOf(1));
 				itemBr.setPoint((short) 0);
 				itemBr.setReward((short) 0);
 				itemBr.setAddPercent((short) 0);
@@ -312,6 +313,7 @@ public class ItemService {
 			item.setName(requestItem.getName());
 			item.setNameKh(requestItem.getNameKh());
 			item.setStock(requestItem.isStock());
+			item.setBarCode(requestItem.getBarCode());
 			itemRepository.save(item);
 			return itemBranchRepository
 					.findFirstByBranchIdAndItemIdOrderByIdDesc(userProfile.getProfile().getBranch().getId(), itemId)
@@ -328,7 +330,7 @@ public class ItemService {
 			List<ItemBranch> itemBr = itemBranchRepository.findByItemId(itemId, true);
 			itemBr.forEach((items) -> {
 				boolean pending = false;
-				if (items.getItemBalance() > 0) {
+				if (items.getItemBalance().doubleValue() > 0) {
 					throw new ConflictException("The item is still in stock", "13");
 				}
 				pending = saleTemporaryRepository.existsByItemId(itemId);
@@ -342,8 +344,8 @@ public class ItemService {
 	private ItemBranch createItemBranch(Item item) {
 		try {
 			ItemBranch itemBranch = new ItemBranch();
-			itemBranch.setStockIn((long) 0);
-			itemBranch.setStockOut((long) 0);
+			itemBranch.setStockIn(BigDecimal.valueOf(0));
+			itemBranch.setStockOut(BigDecimal.valueOf(0));
 			itemBranch.setEnable(item.isEnable());
 			itemBranch.setDiscount(item.getDiscount());
 			itemBranch.setPrice(item.getPrice());

@@ -720,7 +720,7 @@ public class SaleTemporaryService {
 				throw new UnauthorizedException("Item is unauthorized");
 			}
 			if (item.isStock()) {
-				if (item.getItemBalance() < quantity) {
+				if (item.getItemBalance().floatValue() < quantity) {
 					String setting = branchSettingRepository
 							.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN")
 							.orElse("");

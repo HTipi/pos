@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
-import  com.spring.miniposbackend.exception.BadRequestException;
+import com.spring.miniposbackend.exception.BadRequestException;
 import org.hibernate.QueryException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,18 +46,19 @@ public class AccountService {
 	private UserProfileUtil userProfile;
 	@Autowired
 	private BranchRepository branchRepository;
-	
+
 	@Autowired
 	private BranchAdveriseRepository branchAdvertiseRepository;
 	@Autowired
 	private ImageUtil imageUtil;
-	
+
 	@Value("${file.path.image.branch}")
 	private String imagePath;
 	@Value("${file.path.image.profile}")
 	private String imagePathProfile;
 	@Value("${file.path.image.advertisement}")
 	private String logoAdvertise;
+
 	public List<Account> showsByCreditQuery(String query) {
 		return accountRepository.findByAccountCreditQuery(query, userProfile.getProfile().getBranch().getId()).stream()
 				.limit(20).collect(Collectors.toList());
@@ -70,7 +71,7 @@ public class AccountService {
 			List<Account> acc = accountRepository.findByPersonAccInBranch(person.get().getId(),
 					userProfile.getProfile().getBranch().getId());
 			if (acc.size() != 0)
-				throw new BadRequestException("Account is already existed","01");
+				throw new BadRequestException("Account is already existed", "01");
 			BranchCurrency branchcurrency = branchCurrencyRepository
 					.findCurByBranchId(userProfile.getProfile().getBranch().getId());
 			AccountType accountType;
@@ -156,7 +157,7 @@ public class AccountService {
 	}
 
 	public AccountModel showbybranch(Optional<Integer> branchId) throws Exception, QueryException {
-		Integer branch = branchId.isPresent() ? branchId.get() : userProfile.getProfile().getBranch().getId(); 
+		Integer branch = branchId.isPresent() ? branchId.get() : userProfile.getProfile().getBranch().getId();
 		Branch branchlogo = branchRepository.findById(branch).get();
 		String fileLocation = imagePath + "/" + branchlogo.getLogo();
 		byte[] logo;
@@ -165,9 +166,9 @@ public class AccountService {
 		} catch (IOException e) {
 			logo = null;
 		}
-		List<Integer> branchAdvertise  = branchAdvertiseRepository.findByBranchId(branch);
-		if(branchAdvertise.isEmpty()) {
-			branchAdvertise = branchAdvertiseRepository.findByBranchId(1);		
+		List<Integer> branchAdvertise = branchAdvertiseRepository.findByBranchId(branch);
+		if (branchAdvertise.isEmpty()) {
+			branchAdvertise = branchAdvertiseRepository.findByBranchId(1);
 		}
 		AccountModel account = new AccountModel();
 		account.setCredit(credit(branch));
@@ -176,33 +177,52 @@ public class AccountService {
 		account.setLogo(logo);
 		return account;
 	}
-	
+
 	public AccountCreditPoint point(int branchId) {
 		AccountCreditPoint point = new AccountCreditPoint();
-		Optional<Account> account = accountRepository.findByPoint(branchId,userProfile.getProfile().getUser().getPerson().getId());
+		Optional<Account> account = accountRepository.findByPoint(branchId,
+				userProfile.getProfile().getUser().getPerson().getId());
 		if (account.isPresent()) {
 			point.setBalance(account.get().getBalance());
 			point.setAccountId(account.get().getId());
-			point.setAccountTypeId(account.get().getAccountType().getId());	
+			point.setAccountTypeId(account.get().getAccountType().getId());
 			return point;
-		}else {
+		} else {
 			return null;
 		}
-		
+
 	}
+
 	public AccountCreditPoint credit(int branchId) {
 		AccountCreditPoint credit = new AccountCreditPoint();
-		Optional<Account> account = accountRepository.findByCredit(branchId,userProfile.getProfile().getUser().getPerson().getId());
+		Optional<Account> account = accountRepository.findByCredit(branchId,
+				userProfile.getProfile().getUser().getPerson().getId());
 		if (account.isPresent()) {
 			credit.setBalance(account.get().getBalance());
 			credit.setAccountId(account.get().getId());
-			credit.setAccountTypeId(account.get().getAccountType().getId());	
+			credit.setAccountTypeId(account.get().getAccountType().getId());
 			return credit;
-		}
-		else {
+		} else {
 			return null;
 		}
-		
+
+	}
+
+	public String remark(Long personId, String remark) {
+			Person person = personRepository.findById(personId)
+					.orElseThrow(() -> new ResourceNotFoundException("This phone number is invalid!", "01"));
+			Account credit = accountRepository
+					.findByCredit(userProfile.getProfile().getBranch().getId(), person.getId())
+					.orElseThrow(() -> new ResourceNotFoundException("This person doesn't have account in your branch!",
+							"02"));
+			Account point = accountRepository.findByPoint(userProfile.getProfile().getBranch().getId(), person.getId())
+					.orElseThrow(() -> new ResourceNotFoundException("This person doesn't have account in your branch!",
+							"02"));
+			credit.setRemark(remark);
+			point.setRemark(remark);
+			accountRepository.save(credit);
+			accountRepository.save(point);
+			return remark;
 	}
 
 }

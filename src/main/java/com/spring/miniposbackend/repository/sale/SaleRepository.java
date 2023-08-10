@@ -25,7 +25,6 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
 	 @Query(value = "select s from Sale s where s.user.id = ?1 and  end_date between ?2 and ?3")
 	    List<Sale> findByIdWithValueDateRange(Integer userId, @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date date,@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date end);
 	 
-	 
 	 @Query(value = "select s from Sale s where s.user.id = ?1 and  date_trunc('day',end_date)=?2 and s.paymentChannel.id=null")
 	    List<Sale> findByIdWithValueDateAndPaymentNullId(Integer userId, @DateTimeFormat(pattern = "yyyy-MM-dd") Date date);
 	 
@@ -58,9 +57,9 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
 	    List<Sale> findByBranchIdWithValueDateRange(Integer userId, @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date date,@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date end);
 	 
 	 
-	 @Query(value = "select s from Sale s where s.user.id = ?1 and  end_date between ?2 and ?3 and s.paymentChannel.id=null and s.transactionSale.sale.id != null")
+	 @Query(value = "select s from Sale s join fetch s.transactionSale t where s.user.id = ?1 and  end_date between ?2 and ?3 and s.paymentChannel.id=null and t.sale.id != null")
 	    List<Sale> findByIdWithValueDateRangeAndPaymentNullIdAccount(Integer userId, @DateTimeFormat(pattern = "yyyy-MM-dd") Date date,@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date end);
 	 
-	 @Query(value = "select s from Sale s where s.branch.id = ?1 and  end_date between ?2 and ?3 and s.paymentChannel.id=null and s.transactionSale.sale.id != null")
+	 @Query(value = "select s from Sale s join fetch s.transactionSale t where s.branch.id = ?1 and  end_date between ?2 and ?3 and s.paymentChannel.id=null and t.sale.id != null")
 	    List<Sale> findByBranchIdWithValueDateRangeAndPaymentNullIdAccount(Integer userId, @DateTimeFormat(pattern = "yyyy-MM-dd") Date date,@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date end);
 }

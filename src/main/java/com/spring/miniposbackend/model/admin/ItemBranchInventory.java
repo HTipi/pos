@@ -42,7 +42,7 @@ public class ItemBranchInventory {
 	private Branch branch;
 	
 	@Column(name = "qty", nullable = false)
-	private int qty;
+	private double qty;
 	
 	public Long getItemBranchId() {
 		return itembranch.getId();

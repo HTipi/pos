@@ -126,26 +126,26 @@ public class TransactionService {
 	}
 	@Transactional
 	 public boolean givePoint(Long personId, GivePointRequest givePointRequest) {
-	  Account pointAccount = accountRepository.findByPoint(userProfile.getProfile().getBranch().getId(),personId)
-	    .orElseThrow(() -> new ResourceNotFoundException("Point Account not found"));
-	  TransactionType tranType = transactionTypeRepository.findById(5)
-	    .orElseThrow(() -> new ResourceNotFoundException("type does not exist"));
-	  final BigDecimal previousBalance = pointAccount.getBalance();
-	  pointAccount.setBalance(pointAccount.getBalance().add(BigDecimal.valueOf(givePointRequest.getPoint())));
-	  accountRepository.save(pointAccount);
-	  Transaction transaction = new Transaction();
-	  transaction.setTransactionAmount(BigDecimal.valueOf(givePointRequest.getPoint()));
-	  transaction.setPreviousBalance(previousBalance);
-	  transaction.setAccount(pointAccount);
-	  transaction.setTransactionType(tranType);
-	  transaction.setBranch(userProfile.getProfile().getBranch());
-	  transaction.setCurrentBalance(pointAccount.getBalance());
-	  transaction.setUser(userProfile.getProfile().getUser());
-	  transaction.setValueDate(new Date());
-	  transaction.setRemark(givePointRequest.getRemark());
-	  transactionRepository.save(transaction);
-	  return true;
-	 }
-	
 
+	   Account pointAccount = accountRepository.findByPoint(userProfile.getProfile().getBranch().getId(), personId)
+	     .orElseThrow(() -> new ResourceNotFoundException("Point Account not found", "01"));
+	   TransactionType tranType = transactionTypeRepository.findById(5)
+	     .orElseThrow(() -> new ResourceNotFoundException("type does not exist", "02"));
+	   final BigDecimal previousBalance = pointAccount.getBalance();
+	   pointAccount.setBalance(pointAccount.getBalance().add(BigDecimal.valueOf(givePointRequest.getPoint())));
+	   accountRepository.save(pointAccount);
+	   Transaction transaction = new Transaction();
+	   transaction.setTransactionAmount(BigDecimal.valueOf(givePointRequest.getPoint()));
+	   transaction.setPreviousBalance(previousBalance);
+	   transaction.setAccount(pointAccount);
+	   transaction.setTransactionType(tranType);
+	   transaction.setBranch(userProfile.getProfile().getBranch());
+	   transaction.setCurrentBalance(pointAccount.getBalance());
+	   transaction.setUser(userProfile.getProfile().getUser());
+	   transaction.setValueDate(new Date());
+	   transaction.setRemark(givePointRequest.getRemark());
+	   transactionRepository.save(transaction);
+	   return true;
+	  
+	}
 }

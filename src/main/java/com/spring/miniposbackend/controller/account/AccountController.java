@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.modelview.account.AccountRequest;
+import com.spring.miniposbackend.modelview.account.RemarkView;
 import com.spring.miniposbackend.service.account.AccountService;
 
 @RestController
@@ -46,6 +47,11 @@ public class AccountController {
 	public SuccessResponse showByCredit(@RequestParam("query") String query) throws Exception, QueryException {
 		return new SuccessResponse("00", "Here your're informations",accountService.showsByCreditQuery(query));
 	}
+	
+	@PostMapping("remark/{personId}")
+	 public SuccessResponse remark(@PathVariable Long personId,@RequestBody RemarkView remark) throws Exception {
+	  return new SuccessResponse("00", "Here your're informations",accountService.remark(personId, remark.getRemark()));
+	 }
 	
 
 }

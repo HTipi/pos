@@ -68,6 +68,9 @@ public class Account extends AuditModel {
 	@JsonIgnore
 	private Currency currency;
 	
+	@Column(name = "remark", nullable = true, length = 256)
+	private String remark;
+	
 	public void setBranch() {
 	}
 

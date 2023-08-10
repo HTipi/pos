@@ -62,7 +62,7 @@ public class Printer {
     @ColumnDefault("false")
 	private boolean separatePrinter;
 	
-	@Column(name = "type", nullable = true, length = 1)
+	@Column(name = "type", nullable = true, length = 3)
     private String type;
 	
 	public List<Integer> getItemTypes(){

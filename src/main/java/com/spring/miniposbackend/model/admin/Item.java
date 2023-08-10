@@ -91,6 +91,9 @@ public class Item extends AuditModel{
     @ColumnDefault("false")
     private boolean enable;
 	
+	@Column(name = "bar_code", nullable = true,length = 128)
+    private String barCode;
+	
 	public int getItemType_Id() {
         return itemType.getId();
     }

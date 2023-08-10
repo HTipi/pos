@@ -56,12 +56,12 @@ public class StockPost extends AuditModel {
 
 	@Column(name = "discount_amt", nullable = true, precision = 10, scale = 2)
 	private BigDecimal discountAmount;
-	@Column(name = "quantity", nullable = false)
+	@Column(name = "quantity", nullable = false,precision = 10, scale = 2)
 	@ColumnDefault("1")
-	private Short quantity;
+	private BigDecimal quantity;
 
-	@Column(name = "stock_balance", nullable = false)
-	private Long stockBalance;
+	@Column(name = "stock_balance", nullable = false,precision = 10, scale = 2)
+	private BigDecimal stockBalance;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "stock_id", nullable = false)

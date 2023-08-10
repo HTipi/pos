@@ -1,5 +1,6 @@
 package com.spring.miniposbackend.service.stock;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -65,8 +66,8 @@ public class StockEntryService {
 							.orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 					int stockEntry = 0;
 					stockEntry = stockEntryRepository.findByItemBranchId(itemBr.getId(), stockId).orElse(0);
-					int stockBalance = entries.getQuantity() + stockEntry;
-					if (itemBr.getItemBalance() < stockBalance) {
+					double stockBalance = entries.getQuantity() + stockEntry;
+					if (itemBr.getItemBalance().doubleValue() < stockBalance) {
 						throw new ResourceNotFoundException("មិនមានចំនួនស្តុកគ្រប់គ្រាន់", "09");
 					}
 				});
@@ -91,7 +92,7 @@ public class StockEntryService {
 								stockEnt.setValueDate(stock.getValueDate());
 								stockEnt.setItemBranch(itemBranch);
 								stockEnt.setPrice(stockEntryRequest.getPrice());
-								stockEnt.setQuantity(stockEntryRequest.getQuantity());
+								stockEnt.setQuantity(BigDecimal.valueOf(stockEntryRequest.getQuantity()));
 								stockEnt.setBranch(stock.getBranch());
 								stockEnt.setUser(user);
 								stockEnt.setDiscount(stockEntryRequest.getDiscount());
@@ -130,7 +131,7 @@ public class StockEntryService {
 				}
 				stockEntry.setItemBranch(itemBranch);
 				stockEntry.setPrice(stockEntryRequest.getPrice());
-				stockEntry.setQuantity(stockEntryRequest.getQuantity());
+				stockEntry.setQuantity(BigDecimal.valueOf(stockEntryRequest.getQuantity()));
 				return stockEntryRepository.save(stockEntry);
 			}).orElseThrow(() -> new ResourceNotFoundException("Stock does not exist"));
 		}).orElseThrow(() -> new ResourceNotFoundException("Stock does not exist"));

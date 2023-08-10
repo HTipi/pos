@@ -1,5 +1,6 @@
 package com.spring.miniposbackend.service.stock;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -78,9 +79,9 @@ public class StockPostService {
 						stockPostTem.setUser(user);
 						stockPostTem.setStock(stock);
 						if(stockType.getCode().compareTo("STOCK-IN") == 0) {
-							itemBranch.setStockIn(itemBranch.getStockIn()+stockEntry.getQuantity());
+							itemBranch.setStockIn(itemBranch.getStockIn().add(stockEntry.getQuantity()));
 						}else {
-							itemBranch.setStockOut(itemBranch.getStockOut()+stockEntry.getQuantity());
+							itemBranch.setStockOut(itemBranch.getStockOut().add(stockEntry.getQuantity()));
 						}
 						itemBranchRepository.save(itemBranch);
 						stockPostTem.setStockBalance(itemBranch.getItemBalance());

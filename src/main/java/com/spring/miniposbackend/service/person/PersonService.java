@@ -227,7 +227,8 @@ public class PersonService {
 				  showProfileView.setCredit(credit.getBalance());
 				  showProfileView.setPoint(point.getBalance());
 				  showProfileView.setSex(person.get().getSex().getName());
-				  showProfileView.setRemark("");
+				  showProfileView.setRemark(point.getRemark());
+				  showProfileView.setPersonId(person.get().getId());
 				return new SuccessResponse("01", "Have account", showProfileView);
 			} else {
 				return new SuccessResponse("03", "No account in the branch", person.get().getId());

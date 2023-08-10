@@ -1,5 +1,6 @@
 package com.spring.miniposbackend.model.transaction;
 
+import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -8,6 +9,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -27,7 +30,7 @@ public class TransactionSale {
 	@Column(name = "id", nullable = false)
 	private long id;
 
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name = "sale_id", nullable = false)
 	@JsonIgnore
 	private Sale sale;

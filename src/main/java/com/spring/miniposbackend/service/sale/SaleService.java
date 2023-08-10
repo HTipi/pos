@@ -166,8 +166,11 @@ public class SaleService {
 						return saleRepository.findByIdWithValueDateRangeAndPaymentId(
 								userProfile.getProfile().getUser().getId(), date.get(), paymentId.get(), end.get());
 				} else
+				{
+					System.out.println(123);
 					return saleRepository.findByIdWithValueDateRange(userProfile.getProfile().getUser().getId(),
 							date.get(), end.get());
+				}
 
 			} else {
 				if (paymentId.isPresent()) {
@@ -327,16 +330,17 @@ public class SaleService {
 				itemInventories.forEach((inventory) -> {
 					ItemBranch item = itemRepository.findById(inventory.getInvenId())
 							.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
-					int itembalance = saleTemporaryRepository.findItemBalanceByUserId(user.getId(), item.getId())
+					double itembalance = saleTemporaryRepository.findItemBalanceByUserId(user.getId(), item.getId())
 							.orElse(0);
-					if (item.getItemBalance() < itembalance) {
+					if (item.getItemBalance().doubleValue() < itembalance) {
 						String setting = branchSettingRepository
 								.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN")
 								.orElse("");
 						if (!setting.contentEquals(setting))
 							throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 					}
-					item.setStockOut((long) (item.getStockOut() + (saleTemp.getQuantity() * inventory.getQty())));
+					BigDecimal inven = BigDecimal.valueOf(saleTemp.getQuantity() * inventory.getQty());
+					item.setStockOut((item.getStockOut().add(inven)));
 					itemRepository.save(item);
 				});
 			} else {
@@ -345,16 +349,17 @@ public class SaleService {
 				inventories.forEach((inventory) -> {
 					ItemBranch item = itemRepository.findById(inventory)
 							.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
-					int itembalance = saleTemporaryRepository.findItemBalanceByUserId(user.getId(), item.getId())
+					double itembalance = saleTemporaryRepository.findItemBalanceByUserId(user.getId(), item.getId())
 							.orElse(0);
-					if (item.getItemBalance() < itembalance) {
+					if (item.getItemBalance().doubleValue() < itembalance) {
 						String setting = branchSettingRepository
 								.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN")
 								.orElse("");
 						if (!setting.contentEquals(setting))
 							throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 					}
-					item.setStockOut((long) (item.getStockOut() + (saleTemp.getQuantity() * itemBranch.getInvenQty())));
+					BigDecimal inven = BigDecimal.valueOf(saleTemp.getQuantity()).multiply(itemBranch.getInvenQty());
+					item.setStockOut((item.getStockOut().add(inven)));
 					itemRepository.save(item);
 				});
 			}
@@ -527,14 +532,15 @@ public class SaleService {
 							.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
 					int itembalance = saleTemporaryRepository.findItemBalanceByUserId(user.getId(), item.getId())
 							.orElse(0);
-					if (item.getItemBalance() < itembalance) {
+					if (item.getItemBalance().doubleValue() < itembalance) {
 						String setting = branchSettingRepository
 								.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN")
 								.orElse("");
 						if (!setting.contentEquals(setting))
 							throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 					}
-					item.setStockOut((long) (item.getStockOut() + (saleTemp.getQuantity() * inventory.getQty())));
+					BigDecimal inven = BigDecimal.valueOf(saleTemp.getQuantity() * inventory.getQty());
+					item.setStockOut((item.getStockOut().add(inven)));
 					itemRepository.save(item);
 				});
 			} else {
@@ -543,16 +549,17 @@ public class SaleService {
 				inventories.forEach((inventory) -> {
 					ItemBranch item = itemRepository.findById(inventory)
 							.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
-					int itembalance = saleTemporaryRepository.findItemBalanceByUserId(user.getId(), item.getId())
+					double itembalance = saleTemporaryRepository.findItemBalanceByUserId(user.getId(), item.getId())
 							.orElse(0);
-					if (item.getItemBalance() < itembalance) {
+					if (item.getItemBalance().doubleValue() < itembalance) {
 						String setting = branchSettingRepository
 								.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN")
 								.orElse("");
 						if (!setting.contentEquals(setting))
 							throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 					}
-					item.setStockOut((long) (item.getStockOut() + (saleTemp.getQuantity() * itemBranch.getInvenQty())));
+					BigDecimal inven = BigDecimal.valueOf(saleTemp.getQuantity()).multiply(itemBranch.getInvenQty());
+					item.setStockOut((item.getStockOut().add(inven)));
 					itemRepository.save(item);
 				});
 			}
@@ -632,7 +639,7 @@ public class SaleService {
 			ItemBranch itemBr = itemRepository.findById(sales.getItemBranch().getId())
 					.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
 			if (itemBr.isStock()) {
-				itemBr.setStockOut((long) (itemBr.getStockOut() - sales.getQuantity()));
+				itemBr.setStockOut(itemBr.getStockOut().subtract(BigDecimal.valueOf(sales.getQuantity())));
 				itemRepository.save(itemBr);
 			}
 			List<ItemBranchInventory> itemInventories = itemBranchinventoryRepository
@@ -641,17 +648,18 @@ public class SaleService {
 				itemInventories.forEach((inventory) -> {
 					ItemBranch item = itemRepository.findById(inventory.getInvenId())
 							.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
-					int itembalance = saleTemporaryRepository
+					double itembalance = saleTemporaryRepository
 							.findItemBalanceByUserId(userProfile.getProfile().getUser().getId(), item.getId())
 							.orElse(0);
-					if (item.getItemBalance() < itembalance) {
+					if (item.getItemBalance().doubleValue() < itembalance) {
 						String setting = branchSettingRepository
 								.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN")
 								.orElse("");
 						if (!setting.contentEquals(setting))
 							throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 					}
-					item.setStockOut((long) (item.getStockOut() - (sales.getQuantity() * inventory.getQty())));
+					BigDecimal inven = BigDecimal.valueOf(sales.getQuantity() * inventory.getQty());
+					item.setStockOut((item.getStockOut().subtract(inven)));
 					itemRepository.save(item);
 				});
 			} else {
@@ -660,17 +668,18 @@ public class SaleService {
 				inventories.forEach((inventory) -> {
 					ItemBranch item = itemRepository.findById(inventory)
 							.orElseThrow(() -> new ResourceNotFoundException("Record does not exist"));
-					int itembalance = saleTemporaryRepository
+					double itembalance = saleTemporaryRepository
 							.findItemBalanceByUserId(userProfile.getProfile().getUser().getId(), item.getId())
 							.orElse(0);
-					if (item.getItemBalance() < itembalance) {
+					if (item.getItemBalance().doubleValue() < itembalance) {
 						String setting = branchSettingRepository
 								.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN")
 								.orElse("");
 						if (!setting.contentEquals(setting))
 							throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 					}
-					item.setStockOut((long) (item.getStockOut() - (sales.getQuantity() * itemBr.getInvenQty())));
+					BigDecimal inven = BigDecimal.valueOf(sales.getQuantity()).multiply(itemBr.getInvenQty());
+					item.setStockOut((item.getStockOut().subtract(inven)));
 					itemRepository.save(item);
 				});
 			}
@@ -724,16 +733,16 @@ public class SaleService {
 		ItemBranch itemBranch = saleTemporary.getItemBranch();
 		if (!cancel) {
 			if (itemBranch.isStock()) {
-				int itembalance = saleTemporaryRepository.findItemBalanceByUserId(user.getId(), itemBranch.getId())
+				double itembalance = saleTemporaryRepository.findItemBalanceByUserId(user.getId(), itemBranch.getId())
 						.orElse(0);
-				if (itemBranch.getItemBalance() < itembalance) {
+				if (itemBranch.getItemBalance().doubleValue() < itembalance) {
 					String setting = branchSettingRepository
 							.findByBranchIdAndSettingCode(userProfile.getProfile().getBranch().getId(), "STN")
 							.orElse("");
 					if (!setting.contentEquals(setting))
 						throw new ConflictException("ចំនួនដែលបញ្ជាទិញច្រើនចំនួនក្នុងស្តុក", "09");
 				}
-				itemBranch.setStockOut((long) (itemBranch.getStockOut() + saleTemporary.getQuantity()));
+				itemBranch.setStockOut(itemBranch.getStockOut().add(BigDecimal.valueOf(saleTemporary.getQuantity())));
 				itemRepository.save(itemBranch);
 			}
 		}

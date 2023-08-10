@@ -15,6 +15,7 @@ public class ShowProfileView {
 	private String remark;
 	private String name;
 	private String sex;
+	private long personId;
 
 }
 

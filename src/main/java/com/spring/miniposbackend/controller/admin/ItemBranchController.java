@@ -97,7 +97,7 @@ public class ItemBranchController {
 	}
 	@PatchMapping("{itemBranchId}/set-inven")
 	@PreAuthorize("hasAnyRole('BRANCH','OWNER')")
-	public SuccessResponse setInvenQty(@PathVariable Long itemBranchId, @RequestParam Short qty) {
+	public SuccessResponse setInvenQty(@PathVariable Long itemBranchId, @RequestParam double qty) {
 		return new SuccessResponse("00", "fetch Image Item List",  itemBranchService.setInvenQty(itemBranchId, qty));
 	}
 	/*

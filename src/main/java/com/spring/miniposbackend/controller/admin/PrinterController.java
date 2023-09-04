@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -39,9 +40,7 @@ public class PrinterController {
 	}
 
 	@PostMapping
-	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
 	public SuccessResponse createPrinter(@RequestBody PrinterRequest printer) throws Exception {
-
 		return new SuccessResponse("00", "create printers", printerService.createPrinter(printer));
 	}
 
@@ -55,6 +54,12 @@ public class PrinterController {
 	public SuccessResponse deletePrinter(@PathVariable Integer printerId) {
 
 		return new SuccessResponse("00", "update printers", printerService.deletePrinter(printerId));
+	}
+	
+	@PatchMapping("{printerId}")
+	public SuccessResponse updateIP(@PathVariable Integer printerId,@RequestParam(value = "ip") String ip) {
+
+		return new SuccessResponse("00", "update printers", printerService.updateIP(printerId,ip));
 	}
 	
 }

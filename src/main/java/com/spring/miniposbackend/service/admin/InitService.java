@@ -134,9 +134,11 @@ public class InitService {
 			Integer corporateId = userProfile.getProfile().getCorporate().getId();
 			List<BranchSetting> settings = getSettings(branchId);
 			List<BranchCurrency> currencies = getCurrencies(branchId, true, true);
+			List<ItemBranch> itemBranch = getItemBranch(branchId);
+			List<ItemType> itemType = getItemTypes(corporateId);
 			UserResponse user = getUsers();
 			List<Branch> branches = showByCorpoateId(corporateId);
-			return new InitDashboardViewModel(settings, currencies, user,branches);
+			return new InitDashboardViewModel(settings, currencies, user,branches,itemBranch,itemType);
 		} catch (Exception e) {
 			throw new Exception(e.getMessage());
 		}

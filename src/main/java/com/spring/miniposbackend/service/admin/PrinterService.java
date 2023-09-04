@@ -42,17 +42,17 @@ public class PrinterService {
 			if (userProfile.getProfile().getBranch().getId() != printers.getBranch().getId()) {
 				throw new UnauthorizedException("branch is unauthorized");
 			}
-			printer.setName(printer.getName());
+			printers.setName(printer.getName());
 			printers.setCode(printer.getCode());
 			printers.setIp(printer.getIp());
 			printers.setPaymentPrinter(printer.isPaymentPrinter());
 			printers.setSeparatePrinter(printer.isSeparatePrinter());
+			printers.setType(printer.getType());
 			return printerRepository.save(printers);
 		}).orElseThrow(() -> new ResourceNotFoundException("printer does not exist"));
 	}
 
 	public Printer createPrinter(PrinterRequest printer) throws Exception {
-
 		try {
 			Printer newPrinter = new Printer();
 			newPrinter.setBranch(userProfile.getProfile().getBranch());
@@ -62,6 +62,7 @@ public class PrinterService {
 			newPrinter.setEnable(true);
 			newPrinter.setSeparatePrinter(printer.isSeparatePrinter());
 			newPrinter.setPaymentPrinter(printer.isPaymentPrinter());
+			newPrinter.setType(printer.getType());
 			return printerRepository.save(newPrinter);
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
@@ -103,6 +104,13 @@ public class PrinterService {
 				.orElseThrow(() -> new ResourceNotFoundException("Printer_id does not exist"));
 		printerRepository.deleteByPrinterId(printerId);
 		return printer;
+	}
+	@Transactional
+	public Printer updateIP(Integer printerId,String ip) {
+		Printer printer = printerRepository.findById(printerId)
+				.orElseThrow(() -> new ResourceNotFoundException("Printer_id does not exist"));
+		printer.setIp(ip);
+		return printerRepository.save(printer);
 	}
 
 }

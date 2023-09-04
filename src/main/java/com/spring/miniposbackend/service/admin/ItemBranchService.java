@@ -17,14 +17,17 @@ import com.spring.miniposbackend.exception.UnauthorizedException;
 import com.spring.miniposbackend.model.admin.Branch;
 import com.spring.miniposbackend.model.admin.Item;
 import com.spring.miniposbackend.model.admin.ItemBranch;
+import com.spring.miniposbackend.model.admin.ItemType;
 import com.spring.miniposbackend.modelview.ImageRequest;
 import com.spring.miniposbackend.modelview.ImageResponse;
 import com.spring.miniposbackend.modelview.ItemBranchCheckList;
 import com.spring.miniposbackend.modelview.ItemBranchUpdate;
 import com.spring.miniposbackend.modelview.PointRewardRequest;
+import com.spring.miniposbackend.modelview.account.PointAndRewardView;
 import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
 import com.spring.miniposbackend.repository.admin.ItemRepository;
+import com.spring.miniposbackend.repository.admin.ItemTypeRepository;
 import com.spring.miniposbackend.repository.sale.SaleTemporaryRepository;
 import com.spring.miniposbackend.util.ImageUtil;
 import com.spring.miniposbackend.util.UserProfileUtil;
@@ -43,6 +46,8 @@ public class ItemBranchService {
 	private ImageUtil imageUtil;
 	@Autowired
 	private UserProfileUtil userProfile;
+	@Autowired
+	private ItemTypeRepository itemTypeRepository;
 
 	@Value("${file.path.image.item}")
 	private String imagePath;
@@ -200,7 +205,7 @@ public class ItemBranchService {
 			return itemBranchRepository.save(itemBranch);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
-	
+
 	public ItemBranch updateAddOn(Long itemBranchId, List<Long> addOnItems) {
 		return itemBranchRepository.findById(itemBranchId).map(itemBranch -> {
 			if (itemBranch.getBranch().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
@@ -210,7 +215,7 @@ public class ItemBranchService {
 			return itemBranchRepository.save(itemBranch);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
-	
+
 	public ItemBranch updateAddOnInventory(Long itemBranchId, List<Long> addOnItems) {
 		return itemBranchRepository.findById(itemBranchId).map(itemBranch -> {
 			if (itemBranch.getBranch().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
@@ -221,11 +226,14 @@ public class ItemBranchService {
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
 
-	public ItemBranch setPrice(Long itemBranchId, BigDecimal price, Short discount,BigDecimal costing) {
+	public ItemBranch setPrice(Long itemBranchId, BigDecimal price, Short discount, BigDecimal costing,
+			Optional<Short> point) {
 		return itemBranchRepository.findById(itemBranchId).map(itemBranch -> {
 			itemBranch.setPrice(price);
 			itemBranch.setDiscount(discount);
 			itemBranch.setCosting(costing);
+			if (point.isPresent())
+				itemBranch.setPoint(point.get());
 			return itemBranchRepository.save(itemBranch);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
@@ -236,6 +244,7 @@ public class ItemBranchService {
 			return itemBranchRepository.save(itemBranch);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
+
 	public ItemBranch setInvenQty(Long itemBranchId, double qty) {
 		return itemBranchRepository.findById(itemBranchId).map(itemBranch -> {
 			itemBranch.setInvenQty(BigDecimal.valueOf(qty));
@@ -252,6 +261,7 @@ public class ItemBranchService {
 			return itemBranchRepository.save(itemBranch);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
+
 	public ItemBranch disable(Long itemBranchId) {
 		return itemBranchRepository.findById(itemBranchId).map(itemBranch -> {
 			if (itemBranch.getBranch().getCorporate().getId() != userProfile.getProfile().getCorporate().getId()) {
@@ -265,27 +275,60 @@ public class ItemBranchService {
 			if (pending)
 				throw new ConflictException("The item is pending ordered", "10");
 			List<ItemBranch> itemsBranch = itemBranchRepository.findAnyAddOn(itemBranchId);
-			if(itemsBranch.size() > 0)
-			{
+			if (itemsBranch.size() > 0) {
 				throw new ConflictException("Please remove sub item from " + itemsBranch.get(0).getNameKh(), "13");
 			}
 			itemBranch.setEnable(false);
 			return itemBranchRepository.save(itemBranch);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
+
 	@Transactional
-	  public List<ItemBranch> updatePointAndReward(PointRewardRequest itemBranchView){
-	    List<ItemBranch> list = new ArrayList<>();
-	    for(int i=0;i<itemBranchView.getItemBranchId().size();i++) {
-	      ItemBranch itemBranch = itemBranchRepository.findById(itemBranchView.getItemBranchId().get(i)).orElseThrow(() -> new ResourceNotFoundException("This item doesn’t exit","01"));
-	      if(userProfile.getProfile().getBranch().getId() != itemBranch.getBranch().getId()) {
-	        throw new UnauthorizedException("Branch is unauthorized");
-	      }
-	      itemBranch.setPoint(itemBranchView.getPoint());
-	      itemBranch.setReward(itemBranchView.getReward());
-	      itemBranchRepository.save(itemBranch);
-	      list.add(itemBranch);
-	    }
-	    return list;
-	  }
+	public List<ItemBranch> updatePointAndReward(PointRewardRequest itemBranchView) {
+		List<ItemBranch> list = new ArrayList<>();
+		for (int i = 0; i < itemBranchView.getItemBranchId().size(); i++) {
+			ItemBranch itemBranch = itemBranchRepository.findById(itemBranchView.getItemBranchId().get(i))
+					.orElseThrow(() -> new ResourceNotFoundException("This item doesn’t exit", "01"));
+			if (userProfile.getProfile().getBranch().getId() != itemBranch.getBranch().getId()) {
+				throw new UnauthorizedException("Branch is unauthorized");
+			}
+			itemBranch.setPoint(itemBranchView.getPoint());
+			itemBranch.setReward(itemBranchView.getReward());
+			itemBranchRepository.save(itemBranch);
+			list.add(itemBranch);
+		}
+		return list;
+	}
+
+	@Transactional
+	public List<ItemBranch> updateByItemTypeId(Integer itemTypeId, PointAndRewardView pointAndRewardView) {
+		ItemType itemType = itemTypeRepository
+				.findBycorporateIdandId(userProfile.getProfile().getBranch().getCorporate().getId(), itemTypeId)
+				.orElseThrow(() -> new ResourceNotFoundException("Please refresh the app", "01"));
+		List<Item> item = itemRepository.findByItemTypeId(itemType.getId());
+		ItemBranch itemBranch = null;
+		List<ItemBranch> list = new ArrayList<>();
+		for (int i = 0; i < item.size(); i++) {
+			itemBranch = itemBranchRepository
+					.findFirstByBranchIdAndItemIdOrderByIdDesc(userProfile.getProfile().getBranch().getId(),
+							item.get(i).getId())
+					.orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
+			list.add(itemBranch);
+			itemBranch.setPoint(pointAndRewardView.getPoint());
+			itemBranch.setReward(pointAndRewardView.getReward());
+			itemBranchRepository.save(itemBranch);
+		}
+		return list;
+	}
+
+	@Transactional
+	public ItemBranch updateById(Long itemBranchId, PointAndRewardView pointAndRewardView) {
+		ItemBranch itemBranch = itemBranchRepository
+				.findByBranchIdandId(userProfile.getProfile().getBranch().getId(), itemBranchId)
+				.orElseThrow(() -> new ResourceNotFoundException("Please refresh the app", "01"));
+		itemBranch.setPoint(pointAndRewardView.getPoint());
+		itemBranch.setReward(pointAndRewardView.getReward());
+		itemBranchRepository.save(itemBranch);
+		return itemBranch;
+	}
 }

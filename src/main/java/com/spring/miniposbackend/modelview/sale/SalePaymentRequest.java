@@ -18,7 +18,7 @@ public class SalePaymentRequest {
 	String remark;
 	Double serviceCharge;
 	BigDecimal total;
-	short discountPercentage;
+	double discountPercentage;
 	long accountId;
 	short point;
 	int transactionTypeId;

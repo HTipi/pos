@@ -81,8 +81,8 @@ public class SaleDashboardService {
 				mapSqlParameterSource, (rs, rowNum) -> new PromotionReceipt(rs.getString("promotion"),
 						rs.getDouble("discount_amt"), rs.getDouble("qty")));
 	}
-	public List<PromotionReceipt> promotionReceipts(
-			@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date startDate,
+
+	public List<PromotionReceipt> promotionReceipts(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date startDate,
 			@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm") Date end) {
 		MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource();
 		mapSqlParameterSource.addValue("startDate", startDate);
@@ -217,6 +217,11 @@ public class SaleDashboardService {
 			return jdbc.query("select * from promotionbybranches(:branchId,:startDate,:enddate)", mapSqlParameterSource,
 					(rs, rowNum) -> new SummaryDetail(rs.getInt("id"), rs.getString("name_kh"), rs.getInt("receipt"),
 							rs.getDouble("total"), rs.getDouble("discount")));
+		} else if (reportName.equalsIgnoreCase("card")) {
+
+			return jdbc.query("select * from cardbybranches(:branchId,:startDate,:enddate)", mapSqlParameterSource,
+					(rs, rowNum) -> new SummaryDetail(rs.getInt("id"), rs.getString("name_kh"), rs.getInt("receipt"),
+							rs.getDouble("total"), rs.getDouble("discount")));
 		} else {
 			return jdbc.query("select * from userbybranches(:branchId,:startDate,:enddate)", mapSqlParameterSource,
 					(rs, rowNum) -> new SummaryDetail(rs.getInt("id"), rs.getString("name_kh"), rs.getInt("receipt"),
@@ -253,7 +258,7 @@ public class SaleDashboardService {
 		return jdbc.query("select * from itemTypeChartByBranchId(:branchId,:startDate,:endDate)", mapSqlParameterSource,
 				(rs, rowNum) -> new ItemTypeSummaryChart(rs.getInt("itemTypeId"), rs.getString("itemTypeName"),
 						rs.getString("itemTypeKh"), rs.getDouble("saleAmt"), rs.getDouble("disAmt"),
-						rs.getInt("saleItem"),rs.getDouble("servicecharge")));
+						rs.getInt("saleItem"), rs.getDouble("servicecharge")));
 	}
 
 //	public List<ItemTypeSummaryChart> itemTypeChartByCopId(Integer corporateId, Date startDate, Date endDate) {

@@ -63,7 +63,7 @@ public class SaleController {
 			@RequestParam Double discount, @RequestParam Double cashIn, @RequestParam Double change,
 			@RequestParam Integer currencyId,@RequestParam Integer userId,@RequestParam Optional<Boolean> cancel,@RequestParam Optional<String> remark,@RequestParam Optional<Double> serviceCharge,
 			@RequestParam Optional<Long> customerId,@RequestParam Optional<Double> vat,
-			@RequestBody Optional<SpitBillItems> spitBillItems,@RequestParam Optional<Long> personId,@RequestParam Optional<Integer> transactionTypeId,@RequestParam Optional<Short> discountPercentage) throws IOException {
+			@RequestBody Optional<SpitBillItems> spitBillItems,@RequestParam Optional<Long> personId,@RequestParam Optional<Integer> transactionTypeId,@RequestParam Optional<Double> discountPercentage) throws IOException {
 		boolean check = cancel.isPresent() ? cancel.get() : false;
 	
 		List list = saleService.create(invoiceId, seatId,channelId, discount, cashIn, change, currencyId,userId,check,remark,serviceCharge,spitBillItems,customerId,vat,personId,transactionTypeId,discountPercentage);

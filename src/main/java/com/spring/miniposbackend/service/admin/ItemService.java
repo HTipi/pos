@@ -31,6 +31,7 @@ import com.spring.miniposbackend.model.admin.ItemBranch;
 import com.spring.miniposbackend.model.admin.ItemType;
 import com.spring.miniposbackend.modelview.ImageRequest;
 import com.spring.miniposbackend.modelview.ImageResponse;
+import com.spring.miniposbackend.modelview.account.CreditView;
 import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.admin.CorporateRepository;
 import com.spring.miniposbackend.repository.admin.ImageRepository;
@@ -123,7 +124,7 @@ public class ItemService {
 			}
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
-	
+
 	@Transactional
 	public Item uploadPhoto(Long itemId, MultipartFile file) throws IOException {
 		return itemRepository.findById(itemId).map(item -> {
@@ -136,9 +137,7 @@ public class ItemService {
 				// String baseLocation = String.format("%s/" + imagePath,
 				// System.getProperty("catalina.base"));
 				String baseLocation = photoPath;
-				String fileName = imageUtil.uploadImage(
-						baseLocation, itemId.toString(),
-						file);
+				String fileName = imageUtil.uploadImage(baseLocation, itemId.toString(), file);
 				item.setPhoto(fileName);
 				return itemRepository.save(item);
 			} catch (Exception e) {
@@ -147,17 +146,17 @@ public class ItemService {
 			}
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
-	
+
 	public byte[] getFileData(Long itemId) {
 		return itemRepository.findById(itemId).map(item -> {
 			try {
-				   return get(photoPath + "/" + itemId + ".png");
+				return get(photoPath + "/" + itemId + ".png");
 			} catch (Exception e) {
 				System.out.println(e.getMessage());
 				throw new ConflictException(e.getMessage());
 			}
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
-		
+
 	}
 
 	public byte[] get(String filePath) throws Exception {
@@ -179,6 +178,7 @@ public class ItemService {
 		}
 
 	}
+
 	public ImageResponse getImage(Item item) {
 		if (item.getImage().isEmpty()) {
 			return new ImageResponse(item.getId(), null, item.getVersion());
@@ -341,6 +341,7 @@ public class ItemService {
 			return itemRepository.save(item);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
 	}
+
 	private ItemBranch createItemBranch(Item item) {
 		try {
 			ItemBranch itemBranch = new ItemBranch();
@@ -354,7 +355,10 @@ public class ItemService {
 			itemBranch.setBranch(userProfile.getProfile().getBranch());
 			itemBranch.setAddOnItems(new ArrayList<>());
 			itemBranch.setCosting(item.getCosting());
-			itemBranch.setWholePrice(item.getWholePrice());	
+			itemBranch.setWholePrice(item.getWholePrice());
+			itemBranch.setReward((short) 0);
+			itemBranch.setPoint((short) 0);
+			itemBranch.setAddPercent((short) 0);
 			itemBranchRepository.save(itemBranch);
 			return itemBranch;
 		} catch (Exception e) {
@@ -363,6 +367,7 @@ public class ItemService {
 			// TODO: handle exception
 		}
 	}
+
 	@SuppressWarnings("resource")
 	@Transactional
 	public Integer Uploadexcel(@RequestParam("file") MultipartFile file) throws IOException {
@@ -377,7 +382,8 @@ public class ItemService {
 			XSSFSheet sheet = workbook.getSheetAt(0);
 			for (int i = 0; i < sheet.getPhysicalNumberOfRows() - 1; i++) {
 				XSSFRow row = sheet.getRow(i + 1);
-				ItemType type = itemTypeRepository.findById((int) row.getCell(7).getNumericCellValue()).orElseThrow(() -> new ResourceNotFoundException("Item Type does not exist"));
+				ItemType type = itemTypeRepository.findById((int) row.getCell(7).getNumericCellValue())
+						.orElseThrow(() -> new ResourceNotFoundException("Item Type does not exist"));
 				if (userProfile.getProfile().getCorporate().getId() != type.getCorporate().getId()) {
 					throw new UnauthorizedException("you are putting other corporate item type");
 				}
@@ -390,9 +396,9 @@ public class ItemService {
 				item.setPrice(BigDecimal.valueOf(row.getCell(4).getNumericCellValue()));
 				item.setDiscount(Short.valueOf((short) row.getCell(5).getNumericCellValue()));
 				item.setStock(row.getCell(6).getBooleanCellValue());
-				
+
 				item.setItemType(type);
-				item.setVersion((short)0);
+				item.setVersion((short) 0);
 				item.setEnable(true);
 				if (row.getCell(10) != null) {
 					item.setSub(row.getCell(10).getStringCellValue());
@@ -411,11 +417,11 @@ public class ItemService {
 				}
 				listItemBranch.add(itemBranch);
 				listItem.add(item);
-				
+
 			}
 			entityManager.flush();
 			entityManager.clear();
-			//Add Sub
+			// Add Sub
 			for (int k = 0; k < mainItem.size(); k++) {
 				if (!mainItem.get(k).getItem().getSub().isBlank()) {
 					code.clear();
@@ -444,13 +450,14 @@ public class ItemService {
 			}
 			workbook.close();
 			return listItemBranch.size();
-			} catch (Exception e) {
-				workbook.close();
+		} catch (Exception e) {
+			workbook.close();
 			System.out.println(e.getMessage());
 			throw new BadRequestException(e.getMessage(), "not success!");
 			// TODO: handle exception
 		}
 	}
+
 //	List<Item> listupdate = new ArrayList<>();
 //	@Transactional
 //	public List<Item> updatexcel(@RequestParam("file") MultipartFile file) {
@@ -575,4 +582,69 @@ public class ItemService {
 //			// TODO: handle exception
 //		}
 //	}
+	@Transactional
+	public Item createCredit(CreditView creditView) {
+		ItemType itemType = itemTypeRepository
+				.findByBranchIdandCreditTrue(userProfile.getProfile().getBranch().getCorporate().getId());
+		Item item = new Item();
+		item.setCode("0");
+		item.setType("CREDIT");
+		item.setName(creditView.getName());
+		item.setNameKh(creditView.getName());
+		item.setPrice(creditView.getPrice());
+		item.setDiscount((short) 0);
+		item.setStock(false);
+		item.setItemType(itemType);
+		item.setCosting(BigDecimal.valueOf(0));
+		item.setWholePrice(BigDecimal.valueOf(0));
+		item.setEnable(true);
+		itemRepository.save(item);
+		List<Branch> branches = branchRepository.findByCorporateId(itemType.getCorporate().getId(), true);
+		branches.forEach((branch) -> {
+			Integer branchId = branch.getId();
+			ItemBranch itemBr = new ItemBranch();
+			itemBr.setBranch(branch);
+			itemBr.setItem(item);
+			itemBr.setUseItemConfiguration(true);
+			if (branchId == userProfile.getProfile().getBranch().getId()) {
+				itemBr.setEnable(true);
+			} else {
+				itemBr.setEnable(false);
+			}
+			itemBr.setAddOnItems(new ArrayList<Long>());
+			itemBr.setStockIn(BigDecimal.valueOf(0));
+			itemBr.setStockOut(BigDecimal.valueOf(0));
+			itemBr.setCosting(BigDecimal.valueOf(0));
+			itemBr.setWholePrice(BigDecimal.valueOf(0));
+			itemBr.setPrice(item.getPrice());
+			itemBr.setDiscount(item.getDiscount());
+			itemBr.setInvenQty(BigDecimal.valueOf(0));
+			itemBr.setPoint(creditView.getPoint());
+			itemBr.setReward((short) 0);
+			itemBr.setAddPercent((short) 0);
+			itemBranchRepository.save(itemBr);
+
+//	     else {
+//	      itemBranch.get().setPrice(item.getPrice());
+//	      itemBranch.get().setDiscount(item.getDiscount());
+//	      itemBranchRepository.save(itemBranch.get());
+//	      
+//	     }
+		});
+		return item;
+	}
+	@Transactional
+	 public ItemBranch updateCredit(Long itemId, String name) {
+	  return itemRepository.findById(itemId).map((item) -> {
+	   if (userProfile.getProfile().getCorporate().getId() != item.getItemType().getCorporate().getId()) {
+	    throw new UnauthorizedException("Item is unauthorized");
+	   }
+	   item.setName(name);
+	   item.setNameKh(name);
+	   itemRepository.save(item);
+	   return itemBranchRepository
+	     .findFirstByBranchIdAndItemIdOrderByIdDesc(userProfile.getProfile().getBranch().getId(), itemId)
+	     .orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
+	  }).orElseThrow(() -> new ResourceNotFoundException("Item does not exist"));
+	 }
 }

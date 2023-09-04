@@ -99,13 +99,13 @@ public class PersonService {
 			user.setEnable(true);
 			user.setTimeCount(0);
 			user.setResetDate(19910101);
-			user.setFirstLogin(true);
+			user.setFirstLogin(false);
 			user.setEnable(true);
 			user.setLock(false);
 			user.setTelephone(request.getUserName());
 			user.setUsername(request.getUserName());
 			user.setFullName("");
-			user.setOtp(true);
+			user.setOtp(false);
 			user.setPerson(person);
 			userRepository.save(user);
 			entityManager.flush();

@@ -1,5 +1,6 @@
 package com.spring.miniposbackend.controller.admin;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -7,6 +8,11 @@ import java.util.UUID;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -100,4 +106,20 @@ public class ItemTypeController {
 	public SuccessResponse getImagesList(@RequestBody List<ImageRequest> requestImages) {
 		return new SuccessResponse("00", "fetch Image List ItemType", itemTypeService.getImagesFromList(requestImages));
 	}
+	
+	@PostMapping("{itemtypeId}/uploadPhoto")
+	@PreAuthorize("hasAnyRole('SALE')")
+	public SuccessResponse uploadPhoto(@PathVariable Integer itemtypeId, @RequestParam("imageFile") MultipartFile file)
+			throws IOException {
+		return new SuccessResponse("00", "update Image Item", itemTypeService.uploadPhoto(itemtypeId, file));
+	}
+	@GetMapping("photo/{itemTypeId}")
+	 public ResponseEntity<byte[]> getImageAsResponseEntity(@PathVariable Integer itemTypeId) {
+	  HttpHeaders headers = new HttpHeaders();
+	  headers.setCacheControl(CacheControl.noCache().getHeaderValue());
+	  headers.setContentType(MediaType.IMAGE_PNG);
+	  ResponseEntity<byte[]> responseEntity = new ResponseEntity<>(itemTypeService.getFileData(itemTypeId), headers,
+	    HttpStatus.OK);
+	  return responseEntity;
+	 }
 }

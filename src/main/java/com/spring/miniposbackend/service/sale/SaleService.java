@@ -201,7 +201,7 @@ public class SaleService {
 			Double cashIn, Double change, Integer currencyId, Integer userId, boolean cancel, Optional<String> remark,
 			Optional<Double> serviceCharge, Optional<SpitBillItems> spitBillItems, Optional<Long> customerId,
 			Optional<Double> vat, Optional<Long> personId, Optional<Integer> transactionTypeId,
-			Optional<Short> discountPercentage) {
+			Optional<Double> discountPercentage) {
 		entityManager.clear();
 		User user = userProfile.getProfile().getUser();
 		Branch branch = userProfile.getProfile().getBranch();
@@ -292,7 +292,7 @@ public class SaleService {
 		if (discountPercentage.isPresent())
 			sale.setDiscountPercentage(discountPercentage.get());
 		else
-			sale.setDiscountPercentage((short) 0);
+			sale.setDiscountPercentage(0.00);
 		if (serviceCharge.isPresent())
 			sale.setServiceCharge(serviceCharge.get());
 		else
@@ -407,6 +407,7 @@ public class SaleService {
 			transaction.setPreviousBalance(previousBalance);
 			transaction.setAccount(account);
 			transaction.setTransactionType(transactionType);
+			saleResult.setTransactionType(transactionType);
 			transaction.setBranch(account.getBranch());
 			transaction.setCurrentBalance(account.getBalance());
 			transaction.setRemark(remark.get());
@@ -436,6 +437,10 @@ public class SaleService {
 				accountRepository.save(accountPoint);
 				transactionRepository.save(pointTran);
 			}
+		}
+		else {
+			TransactionType type = transactionTypeRepository.findById(6).orElse(null);
+			saleResult.setTransactionType(type);
 		}
 		saleRepository.save(saleResult);
 		entityManager.flush();
@@ -508,6 +513,7 @@ public class SaleService {
 		sale.setServiceCharge(request.getServiceCharge());
 		sale.setVat(request.getVat());
 		sale.setDiscountPercentage(request.getDiscountPercentage());
+		sale.setTransactionType(transactionType);
 		if (saleTemps.get(0).getBillNumber() == 0) {
 			Long receiptNum = receiptService.getBillNumberByBranchId(userProfile.getProfile().getBranch().getId());
 			sale.setBillNumber(receiptNum);

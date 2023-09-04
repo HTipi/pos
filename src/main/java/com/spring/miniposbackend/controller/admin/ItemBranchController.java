@@ -24,6 +24,7 @@ import com.spring.miniposbackend.modelview.ImageRequest;
 import com.spring.miniposbackend.modelview.ItemBranchCheckList;
 import com.spring.miniposbackend.modelview.ItemBranchUpdate;
 import com.spring.miniposbackend.modelview.PointRewardRequest;
+import com.spring.miniposbackend.modelview.account.PointAndRewardView;
 import com.spring.miniposbackend.service.admin.ItemBranchService;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
@@ -79,9 +80,9 @@ public class ItemBranchController {
 	@PatchMapping("{itemBranchId}/set-price")
 	@PreAuthorize("hasAnyRole('BRANCH','OWNER')")
 	public SuccessResponse setPrice(@PathVariable Long itemBranchId, @RequestParam BigDecimal price,
-			@RequestParam Short discount,@RequestParam BigDecimal costing) {
+			@RequestParam Short discount, @RequestParam BigDecimal costing, @RequestParam Optional<Short> point) {
 		return new SuccessResponse("00", "update Price Discount",
-				itemBranchService.setPrice(itemBranchId, price, discount,costing));
+				itemBranchService.setPrice(itemBranchId, price, discount, costing, point));
 	}
 
 	@PatchMapping("{itemBranchId}/set-discount")
@@ -89,16 +90,17 @@ public class ItemBranchController {
 	public ItemBranch setDiscount(@PathVariable Long itemBranchId, @RequestParam Short discount) {
 		return itemBranchService.setDiscount(itemBranchId, discount);
 	}
+
 	@PatchMapping("{itemBranchId}/disable")
 	@PreAuthorize("hasAnyRole('OWNER')")
 	public SuccessResponse disable(@PathVariable Long itemBranchId) {
-		return new SuccessResponse("00", "disable item",
-				itemBranchService.disable(itemBranchId));
+		return new SuccessResponse("00", "disable item", itemBranchService.disable(itemBranchId));
 	}
+
 	@PatchMapping("{itemBranchId}/set-inven")
 	@PreAuthorize("hasAnyRole('BRANCH','OWNER')")
 	public SuccessResponse setInvenQty(@PathVariable Long itemBranchId, @RequestParam double qty) {
-		return new SuccessResponse("00", "fetch Image Item List",  itemBranchService.setInvenQty(itemBranchId, qty));
+		return new SuccessResponse("00", "fetch Image Item List", itemBranchService.setInvenQty(itemBranchId, qty));
 	}
 	/*
 	 * Admin Controller
@@ -127,25 +129,41 @@ public class ItemBranchController {
 	public ItemBranch update(@PathVariable Long itemBranchId, @RequestBody ItemBranchUpdate itemBranch) {
 		return itemBranchService.update(itemBranchId, itemBranch);
 	}
-	
+
 	@PatchMapping("{itemBranchId}/update-add-on")
 	@PreAuthorize("hasAnyRole('OWNER')")
 	public SuccessResponse updateAddOn(@PathVariable Long itemBranchId, @RequestBody List<Long> addOnItems) {
-		return new SuccessResponse("00", "update Sub Item",
-				itemBranchService.updateAddOn(itemBranchId, addOnItems));
+		return new SuccessResponse("00", "update Sub Item", itemBranchService.updateAddOn(itemBranchId, addOnItems));
 	}
-	
+
 	@PatchMapping("{itemBranchId}/update-inventory")
 	@PreAuthorize("hasAnyRole('OWNER')")
 	public SuccessResponse updateAddOnInventory(@PathVariable Long itemBranchId, @RequestBody List<Long> addOnItems) {
 		return new SuccessResponse("00", "update Inventory Item",
 				itemBranchService.updateAddOnInventory(itemBranchId, addOnItems));
 	}
+
 	@PatchMapping("update-item-point")
-	  @PreAuthorize("hasAnyRole('BRANCH','OWNER')")
-	  public SuccessResponse updatePointAndReward(@RequestBody PointRewardRequest itemBranchView) {
-	    return new SuccessResponse("00", "update Point and Reward", itemBranchService.updatePointAndReward(itemBranchView));
-	  }
-	
+	@PreAuthorize("hasAnyRole('BRANCH','OWNER')")
+	public SuccessResponse updatePointAndReward(@RequestBody PointRewardRequest itemBranchView) {
+		return new SuccessResponse("00", "update Point and Reward",
+				itemBranchService.updatePointAndReward(itemBranchView));
+	}
+
+	@PatchMapping("{itemTypeId}/point-reward")
+	@PreAuthorize("hasAnyRole('BRANCH','OWNER')")
+	public SuccessResponse updatePointAndRewardByItemTypeId(@PathVariable Integer itemTypeId,
+			@RequestBody PointAndRewardView pointAndRewardView) {
+		return new SuccessResponse("00", "update Point and Reward",
+				itemBranchService.updateByItemTypeId(itemTypeId, pointAndRewardView));
+	}
+
+	@PutMapping("by-itemBranch-id/{itemBranchId}")
+	@PreAuthorize("hasAnyRole('BRANCH','OWNER')")
+	public SuccessResponse updatePointAndRewardById(@PathVariable Long itemBranchId,
+			@RequestBody PointAndRewardView pointAndRewardView) {
+		return new SuccessResponse("00", "update Point and Reward",
+				itemBranchService.updateById(itemBranchId, pointAndRewardView));
+	}
 
 }

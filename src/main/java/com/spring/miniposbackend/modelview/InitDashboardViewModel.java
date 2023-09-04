@@ -19,8 +19,8 @@ import lombok.Setter;
 @Setter
 public class InitDashboardViewModel {
 	private List<BranchSetting> settings;
-	//private List<ItemBranch> items;
-	//private List<ItemType> itemTypes;
+	private List<ItemBranch> items;
+	private List<ItemType> itemTypes;
 	private List<BranchCurrency> currencies;
 	//private List<ImageResponse> itemImages;
 	//private List<ImageResponse> itemTypeImages;
@@ -32,10 +32,10 @@ public class InitDashboardViewModel {
 
 	public InitDashboardViewModel(List<BranchSetting> settings, 
 			List<BranchCurrency> currencies,
-			UserResponse userResponse,List<Branch> branches) {
+			UserResponse userResponse,List<Branch> branches,List<ItemBranch> items, List<ItemType> itemTypes) {
 		this.settings = settings;
-		//this.items = items;
-		//this.itemTypes = itemTypes;
+		this.items = items;
+		this.itemTypes = itemTypes;
 		this.currencies = currencies;
 		//this.itemImages = imageItem;
 		//this.itemTypeImages = imageItemType;

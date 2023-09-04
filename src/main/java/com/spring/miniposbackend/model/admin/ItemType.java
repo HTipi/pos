@@ -60,4 +60,11 @@ public class ItemType extends AuditModel{
 	@Column(name = "enable", nullable = false)
     @ColumnDefault("false")
     private boolean enable;
+	
+	@Column(name = "credit", nullable = false)
+    @ColumnDefault("false")
+    private boolean credit;
+	
+	@Column(name = "photo",length = 64)
+    private String photo;
 }

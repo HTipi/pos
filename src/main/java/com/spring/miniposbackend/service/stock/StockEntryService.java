@@ -78,7 +78,7 @@ public class StockEntryService {
 			List<StockEntry> entries = new ArrayList<StockEntry>();
 			return userRepository.findById(userProfile.getProfile().getUser().getId()).map((user) -> {
 				stockEntries.forEach((stockEntryRequest) -> {
-					if (stockEntryRequest.getQuantity() < 1) {
+					if (stockEntryRequest.getQuantity() < 0.01) {
 						throw new ConflictException("Quantity must be greater than 0");
 					}
 					StockEntry stockEntry = itemBranchRepository.findById(stockEntryRequest.getItemId())

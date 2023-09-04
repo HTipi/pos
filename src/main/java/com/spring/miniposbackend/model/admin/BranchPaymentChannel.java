@@ -44,6 +44,6 @@ public class BranchPaymentChannel {
 	private boolean show;
 	@Column(name = "percentage", nullable = false)
 	@ColumnDefault("0")
-	private Short percentage;
+	private double percentage;
 
 }

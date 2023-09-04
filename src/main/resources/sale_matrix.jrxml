@@ -2,7 +2,7 @@
 <!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="sale_matrix" pageWidth="2400" pageHeight="500" orientation="Landscape" columnWidth="2360" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="b51cea4b-9523-486d-8734-53cadf7242a6">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="uat"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="New Data Adapter"/>
 	<style name="Crosstab_CH" mode="Opaque" backcolor="#F0F8FF">
 		<box>
 			<pen lineWidth="0.5" lineColor="#000000"/>
@@ -81,12 +81,14 @@ group by i.name_kh,i.id,t.name_kh,date_trunc('day',d.value_date) order by value_
 	<parameter name="end" class="java.util.Date"/>
 	<queryString language="SQL">
 		<![CDATA[select t.name_kh type_kh,i.name_kh,sum(quantity) quantities,sum(d.sub_total) total,
-date_trunc('day',d.value_date) value_date,ib.price
+date_trunc('day',d.value_date) value_date,ib.price,
+(select sum(service_charge) from sales where branch_id=$P{branchId} and reverse=false and date_trunc('day',end_date) between $P{start} and $P{end}) servicecharge,
+(select sum(vat) from sales where branch_id=$P{branchId} and reverse=false and date_trunc('day',end_date) between $P{start} and $P{end}) vat,
+(select sum(discount_amount+discount_sale_detail) from sales where branch_id=$P{branchId} and reverse=false and date_trunc('day',end_date) between $P{start} and $P{end}) discount
 from sale_details d inner join item_branches ib on d.item_branch_id=ib.id
-inner join sales s on s.id=d.sale_id
 inner join items i on i.id=ib.item_id
 inner join item_types t on t.id=i.item_type_id
-where ib.branch_id=$P{branchId} and d.reverse=false and s.reverse=false and date_trunc('day',d.value_date) between $P{start} and $P{end} and parent_sale_id is null 
+where ib.branch_id=$P{branchId} and d.reverse=false and date_trunc('day',d.value_date) between $P{start} and $P{end} and parent_sale_id is null 
 group by i.name_kh,i.id,t.name_kh,date_trunc('day',d.value_date),ib.price order by value_date]]>
 	</queryString>
 	<field name="type_kh" class="java.lang.String">
@@ -116,11 +118,26 @@ group by i.name_kh,i.id,t.name_kh,date_trunc('day',d.value_date),ib.price order 
 		<property name="com.jaspersoft.studio.field.label" value="price"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="item_branches"/>
 	</field>
+	<field name="servicecharge" class="java.lang.Double">
+		<property name="com.jaspersoft.studio.field.name" value="servicecharge"/>
+		<property name="com.jaspersoft.studio.field.label" value="servicecharge"/>
+	</field>
+	<field name="vat" class="java.lang.Double">
+		<property name="com.jaspersoft.studio.field.name" value="vat"/>
+		<property name="com.jaspersoft.studio.field.label" value="vat"/>
+	</field>
+	<field name="discount" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="discount"/>
+		<property name="com.jaspersoft.studio.field.label" value="discount"/>
+	</field>
+	<variable name="vat1" class="java.lang.Double" resetType="Column" calculation="First">
+		<variableExpression><![CDATA[$F{vat}]]></variableExpression>
+	</variable>
 	<background>
-		<band splitType="Stretch"/>
+		<band height="39" splitType="Stretch"/>
 	</background>
 	<pageHeader>
-		<band height="54">
+		<band height="17">
 			<textField>
 				<reportElement x="-20" y="-18" width="310" height="30" uuid="492b6294-f01e-46d6-9e8d-aecf5cab5a28"/>
 				<textElement>
@@ -130,10 +147,56 @@ group by i.name_kh,i.id,t.name_kh,date_trunc('day',d.value_date),ib.price order 
 			</textField>
 		</band>
 	</pageHeader>
+	<columnHeader>
+		<band height="102">
+			<textField pattern="#,##0.###;(#,##0.###-)">
+				<reportElement x="90" y="0" width="200" height="30" uuid="89b62d27-239e-4160-a5b2-90037d294198"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{servicecharge}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.###;(#,##0.###-)">
+				<reportElement x="90" y="60" width="200" height="30" uuid="a8e186f3-d028-47f3-98db-0b43078f30f5"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{discount}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.###;(#,##0.###-)">
+				<reportElement x="90" y="30" width="200" height="30" uuid="762c3d58-34a2-4910-93df-61852d774e01"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{vat}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="-20" y="0" width="110" height="30" uuid="bac15895-cc02-4a5d-9559-b91b69fb423b"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Service Charge:"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="-20" y="30" width="110" height="30" uuid="683859f6-fa13-46e4-b127-32a929f3a5e8"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["VAT:"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="-20" y="60" width="110" height="30" uuid="493c265e-5c10-4224-ad5d-5b529b5787bb"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Discount:"]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
 	<summary>
-		<band height="179" splitType="Stretch">
+		<band height="208" splitType="Stretch">
 			<crosstab>
-				<reportElement x="-20" y="-20" width="2330" height="198" uuid="dc296981-9833-4556-937b-a62e6ff62e93">
+				<reportElement x="-19" y="4" width="2330" height="198" uuid="dc296981-9833-4556-937b-a62e6ff62e93">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
 					<property name="com.jaspersoft.studio.crosstab.style.header" value="Crosstab_CH"/>
 					<property name="com.jaspersoft.studio.crosstab.style.group" value="Crosstab_CG"/>

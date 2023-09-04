@@ -1,6 +1,7 @@
 package com.spring.miniposbackend.repository.admin;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,4 +18,10 @@ public interface ItemTypeRepository extends JpaRepository<ItemType, Integer>{
 	
 //	@Query(value = "select t from ItemType t where t.item and t.enable= ?2")
 //	List<ItemType> findByBranchId(Integer branchId, boolean enable);
+	
+	@Query(value = "select t from ItemType t where t.corporate.id=?1 and t.credit = 'true'")
+	 ItemType findByBranchIdandCreditTrue(Integer corporateId);
+	
+	@Query(value = "select t from ItemType t where t.corporate.id=?1 and t.id=?2 and t.credit = 'false' ")
+	 Optional<ItemType> findBycorporateIdandId(Integer corporateId, Integer itemTypeId);
 }

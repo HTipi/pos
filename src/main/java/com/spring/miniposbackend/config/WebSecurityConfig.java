@@ -63,6 +63,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/authenticate").permitAll()
 				.antMatchers("/image/**").permitAll()
 				.antMatchers("/item/photo/**").permitAll()
+				.antMatchers("/item-type/photo/**").permitAll()
 				.antMatchers("/verifying").permitAll()
 				.antMatchers("/user/reset-firstlogin").permitAll()
 				.antMatchers("/user/verify-otpfirstlogin").permitAll()

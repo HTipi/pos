@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.model.admin.Item;
 import com.spring.miniposbackend.modelview.ImageRequest;
+import com.spring.miniposbackend.modelview.account.CreditView;
 import com.spring.miniposbackend.service.admin.ItemService;
 import com.spring.miniposbackend.util.UserProfileUtil;
 
@@ -125,4 +126,15 @@ public class ItemController {
 //	public SuccessResponse updatexcel(@RequestParam("file") MultipartFile file)throws SQLException, IOException {
 //		return new SuccessResponse("00", "Update Item", itemService.updatexcel(file));
 //	}
+	@PostMapping("createCredit")
+	@PreAuthorize("hasAnyRole('OWNER','BRANCH')")
+	 public SuccessResponse createCredit(@RequestBody CreditView creditView) {
+	  return new SuccessResponse("00", "Create Item", itemService.createCredit(creditView));
+	 }
+	
+	@PatchMapping("updateCredit/{itemId}")
+	 @PreAuthorize("hasAnyRole('OWNER','BRANCH')")
+	 public SuccessResponse updateCredit(@PathVariable Long itemId, @RequestParam String name) {
+	  return new SuccessResponse("00", "update Item", itemService.updateCredit(itemId,name));
+	 }
 }

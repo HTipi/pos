@@ -30,6 +30,7 @@ import com.spring.miniposbackend.model.admin.PaymentChannel;
 import com.spring.miniposbackend.model.admin.User;
 import com.spring.miniposbackend.model.customer.Customer;
 import com.spring.miniposbackend.model.transaction.TransactionSale;
+import com.spring.miniposbackend.model.transaction.TransactionType;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -145,10 +146,16 @@ public class Sale extends AuditModel {
 	@Min(0)
 	@Max(100)
 	@ColumnDefault("0")
-	private Short discountPercentage;
+	private Double discountPercentage;
 
 	@OneToMany(mappedBy = "sale")
 	@JsonIgnore
 	private List<TransactionSale> transactionSale;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "transaction_type_id", nullable = true)
+	@JsonIgnore
+	private TransactionType transactionType;
+
 
 }

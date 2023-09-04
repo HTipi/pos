@@ -1,10 +1,14 @@
 package com.spring.miniposbackend.service.admin;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -212,6 +216,7 @@ public class ItemTypeService {
 			return itemTypeRepository.save(itemType);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
 	}
+
 	public ItemType invisible(Integer itemTypeId) {
 		return itemTypeRepository.findById(itemTypeId).map(itemType -> {
 			if (userProfile.getProfile().getCorporate().getId() != itemType.getCorporate().getId()) {
@@ -220,6 +225,55 @@ public class ItemTypeService {
 			itemType.setVisible(!itemType.isVisible());
 			return itemTypeRepository.save(itemType);
 		}).orElseThrow(() -> new ResourceNotFoundException("Item type does not exist"));
+	}
+
+	@Transactional
+	public ItemType uploadPhoto(Integer itemtypeId, MultipartFile file) throws IOException {
+		return itemTypeRepository.findById(itemtypeId).map(itemtype -> {
+			if (file.isEmpty()) {
+				throw new ResourceNotFoundException("File content does not exist");
+			}
+			try {
+				String baseLocation = imagePath;
+				String fileName = imageUtil.uploadImage(baseLocation, itemtypeId.toString(), file);
+				itemtype.setPhoto(fileName);
+				return itemTypeRepository.save(itemtype);
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+				throw new ConflictException(e.getMessage());
+			}
+		}).orElseThrow(() -> new ResourceNotFoundException("ItemType does not exist"));
+	}
+
+	public byte[] getFileData(Integer itemTypeId) {
+		return itemTypeRepository.findById(itemTypeId).map(itemType -> {
+			try {
+				return get(imagePath + "/" + itemTypeId + ".png");
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+				throw new ConflictException(e.getMessage());
+			}
+		}).orElseThrow(() -> new ResourceNotFoundException("ItemType does not exist"));
+	}
+
+	public byte[] get(String filePath) throws Exception {
+		if (filePath.isEmpty()) {
+			return null;
+		}
+		try {
+			File file = new File(filePath);
+			byte[] bArray = new byte[(int) file.length()];
+			FileInputStream fis = new FileInputStream(file);
+			fis.read(bArray);
+			fis.close();
+			return bArray;
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println(e.getMessage());
+			throw new Exception();
+
+		}
+
 	}
 
 //	public ItemType setEnable(Integer itemTypeId, boolean enable) {

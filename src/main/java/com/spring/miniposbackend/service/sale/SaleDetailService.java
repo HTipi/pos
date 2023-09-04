@@ -130,7 +130,7 @@ public class SaleDetailService {
 						+ "group by parent.item_branch_id,parent.name_kh,child.name_kh,item_type_id,is_stock,stock_in,stock_out",
 						mapSqlParameterSource,
 						(rs, rowNum) -> new SaleDetailTransaction(rs.getLong("item_id"), rs.getString("item_name"),
-								rs.getDouble("quantity"), rs.getDouble("sub_total"), rs.getDouble("discount_total"),rs.getInt("item_type_id"),rs.getBoolean("is_stock"),rs.getInt("stocks")));
+								rs.getDouble("quantity"), rs.getDouble("sub_total"), rs.getDouble("discount_total"),rs.getInt("item_type_id"),rs.getBoolean("is_stock"),rs.getDouble("stocks")));
 		summary.setDetails(details);
 		return summary;
 

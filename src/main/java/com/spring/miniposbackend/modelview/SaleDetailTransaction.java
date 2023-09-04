@@ -14,9 +14,9 @@ public class SaleDetailTransaction {
 	private Double discountTotal;
 	private Integer itemTypeId;
 	private boolean isStock;
-	private Integer stocks;
+	private double stocks;
 
-	public SaleDetailTransaction(Long itemId, String itemName, double quanity, Double subTotal, Double discountTotal,Integer itemTypeId,boolean isStock,Integer stocks) {
+	public SaleDetailTransaction(Long itemId, String itemName, double quanity, Double subTotal, Double discountTotal,Integer itemTypeId,boolean isStock,double stocks) {
 		this.itemId = itemId;
 		this.itemName = itemName;
 		this.quantity = quanity;

@@ -12,5 +12,6 @@ public class PrinterRequest {
 	private boolean paymentPrinter;
 	private String name;
 	private boolean separatePrinter;
+	private String type;
 
 }

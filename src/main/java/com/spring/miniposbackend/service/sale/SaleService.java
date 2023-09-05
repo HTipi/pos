@@ -468,7 +468,6 @@ public class SaleService {
 		transaction.setAccount(account);
 		transaction.setTransactionType(transactionType);
 		transaction.setBranch(account.getBranch());
-		transaction.setCurrentBalance(account.getBalance());
 		transaction.setRemark(request.getRemark());
 		transaction.setUser(user);
 		transaction.setValueDate(new Date());
@@ -605,6 +604,7 @@ public class SaleService {
 		saleResult.setReceiptNumber(receiptNum);
 		saleRepository.save(saleResult);
 		accountRepository.save(account);
+		transaction.setCurrentBalance(account.getBalance());
 		transactionRepository.save(transaction);
 		entityManager.flush();
 		entityManager.clear();

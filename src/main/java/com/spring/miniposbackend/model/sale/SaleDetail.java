@@ -292,8 +292,22 @@ public class SaleDetail extends AuditModel {
 	public long getSaleIds() {
 		return sale.getId();
 	}
+
 	public double getDiscountPercentageBill() {
-		
+
 		return sale.getDiscountPercentage();
+	}
+
+	public boolean getStock() {
+
+		return itemBranch.getItem().isStock();
+	}
+
+	public short getReward() {
+		return itemBranch.getReward();
+	}
+
+	public String getType() {
+		return itemBranch.getType();
 	}
 }

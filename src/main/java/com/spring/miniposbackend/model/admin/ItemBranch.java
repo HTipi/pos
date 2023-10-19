@@ -219,5 +219,8 @@ public class ItemBranch extends AuditModel {
 			return "";
 		return item.getBarCode();
 	}
+	public Integer getItemType_Id() {
+		return item.getItemType().getId();
+	}
 
 }

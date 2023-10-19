@@ -45,5 +45,12 @@ public class BranchPaymentChannel {
 	@Column(name = "percentage", nullable = false)
 	@ColumnDefault("0")
 	private double percentage;
+	
+	@Column(name = "sort", nullable = true)
+	@ColumnDefault("0")
+	private int sort;
+	
+	@Column(name = "qr", nullable = true)
+	private String qr;
 
 }

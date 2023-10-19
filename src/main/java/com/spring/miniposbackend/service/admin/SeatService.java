@@ -41,6 +41,8 @@ public class SeatService {
 			seat.setEnable(true);
 			seat.setName(requestItem.getName());
 			seat.setSequence(requestItem.getSequence());
+			seat.setFree(true);
+			seat.setPrinted(false);
 			return seatRepository.save(seat);
 		}).orElseThrow(() -> new ResourceNotFoundException("user does not exist", "01"));
 

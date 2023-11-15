@@ -3,6 +3,7 @@ package com.spring.miniposbackend.controller.admin;
 import com.spring.miniposbackend.model.SuccessResponse;
 import com.spring.miniposbackend.model.admin.Branch;
 import com.spring.miniposbackend.model.admin.UserRole;
+import com.spring.miniposbackend.modelview.BranchView;
 import com.spring.miniposbackend.modelview.ImageResponse;
 //import com.spring.miniposbackend.model.admin.Branch;
 import com.spring.miniposbackend.service.admin.BranchService;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 //import org.springframework.web.bind.annotation.*;
@@ -37,10 +40,11 @@ public class BranchController {
 	private UserProfileUtil userProfile;
 
 	@PostMapping("{branchId}/upload")
-	@PreAuthorize("hasAnyRole('OWNER')")
-	public Branch uploadImage(@PathVariable Integer branchId, @RequestParam("imageFile") MultipartFile file) {
-		return branchService.uploadImage(branchId, file);
-	}
+	 @PreAuthorize("hasAnyRole('OWNER')")
+	 public SuccessResponse uploadImage(@PathVariable Integer branchId, @RequestParam("imageFile") MultipartFile file) {
+	  return new SuccessResponse("00", "Branch update image successful",branchService.uploadImage(branchId, file));
+	 }
+	 
 
 	@GetMapping("{branchId}/get-image")
 	@PreAuthorize("hasAnyRole('OWNER')")
@@ -65,6 +69,19 @@ public class BranchController {
 			return new SuccessResponse("00", "Branch Retrieve",
 					branchService.showByCorpoateId(userProfile.getProfile().getCorporate().getId(), Optional.of(true)));
 	}
+
+    @GetMapping("show-activebranch")
+    public SuccessResponse showAllActiveMainBranch(){
+   
+    	return new SuccessResponse("00", "get Successful",branchService.showAllActive());
+    }
+
+    @PutMapping("update/{branchId}")
+    @PreAuthorize("hasAnyRole('OWNER')")
+    public SuccessResponse update(@PathVariable Integer branchId, @RequestBody BranchView branchView){
+     return new SuccessResponse("00", "Branch Update Successful",branchService.update(branchId, branchView));
+//        return branchService.update(branchId, branchView);
+    }
 
 //    @GetMapping
 //    public List<Branch> shows() {

@@ -1,6 +1,7 @@
 package com.spring.miniposbackend.controller.sale;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -91,8 +92,15 @@ public class SaleController {
 	}
 	@PostMapping("byQR")
 	@PreAuthorize("hasAnyRole('CUSTOMER')")
-	public SuccessResponse createByQR(@RequestBody SalePaymentRequest request,@RequestParam UUID qr) throws IOException {
-		List list = saleService.createByQr(request,qr);
+	public SuccessResponse createByQR(@RequestBody SalePaymentRequest request,@RequestParam UUID qr) throws IOException,ParseException {
+		List list;
+		//PACKAGE
+		if(request.getTransactionTypeId() == 7)
+		{
+			list = saleService.packagesByQr(request,qr);
+		}
+		else
+		list = saleService.createByQr(request,qr);
 		Object obj = list.get(0);
 		if (obj instanceof SaleDetail) {
 			return new SuccessResponse("00", "Update list", list);

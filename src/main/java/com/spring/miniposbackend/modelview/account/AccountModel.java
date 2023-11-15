@@ -5,6 +5,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.account.Account;
 import com.spring.miniposbackend.model.customer.Person;
+import com.spring.miniposbackend.modelview.packages.PackageView;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -22,13 +23,15 @@ public class AccountModel {
 	private AccountCreditPoint point;
 	private Person person;
 	private List<Integer> branchAdvertiseId;
+	private List<PackageView> packages;
 
-	public AccountModel(AccountCreditPoint credit,AccountCreditPoint point,Account account, byte[] logo,List<Integer> branchAdvertiseId) {
+	public AccountModel(AccountCreditPoint credit,AccountCreditPoint point,Account account, byte[] logo,List<Integer> branchAdvertiseId,List<PackageView> packages) {
 		this.credit = credit;
 		this.point = point;
 		this.account = account;
 		this.logo=logo;
 		this.branchAdvertiseId = branchAdvertiseId;
+		this.packages = packages;
 		}
 	
 

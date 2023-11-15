@@ -89,18 +89,18 @@ public class BranchPaymentChannelService {
 			channel = new BranchPaymentChannel();
 				if(paymentChannelView.get(i).isEnable()) {
 					channel.setPercentage(paymentChannelView.get(i).getPercentage());
-					if(paymentChannelView.get(i).getPercentage() > 0) {
-						channel.setShow(!paymentChannelView.get(i).isShow());
-					}else {
-						 channel.setShow(paymentChannelView.get(i).isShow());
-					}
+//					if(paymentChannelView.get(i).getPercentage() > 0) {
+//						channel.setShow(paymentChannelView.get(i).isShow());
+//					}else {
+//						 channel.setShow(paymentChannelView.get(i).isShow());
+//					}
+					channel.setShow(paymentChannelView.get(i).isShow());
 					PaymentChannel allchannel = paymentChannelRepository.findById(paymentChannelView.get(i).getPaymentChannelId())
 							.orElseThrow(()-> new ResourceNotFoundException("This Channel doesn't exit","01"));
 					BranchPaymentIdentity branchPaymentIdentity = new BranchPaymentIdentity();
 					branchPaymentIdentity.setBranch(userProfile.getProfile().getBranch());
 					branchPaymentIdentity.setChannel(allchannel);
 					channel.setBranchPaymentIdentity(branchPaymentIdentity);
-						
 					channel.setSort(paymentChannelView.get(i).getSort());
 					branchPaymentChannelRepository.save(channel);
 				}

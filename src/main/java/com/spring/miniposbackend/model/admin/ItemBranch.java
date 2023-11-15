@@ -2,6 +2,7 @@ package com.spring.miniposbackend.model.admin;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,6 +25,7 @@ import org.hibernate.annotations.TypeDef;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.spring.miniposbackend.model.AuditModel;
+import com.spring.miniposbackend.modelview.SubItemView;
 import com.vladmihalcea.hibernate.type.array.ListArrayType;
 
 import lombok.Getter;
@@ -63,14 +65,14 @@ public class ItemBranch extends AuditModel {
 
 	@Column(name = "price", nullable = false, precision = 10, scale = 2)
 	private BigDecimal price;
-	
+
 	@Column(name = "costing", nullable = true, precision = 10, scale = 2)
 	@ColumnDefault("0")
-    private BigDecimal costing;
-	
+	private BigDecimal costing;
+
 	@Column(name = "whole_price", nullable = true, precision = 10, scale = 2)
 	@ColumnDefault("0")
-    private BigDecimal wholePrice;
+	private BigDecimal wholePrice;
 
 	@Column(name = "discount", nullable = false)
 	@Min(0)
@@ -89,20 +91,19 @@ public class ItemBranch extends AuditModel {
 	@Type(type = "list-array")
 	@Column(name = "add_on", columnDefinition = "bigint[]")
 	private List<Long> addOnItems;
-	
+
 	@Type(type = "list-array")
 	@Column(name = "add_on_inven", columnDefinition = "bigint[]")
 	private List<Long> addOnInven;
-	
-	
-	@Column(name = "inven_qty", nullable = true,precision = 10, scale = 2)
+
+	@Column(name = "inven_qty", nullable = true, precision = 10, scale = 2)
 	@ColumnDefault("1")
 	private BigDecimal invenQty;
-	
+
 	@JsonIgnore
 	@OneToMany(mappedBy = "itemBranchPromotionIdentity.itemBranch", fetch = FetchType.LAZY)
 	List<ItemBranchPromotion> itemBranchPromotions;
-	
+
 	@Column(name = "point", nullable = true)
 	@ColumnDefault("0")
 	private Short point;
@@ -110,13 +111,20 @@ public class ItemBranch extends AuditModel {
 	@Column(name = "reward", nullable = true)
 	@ColumnDefault("0")
 	private Short reward;
-	
+
 	@Column(name = "add_percent", nullable = true)
 	@Min(0)
 	@Max(100)
 	@ColumnDefault("0")
 	private Short addPercent;
-	
+
+	@Type(type = "jsonb")
+	@Column(name = "add_on_packages", columnDefinition = "jsonb", nullable = true)
+	private List<Map<String, Object>> addOnPackages;
+
+	@Type(type = "jsonb")
+	@Column(name = "add_on_sub", columnDefinition = "jsonb", nullable = true)
+	private List<SubItemView> addOnItem;
 
 	public Long getId() {
 		return id;
@@ -206,19 +214,23 @@ public class ItemBranch extends AuditModel {
 	public String getPhoto() {
 		return item.getPhoto();
 	}
+
 	public boolean getVisible() {
-		
+
 		return item.getItemType().isVisible();
 	}
-	public List<ItemBranchPromotion> getItemBranchPromotion(){
-		
+
+	public List<ItemBranchPromotion> getItemBranchPromotion() {
+
 		return itemBranchPromotions;
 	}
+
 	public String getBarCode() {
-		if(item.getBarCode() == null)
+		if (item.getBarCode() == null)
 			return "";
 		return item.getBarCode();
 	}
+
 	public Integer getItemType_Id() {
 		return item.getItemType().getId();
 	}

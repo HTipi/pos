@@ -24,6 +24,7 @@ import com.spring.miniposbackend.modelview.ImageRequest;
 import com.spring.miniposbackend.modelview.ItemBranchCheckList;
 import com.spring.miniposbackend.modelview.ItemBranchUpdate;
 import com.spring.miniposbackend.modelview.PointRewardRequest;
+import com.spring.miniposbackend.modelview.SubItemView;
 import com.spring.miniposbackend.modelview.account.PointAndRewardView;
 import com.spring.miniposbackend.service.admin.ItemBranchService;
 import com.spring.miniposbackend.util.UserProfileUtil;
@@ -165,5 +166,13 @@ public class ItemBranchController {
 		return new SuccessResponse("00", "update Point and Reward",
 				itemBranchService.updateById(itemBranchId, pointAndRewardView));
 	}
+	
+	@PutMapping("subitem/{itemBranchId}")
+	 @PreAuthorize("hasAnyRole('BRANCH','OWNER')")
+	 public SuccessResponse createSubItem(@PathVariable Long itemBranchId,
+	   @RequestBody List<SubItemView> subItemView) throws Exception {
+	  return new SuccessResponse("00", "Add subItem successful",
+	    itemBranchService.subItem(itemBranchId, subItemView));
+	 }
 
 }

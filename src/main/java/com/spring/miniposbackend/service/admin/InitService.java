@@ -20,6 +20,7 @@ import com.spring.miniposbackend.model.admin.ItemType;
 import com.spring.miniposbackend.model.admin.Printer;
 import com.spring.miniposbackend.model.admin.User;
 import com.spring.miniposbackend.model.admin.UserRole;
+import com.spring.miniposbackend.model.packages.PackageBranch;
 import com.spring.miniposbackend.model.sale.Invoice;
 import com.spring.miniposbackend.model.security.ClientApplication;
 import com.spring.miniposbackend.model.transaction.TransactionType;
@@ -29,6 +30,9 @@ import com.spring.miniposbackend.modelview.InitPointViewModel;
 import com.spring.miniposbackend.modelview.InitViewModel;
 import com.spring.miniposbackend.modelview.UserResponse;
 import com.spring.miniposbackend.modelview.account.AccountModel;
+import com.spring.miniposbackend.modelview.packages.PackageCountView;
+import com.spring.miniposbackend.modelview.packages.PackageListView;
+import com.spring.miniposbackend.modelview.packages.PackageView;
 import com.spring.miniposbackend.repository.admin.BranchAdveriseRepository;
 import com.spring.miniposbackend.repository.admin.BranchCurrencyRepository;
 import com.spring.miniposbackend.repository.admin.BranchPaymentChannelRepository;
@@ -40,6 +44,7 @@ import com.spring.miniposbackend.repository.admin.ItemTypeRepository;
 import com.spring.miniposbackend.repository.admin.PrinterRepository;
 import com.spring.miniposbackend.repository.admin.UserRepository;
 import com.spring.miniposbackend.repository.admin.UserRoleRepository;
+import com.spring.miniposbackend.repository.packages.PackageBranchRepository;
 import com.spring.miniposbackend.repository.sale.InvoiceRepository;
 import com.spring.miniposbackend.repository.security.ClientApplicationRepository;
 import com.spring.miniposbackend.repository.transaction.TransactionTypeRepository;
@@ -86,6 +91,8 @@ public class InitService {
 	private BranchAdveriseRepository branchAdvertiseRepository;
 	@Autowired
 	private CorporateRepository corporateRepository;
+	@Autowired
+	private PackageBranchRepository packageBranchRepository;
 
 	@Autowired
 	private ImageUtil imageUtil;
@@ -171,6 +178,8 @@ public class InitService {
 			account.setAccount(accountService.acc(branch));
 			account.setLogo(logo);
 			account.setBranchAdvertiseId(branchAdvertise);
+			List<PackageView> packges = getPackages(account.getCredit().getAccountId());
+			account.setPackages(packges);
 			return new InitPointViewModel(user, account, currency, types);
 
 		} catch (Exception e) {
@@ -332,6 +341,56 @@ public class InitService {
 
 		return branchRepository.findByCorporateId(corporateId);
 
+	}
+	private List<PackageView> getPackages(long accountId){
+		List<PackageView> packageViewList = new ArrayList<>();
+		List<PackageCountView> packageCounts  = packageBranchRepository.findDistinctPackagesByAccountId(accountId);
+		for (int i = 0; i < packageCounts.size(); i++) {
+			long packageId = packageCounts.get(i).getPackageId();
+			long saleId = packageCounts.get(i).getSaleId();
+			List<PackageBranch> packageBranches = packageBranchRepository.findPackageByAccountId(accountId,packageId,saleId);
+			List<PackageListView> list = new ArrayList<>();
+			PackageView packageView = new PackageView();
+			
+			for (int j = 0; j < packageBranches.size(); j++) {
+				
+				if(j == 0)
+				{
+					packageView.setPhotoId(packageBranches.get(j).getPackages().getItem_Id());
+					packageView.setPackageKh(packageBranches.get(j).getPackages().getNameKh());
+					packageView.setPackageName(packageBranches.get(j).getPackages().getName());
+					packageView.setPackgeId(packageBranches.get(j).getPackages().getId());
+					packageView.setSaleId(packageBranches.get(j).getSale().getId());
+					PackageListView item = new PackageListView();
+					item.setDiscount(0);
+					item.setExpiryDate(packageBranches.get(j).getExpiryDate());
+					item.setQty(packageBranches.get(j).getQty());
+					item.setItemBranchId(packageBranches.get(j).getItemBranch().getId());
+					item.setPhotoId(packageBranches.get(j).getItemBranch().getItem_Id());
+					item.setName(packageBranches.get(j).getItemBranch().getName());
+					item.setNameKh(packageBranches.get(j).getItemBranch().getNameKh());
+					item.setPrice(packageBranches.get(j).getItemBranch().getPrice().doubleValue());
+					list.add(item);
+					
+				}
+				else {
+					PackageListView item = new PackageListView();
+					item.setDiscount(0);
+					item.setExpiryDate(packageBranches.get(j).getExpiryDate());
+					item.setQty(packageBranches.get(j).getQty());
+					item.setItemBranchId(packageBranches.get(j).getItemBranch().getId());
+					item.setPhotoId(packageBranches.get(j).getItemBranch().getItem_Id());
+					item.setName(packageBranches.get(j).getItemBranch().getName());
+					item.setNameKh(packageBranches.get(j).getItemBranch().getNameKh());
+					item.setPrice(packageBranches.get(j).getItemBranch().getPrice().doubleValue());
+					list.add(item);
+				}
+			}
+			packageView.setPackages(list);
+			packageViewList.add(packageView);
+		}
+		return packageViewList;
+		
 	}
 
 }

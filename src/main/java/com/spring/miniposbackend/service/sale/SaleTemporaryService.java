@@ -739,6 +739,7 @@ public class SaleTemporaryService {
 				saleTmp.setUserEdit(user);
 				saleTmp.setAddPercent(addPercentage);
 				saleTmp.setAddPromo(requestItem.getAddPromo());
+				saleTmp.setRemark(requestItem.getRemark());
 				if (invoice.isPresent()) {
 					saleTmp.setInvoice(invoice.get());
 				} else if (seat.isPresent()) {

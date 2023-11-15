@@ -2,7 +2,9 @@ package com.spring.miniposbackend.service.admin;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
@@ -23,7 +25,10 @@ import com.spring.miniposbackend.modelview.ImageResponse;
 import com.spring.miniposbackend.modelview.ItemBranchCheckList;
 import com.spring.miniposbackend.modelview.ItemBranchUpdate;
 import com.spring.miniposbackend.modelview.PointRewardRequest;
+import com.spring.miniposbackend.modelview.SubItemView;
 import com.spring.miniposbackend.modelview.account.PointAndRewardView;
+import com.spring.miniposbackend.modelview.packages.PackageItemView;
+import com.spring.miniposbackend.modelview.packages.PackageListView;
 import com.spring.miniposbackend.repository.admin.BranchRepository;
 import com.spring.miniposbackend.repository.admin.ItemBranchRepository;
 import com.spring.miniposbackend.repository.admin.ItemRepository;
@@ -331,4 +336,98 @@ public class ItemBranchService {
 		itemBranchRepository.save(itemBranch);
 		return itemBranch;
 	}
+
+	@Transactional
+	public List<Map<String, Object>> createjsonb(Long id, List<PackageItemView> packageItem) throws Exception {
+		try {
+
+			List<Map<String, Object>> itembranch = new ArrayList<>();
+			ItemBranch itembr = itemBranchRepository
+					.findByBranchIdandId(userProfile.getProfile().getBranch().getId(), id)
+					.orElseThrow(() -> new ResourceNotFoundException("This item is not package", "01"));
+
+			List<Map<String, Object>> list = new ArrayList<>();
+			for (int i = 0; i < packageItem.size(); i++) {
+				ItemBranch ibranch = itemBranchRepository.findById(packageItem.get(i).getItemBranchId())
+						.orElseThrow(() -> new ResourceNotFoundException("This item does not exit", "01"));
+				Map<String, Object> json = new HashMap<String, Object>();
+				json.put("id", ibranch.getId());
+				// json.put("Discount", packageItem.get(i).getDiscount());
+				json.put("qty", packageItem.get(i).getQty());
+				json.put("freq", packageItem.get(i).getFreq());
+				list.add(json);
+				itembranch.add(json);
+
+			}
+			itembr.setAddOnPackages(itembranch);
+			itemBranchRepository.save(itembr);
+			return itembranch;
+		} catch (Exception e) {
+			throw new Exception(e.getMessage());
+		}
+	}
+
+	@Transactional
+	public ItemBranch updateItemPackage(long itemPackageId, List<PackageItemView> itemBranchxItemPackage)
+			throws Exception {
+		try {
+			List<Map<String, Object>> itembranch = new ArrayList<>();
+
+			ItemBranch ibranch = itemBranchRepository
+					.findByBranchIdandId(userProfile.getProfile().getBranch().getId(), itemPackageId)
+					.orElseThrow(() -> new ResourceNotFoundException("This itempackage doesn't exit", "01"));
+
+			if (ibranch.getAddOnPackages() == null || ibranch.getAddOnPackages().size() < 0) {
+				throw new ResourceNotFoundException("This package doesn't have item yet please create item first",
+						"02");
+			}
+
+			List<Map<String, Object>> list = new ArrayList<>();
+			for (int j = 0; j < itemBranchxItemPackage.size(); j++) {
+				Map<String, Object> json = new HashMap<String, Object>();
+				ItemBranch ibId = itemBranchRepository.findById(itemBranchxItemPackage.get(j).getItemBranchId())
+						.orElseThrow(
+								() -> new ResourceNotFoundException("This item doesn't exit in your branch", "03"));
+				json.put("id", ibId.getId());
+				// json.put("Discount", packageItem.get(i).getDiscount());
+				json.put("qty", itemBranchxItemPackage.get(j).getQty());
+				json.put("freq", itemBranchxItemPackage.get(j).getFreq());
+				list.add(json);
+				itembranch.add(json);
+
+			}
+			ibranch.setAddOnPackages(itembranch);
+			itemBranchRepository.save(ibranch);
+			return ibranch;
+		} catch (Exception e) {
+			throw new Exception(e.getMessage());
+		}
+
+	}
+	@Transactional
+	 public List<SubItemView> subItem(Long id, List<SubItemView> subItemView) throws Exception {
+	  try {
+	   ItemBranch itemBranch = itemBranchRepository.findById(id)
+	     .orElseThrow(() -> new ResourceNotFoundException("This MainItem does not exit", "01"));
+	   if (itemBranch.getBranch().getId() != userProfile.getProfile().getBranch().getId()) {
+	    
+	    throw new UnauthorizedException("Branch is unauthorized","03 ");
+	   }
+	   for (int i = 0; i < subItemView.size(); i++) {
+	    ItemBranch ibranch = itemBranchRepository.findById(subItemView.get(i).getId())
+	      .orElseThrow(() -> new ResourceNotFoundException("This SubItem does not exit", "02"));
+//	    Map<String, Object> json = new HashMap<String, Object>();
+//	    json.put("id", ibranch.getId());
+//	    json.put("required", subItemView.get(i).isRequired());
+//	    json.put("sort", subItemView.get(i).getSort());
+//	    listMap.add(json);
+
+	   }
+	   itemBranch.setAddOnItem(subItemView);;
+	   itemBranchRepository.save(itemBranch);
+	   return subItemView;
+	  } catch (Exception e) {
+	   throw new Exception(e.getMessage());
+	  }
+	 }
 }

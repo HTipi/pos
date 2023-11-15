@@ -55,4 +55,8 @@ public class Corporate extends AuditModel {
     @Column(name = "enable", nullable = false)
     @ColumnDefault("true")
     private boolean enable;
+    
+    @Column(name = "centralized", nullable = true)
+    @ColumnDefault("false")
+    private boolean centralized;
 }

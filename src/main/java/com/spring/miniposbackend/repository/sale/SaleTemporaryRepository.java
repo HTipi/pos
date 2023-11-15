@@ -152,5 +152,7 @@ public interface SaleTemporaryRepository extends JpaRepository<SaleTemporary, Lo
 	
 	@Query(value = "select s from SaleTemporary s where s.qrnumber = ?1 and s.cancel = false and s.parentSaleTemporary is null") //update
 	List<SaleTemporary> findByQrnumber(UUID qrnumber);
-	
+	@Modifying
+	@Query(value = "delete from Sales_temp where qr_num=?1", nativeQuery = true)
+	void deleteByQr(UUID qrnumber);
 }

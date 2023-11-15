@@ -100,4 +100,6 @@ public class Item extends AuditModel{
 	public Long getItem_Id() {
 		return id;
 	}
+	@Transient
+	private short point;
 }

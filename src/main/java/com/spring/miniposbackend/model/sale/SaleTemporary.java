@@ -140,6 +140,9 @@ public class SaleTemporary extends AuditModel {
 	@Max(100)
 	@ColumnDefault("0")
 	private Short addPercent;
+	
+	@Column(name = "remark", nullable = true)
+	private String remark;
 
 	public List<Long> getAddOnItems() {
 		return itemBranch.getAddOnItems();

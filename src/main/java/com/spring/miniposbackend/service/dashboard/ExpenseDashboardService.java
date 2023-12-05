@@ -52,9 +52,9 @@ public class ExpenseDashboardService {
 	}
 
 	public List<ExpenseTypeSummaryDetail> expenseTypeSummaryByBranchId(Integer branchId, Date startDate, Date endDate) {
-		if (userProfile.getProfile().getBranch().getId() != branchId) {
-			throw new UnauthorizedException("You are unauthorized");
-		}
+//		if (userProfile.getProfile().getBranch().getId() != branchId) {
+//			throw new UnauthorizedException("You are unauthorized");
+//		}
 		MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource();
 		mapSqlParameterSource.addValue("startDate", startDate);
 		mapSqlParameterSource.addValue("endDate", endDate);

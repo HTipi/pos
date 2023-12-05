@@ -28,19 +28,42 @@ public class ItemBranchPromotion {
 	public BranchPromotion getBranchPromotion() {
 		return itemBranchPromotionIdentity.getBranchPromotion();
 	}
-	
+
 	public Integer getBranchPromotionId() {
 		return itemBranchPromotionIdentity.getBranchPromotion().getId();
 	}
-	
+
 	public String getPromotionCode() {
 		return itemBranchPromotionIdentity.getBranchPromotion().getCode();
 	}
-	
+
 	public Short getPromotionDiscount() {
 		return itemBranchPromotionIdentity.getBranchPromotion().getDiscount();
 	}
+
 	public String getPromotionName() {
-		return itemBranchPromotionIdentity.getBranchPromotion().getPromotion().getName();
+		return itemBranchPromotionIdentity.getBranchPromotion().getName();
 	}
+
+	public String getNameKh() {
+		return itemBranchPromotionIdentity.getBranchPromotion().getNameKh();
+	}
+
+	public boolean getEnable() {
+		return itemBranchPromotionIdentity.getBranchPromotion().isEnable();
+	}
+
+//	@JsonIgnore
+//	public ItemType getItemType() {
+//		return itemBranchPromotionIdentity.getItemType();
+//	}
+
+	public Long getItemBranchId() {
+		return itemBranchPromotionIdentity.getItemBranch().getId();
+	}
+
+//	public Integer getItemTypeId() {
+//		return itemBranchPromotionIdentity.getItemType().getId();
+//	}
+
 }

@@ -778,6 +778,7 @@ public class SaleTemporaryService {
 				saleTmp.setCancel(false);
 				saleTmp.setBillNumber((long) 0);
 				saleTmp.setUser(user);
+				saleTmp.setRemark(requestItem.getRemark());
 				saleTmp.setUserEdit(user);
 				saleTmp.setAddPromo(requestItem.getAddPromo());
 				saleTmp.setAddPercent(addPercentage);

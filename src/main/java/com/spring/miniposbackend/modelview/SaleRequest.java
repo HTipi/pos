@@ -19,6 +19,6 @@ public class SaleRequest {
 	Double price = Double.valueOf(0);
 	List<SaleRequest> addOns;
 	List<Integer> addPromo = new ArrayList<Integer>();
-	String remark;
+	String remark = "";
 
 }

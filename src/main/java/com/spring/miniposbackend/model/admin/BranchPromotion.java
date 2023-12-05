@@ -36,15 +36,17 @@ public class BranchPromotion {
 	@Column(name = "code", nullable = false,length = 3)
     private String code;
 	
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
+	@Column(name = "name", nullable = true)
+    private String name;
+	
+	@Column(name = "name_kh", nullable = true)
+    private String nameKh;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "branch_id")
     @JsonIgnore
     private Branch branch;
 	
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false)
-    @JoinColumn(name = "promotion_id")
-    @JsonIgnore
-    private Promotion promotion;
 
 	@Column(name = "start_date", nullable = false)
 	private Date startDate;

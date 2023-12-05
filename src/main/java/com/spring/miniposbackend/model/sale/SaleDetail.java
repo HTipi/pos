@@ -273,13 +273,15 @@ public class SaleDetail extends AuditModel {
 	public List<ItemPromotion> getItemPromotion() {
 		List<ItemPromotion> items = new ArrayList<ItemPromotion>();
 		ItemPromotion pro = null;
+		if(saleDetailPromotions == null)
+			return items;
 		for (int i = 0; i < saleDetailPromotions.size(); i++) {
 			BranchPromotion itemPro = saleDetailPromotions.get(i).getBranchPromotion();
 			pro = new ItemPromotion();
 			pro.setBranchPromotionId(itemPro.getId());
 			pro.setPromotionCode(itemPro.getCode());
 			pro.setPromotionDiscount(itemPro.getDiscount());
-			pro.setPromotionName(itemPro.getPromotion().getName());
+			pro.setPromotionName(itemPro.getName());
 			items.add(pro);
 		}
 		return items;

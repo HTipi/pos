@@ -7,12 +7,15 @@ import org.springframework.transaction.annotation.Transactional;
 import com.spring.miniposbackend.exception.ResourceNotFoundException;
 import com.spring.miniposbackend.model.sale.Receipt;
 import com.spring.miniposbackend.repository.sale.ReceiptRepository;
+import com.spring.miniposbackend.util.UserProfileUtil;
 
 @Service
 public class ReceiptService {
 
 	@Autowired
 	private ReceiptRepository receiptRepository;
+	@Autowired
+	private UserProfileUtil userProfile;
 
 	public Receipt showByBranchId(Integer branchId) {
 		return receiptRepository.findFirstByBranchIdOrderByIdDesc(branchId)
@@ -35,11 +38,13 @@ public class ReceiptService {
 	}
 	
 	
-	@Transactional
-	public Long resetNumber(Integer branchId) {
-		return receiptRepository.findFirstByBranchIdOrderByIdDesc(branchId).map(receipt -> {
+
+	public Long resetNumber() {
+		return receiptRepository.findFirstByBranchIdOrderByIdDesc(userProfile.getProfile().getBranch().getId()).map(receipt -> {
 			receipt.setReceiptNumber(Long.valueOf(0));
+			receipt.setBillNumber(Long.valueOf(0));
 			return receiptRepository.save(receipt).getReceiptNumber();
 		}).orElseThrow(() -> new ResourceNotFoundException("Branch does not exist"));
 	}
+	
 }

@@ -19,11 +19,10 @@ public class ReceiptController {
 	@Autowired
 	private ReceiptService receiptService;
 	
-	@PatchMapping("{branchId}/reset")
+	@PatchMapping("reset")
 	@PreAuthorize("hasAnyRole('SALE')")
-	public SuccessResponse updateRemark(@PathVariable Integer branchId) {
-		return new SuccessResponse("00", "Patch remark", receiptService.resetNumber(branchId));
+	public SuccessResponse updateRemark() {
+		return new SuccessResponse("00", "Patch remark", receiptService.resetNumber());
 	}
 	
-
 }

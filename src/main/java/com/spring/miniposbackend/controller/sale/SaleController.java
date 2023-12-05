@@ -82,8 +82,8 @@ public class SaleController {
 	}
 	@GetMapping("sale-verify")
 	@PreAuthorize("hasAnyRole('SALE')")
-	public SuccessResponse getSaleQr(@RequestParam UUID qr) {
-		return new SuccessResponse("00", "verify qr payment", saleService.checkQrSale(qr));
+	public SuccessResponse getSaleQr(@RequestParam UUID qr,@RequestParam Optional<Integer> transactionTypeId) {
+		return new SuccessResponse("00", "verify qr payment", saleService.checkQrSale(qr,transactionTypeId));
 	}
 	@PatchMapping("reverse/{saleId}")
 	@PreAuthorize("hasAnyRole('SALE')")

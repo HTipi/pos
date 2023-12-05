@@ -630,12 +630,6 @@ public class SaleService {
 		return saleDetailsFinal;
 	}
 
-	public List<SaleDetail> checkQrSale(UUID qr) {
-		TransactionSale tranSale = transactionSaleRepository.findByQr(qr)
-				.orElseThrow(() -> new ResourceNotFoundException("Not Pay Yet", "02"));
-		return saleDetailRepository.findMainBySaleId(tranSale.getSaleId());
-	}
-
 	@Transactional
 	public Sale reverseSale(Long saleId) {
 		Sale sale = saleRepository.findById(saleId)

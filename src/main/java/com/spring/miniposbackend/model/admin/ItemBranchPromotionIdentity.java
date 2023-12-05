@@ -1,7 +1,6 @@
 package com.spring.miniposbackend.model.admin;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 import javax.persistence.Embeddable;
 import javax.persistence.JoinColumn;
@@ -28,28 +27,37 @@ public class ItemBranchPromotionIdentity implements Serializable{
 	@JoinColumn(name = "branch_promotion_id", nullable = false)
 	@JsonIgnore
 	private BranchPromotion branchPromotion;
+	
+//	@ManyToOne
+//	@JoinColumn(name = "item_type_id", nullable = true)
+//	@JsonIgnore
+//	private ItemType itemType;
 
+	
 	public ItemBranchPromotionIdentity() {
 		itemBranch = null;
 		branchPromotion = null;
+		//itemType = null;
 	}
 
 	public ItemBranchPromotionIdentity(ItemBranch itemBranch, BranchPromotion branchPromotion) {
 		this.itemBranch = itemBranch;
 		this.branchPromotion = branchPromotion;
+		//this.itemType = itemType;
 	}
 	
-	@Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof ItemBranchPromotionIdentity)) return false;
-        ItemBranchPromotionIdentity that = (ItemBranchPromotionIdentity) obj;
-        return Objects.equals(getItemBranch(), that.getItemBranch()) &&
-                Objects.equals(getBranchPromotion(), that.getBranchPromotion());
-    }
- 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getItemBranch(), getBranchPromotion());
-    }
+	
+//	@Override
+//    public boolean equals(Object obj) {
+//        if (this == obj) return true;
+//        if (!(obj instanceof ItemBranchPromotionIdentity)) return false;
+//        ItemBranchPromotionIdentity that = (ItemBranchPromotionIdentity) obj;
+//        return Objects.equals(getItemBranch(), that.getItemBranch()) &&
+//                Objects.equals(getBranchPromotion(), that.getBranchPromotion());
+//    }
+// 
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(getItemBranch(), getBranchPromotion());
+//    }
 }
